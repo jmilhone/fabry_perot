@@ -1,0 +1,11 @@
+To run main_mpdx_fp.pro you need these folders in your idl path
+
+
+Add these lines to your idlstartup.pro file which should be sourced in your .bash_profile (.bashrc probably works too).
+
+
+
+!PATH = !PATH + ':' + Expand_Path('+/data/proc')
+!PATH = !PATH + ':' + Expand_Path('+/data/procscripts')
+!PATH = !PATH + ':' + Expand_Path('+/home/MPDXdata/idl')
+!PATH = !PATH + ':' + Expand_Path('+/data/tatooine')
