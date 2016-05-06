@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import rawpy
+import scipy.optimize
 
 def synthetic_data(plotit=0):
 	
@@ -57,8 +58,9 @@ def real_data(plotit=0):
 		plt.show()
 
 	return (center,A)
-	
-def small_angle_sum(data,center,binsize=1):
+
+@profile	
+def small_angle_sum(data,center,binsize=1,plotit=0,printit=0):
 	
 	data=data/data.max() #Normalize the data to one
 	
@@ -108,7 +110,7 @@ def small_angle_sum(data,center,binsize=1):
 	
 	R=R.reshape((npts,))			#ok now we are going to flatten both R and data into 1d arrays
 	data=data.reshape((npts,))		#since the flatten is the same method and they were the same shape, they should still match
-	rarr_ix=np.argsort(R)			#this is a pretty slow line but we need to sort R from smallest to largest
+	rarr_ix=np.argsort(R,kind='mergesort')			#this is a pretty slow line but we need to sort R from smallest to largest
 	R=R[rarr_ix]
 	data=data[rarr_ix]
 	
@@ -122,14 +124,33 @@ def small_angle_sum(data,center,binsize=1):
 	sigarr,_=np.histogram(R,bins=np.concatenate((np.array([0.]),binarr)),weights=data)
 	
 	t2=time.time() 																#just to keep track of how fast this is
-	print 'Summed a ring in '+np.str(np.round((t2-t1)/0.001)*0.001)+' s'	
+	if printit:
+		print 'Summed a ring in '+np.str(np.round((t2-t1)/0.001)*0.001)+' s'	
 	
-	if 1:
+	if plotit:
 		plt.plot(binarr,sigarr,'b')
 		plt.show()
 	
 	return (binarr,sigarr)
+
+def center_minimize(center,data):
 	
-#(center,data)=real_data(plotit=1)
-(center,data)=synthetic_data()
+	x0=int(center[0])
+	y0=int(center[1])
+	
+	ym=np.sum(np.abs(data[y0::,:]-data[:-y0,:][::-1,:]))
+	
+	xm=np.sum(np.abs(data[:,x0::]-data[::,:-x0][:,::-1]))
+		
+	return xm+ym
+
+def find_center(data):
+	
+	(ny,nx)=data.shape
+	
+	(x0,y0)=(int(nx/2),int(ny/2))		#start with center of chip as a guess for the center
+	
+
+(center,data)=real_data()
+#(center,data)=synthetic_data()
 (binarr,sigarr)=small_angle_sum(data,center,binsize=0.1)
