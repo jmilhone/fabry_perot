@@ -273,10 +273,6 @@ shadyvarrelease = size(temporary(Luc))  ; a shady way to undefine a variable dur
 
 
 
-
-
-
-
 ;stop
 if n_elements(xcenter)  ne 0 then releasexcenter  = 0 else releasexcenter =  1  ; xcenter is set, dont release it in the for loop
 if n_elements(ycenter)  ne 0 then releaseycenter  = 0 else releaseycenter =  1  ; ycenter is set, dont release it in the for loop
@@ -295,8 +291,6 @@ for iexposures=0, nexposures-1 do begin
 endfor
 if n_elements(afp) eq 0 then goto, noshot  ; all the data were empty
 
-
-
 ;; temp stop test to look at effects of d.  This should be deleted. comparing thisafp.tiarr to afp.tiarr
 ;; it turns out duc~Luc~Ti^2 so 10% error in duc is a 20% error in Ti.  this sucks.
 ;thisafp=afp
@@ -311,7 +305,7 @@ for iafp=0, nafp-1 do begin
  afp[iafp].goodexposures = goodexposures
 endfor
 
-fprawwrite = writefprawmdsplus(afp, shotnum)
+;fprawwrite = writefprawmdsplus(afp, shotnum)
 
 
 ;stop
@@ -338,29 +332,29 @@ endfor
 if n_elements(mdstime) eq 1 then mdstime=[mdstime,0]     ; cant write a 1 D 1 element xarr for a signal, its OK to add a 0 in this case, it gets ignored in mdsload
 
 
-mdsconnect, '128.104.166.10'
-mdsopen, 'mpdx_proc', shotstr, status=stat
-;write the Ti to signal node in 'mpdx_proc:ti:fabry_perot' with tag 'ti_fabp'
-mdsloadsig, '\ti_fabp',       [Ti],        sigunits='eV' , xaxis=[mdstime], xunits='s'
-if shotnum ge 9684. then begin       ; only used in shots after the tree was changed 
- ;write Tisigma to signal node in 'mpdx_proc:ti:fabry_perot:fabry_per_sd' with tag 'ti_fabp_sd'
- mdsloadsig, '\ti_fabp_sd',   [Tisigma],   sigunits='eV' , xaxis=[mdstime], xunits='s'
- ;write vi a signal node in 'mpdx_proc:velocity:vi_fabp' with tag 'vi_fabp'
- mdsloadsig, '\vi_fabp',      [vi],        sigunits='m/s' , xaxis=[mdstime], xunits='s'
- ;write visigma to signal node in 'mpdx_proc:velocity:vi_fabp:vi_fabp_sd' with tag 'vi_fabp_sd'
- mdsloadsig, '\vi_fabp_sd',   [visigma],   sigunits='m/s' , xaxis=[mdstime], xunits='s'
- ;write Titext to text node in 'mpdx_proc:ti:fabry_perot:ti_fabp_note' with tag 'ti_fabp_note'
- mdsput,     '\ti_fabp_note',    '$',        Titext  
- ;write vitext to text node in 'mpdx_proc:velocity:vi_fabp:vi_fabp_note' with tag 'vi_fabp_note'
- mdsput,     '\vi_fabp_note',    '$',        vitext
-endif
-
-
-print, 'decide what else you want to save from afp for shot info'
-print, 'decide what else you want to save from calib save file for calib info, and where to write that info.  in fpcalib doesnt make sense?'
-
-mdsclose
-mdsdisconnect
+;mdsconnect, '128.104.166.10'
+;mdsopen, 'mpdx_proc', shotstr, status=stat
+;;write the Ti to signal node in 'mpdx_proc:ti:fabry_perot' with tag 'ti_fabp'
+;mdsloadsig, '\ti_fabp',       [Ti],        sigunits='eV' , xaxis=[mdstime], xunits='s'
+;if shotnum ge 9684. then begin       ; only used in shots after the tree was changed 
+; ;write Tisigma to signal node in 'mpdx_proc:ti:fabry_perot:fabry_per_sd' with tag 'ti_fabp_sd'
+; mdsloadsig, '\ti_fabp_sd',   [Tisigma],   sigunits='eV' , xaxis=[mdstime], xunits='s'
+; ;write vi a signal node in 'mpdx_proc:velocity:vi_fabp' with tag 'vi_fabp'
+; mdsloadsig, '\vi_fabp',      [vi],        sigunits='m/s' , xaxis=[mdstime], xunits='s'
+; ;write visigma to signal node in 'mpdx_proc:velocity:vi_fabp:vi_fabp_sd' with tag 'vi_fabp_sd'
+; mdsloadsig, '\vi_fabp_sd',   [visigma],   sigunits='m/s' , xaxis=[mdstime], xunits='s'
+; ;write Titext to text node in 'mpdx_proc:ti:fabry_perot:ti_fabp_note' with tag 'ti_fabp_note'
+; mdsput,     '\ti_fabp_note',    '$',        Titext  
+; ;write vitext to text node in 'mpdx_proc:velocity:vi_fabp:vi_fabp_note' with tag 'vi_fabp_note'
+; mdsput,     '\vi_fabp_note',    '$',        vitext
+;endif
+;
+;
+;print, 'decide what else you want to save from afp for shot info'
+;print, 'decide what else you want to save from calib save file for calib info, and where to write that info.  in fpcalib doesnt make sense?'
+;
+;mdsclose
+;mdsdisconnect
 
 
 

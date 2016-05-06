@@ -367,7 +367,12 @@ L:L, d:d, Finessearr:Finessearr, Finesse:Finesse, cpeakfits:cpeakfits, cpeakfits
 ;save, L, d, Luc, duc, Finessearr, Finesse, cpeakfits, cpeakfitssigma, clambdalocarr, clambdalocarrsigma, clambdaFWHMarr, clambdaFWHMarrsigma, cxcenter, cycenter, clambdaarr, csignalarr, clambda, lampdoppler, cversion, filename=calibfile+'_Calib.sav'
  fpcalibstruct = {cxcenter:cxcenter, cycenter:cycenter, duc:duc, Luc:Luc, clambda:clambda, deltalambda:deltalambda, cndl:cndl, tlamp:tlamp, lampmu:lampmu, cstartfit:cstartfit, cendfit:cendfit, csumdeltalambda:csumdeltalambda, csndl:csndl, $ ;from call rountine
 L:L, d:d, Finessearr:Finessearr, Finesse:Finesse, cpeakfits:cpeakfits, cpeakfitssigma:cpeakfitssigma, clambdalocarr:clambdalocarr, clambdalocarrsigma:clambdalocarrsigma, clambdaFWHMarr:clambdaFWHMarr, clambdaFWHMarrsigma:clambdaFWHMarrsigma, clambdaarr:clambdaarr, csignalarr:csignalarr, lampdoppler:lampdoppler, cversion:cversion} ;from calib savefile 27
- fpcalibwrite = writecalibmdsplus(fpcalibstruct, calib_id)
+
+;;;;;turned off saving calib to mdsplus here;;;;;;
+
+; fpcalibwrite = writecalibmdsplus(fpcalibstruct, calib_id)
+
+
 endif     ; end case of single line calibration
 
 

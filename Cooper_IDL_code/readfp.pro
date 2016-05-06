@@ -138,7 +138,6 @@ endif
 nobackground:
 if n_elements(backgroundfile) eq 0 then backgroundfile=''
 
-
 ;stop
 t5=systime(1)
 ;cctime; 7.0 seconds, delta = 3.5
@@ -189,7 +188,7 @@ if plotit eq 1 then begin
  ;write_png, 'ring_radii.png', tvrd(true=1)
 endif
 
-
+;stop
 
 
 ;make more pretty pictures of the fingsum
@@ -283,6 +282,7 @@ for ipeaks=0, npeaks-1 do begin
  minrarr[ipeaks] = 0.99 * sqrt((2*(d*1E6)*L/(marr[ipeaks]*max(lambdaarrg)))^2 - L^2) ; in pixels, this is the r that corresponds to largest lambda with a buffer
 endfor
 
+print,marr
 ;stop
 nfits=npeaks-1 
 ;The SPLIT_FOR iteration variable is 'i' by default
@@ -305,6 +305,8 @@ split_for, 0,  npeaks, silent=0, commands=[ $               ; have to play games
  ,varnames=['redata','rexcenter','reycenter','bsarr','L','roarr','refrarr','maxrarr','minrarr','marr','lambda','ndl','d'] $ 
  ,outvar=['tlambdaarr','tsignalarr']  $ ;output variable - will appear in scope that called SPLIT_FOR
  ,ctvariable_name='ipeaks' 
+
+;stop
 
 for ipeaks=0, npeaks-1 do begin       ;build the arrays from the pieces
  lambdaarr[*,ipeaks]=scope_varfetch('tlambdaarr'+strcompress(ipeaks, /remove_all), level=0)
@@ -388,6 +390,7 @@ aaasubt2 = MPFITFUN('gaussfitfun', lambdaarr[subtstart2:subtend2,ipeaks], signal
    wset,1
    plot, lambdaarr[*,ipeaks], signalarr[*,ipeaks], color=0, background=255
    oplot, lambdaarr[*,ipeaks], *!machbroadening/max(*!machbroadening)*max(signalarr[*,ipeaks]), color=69
+   ;print,"this is where you save individual orders for checking fits"
    ;write_png, 'FP_shot.png', tvrd(/true)
    ;stop
   endif
@@ -409,8 +412,14 @@ aaasubt2 = MPFITFUN('gaussfitfun', lambdaarr[subtstart2:subtend2,ipeaks], signal
   tcfmpfitguess = MPFITFUN('he4686tivoigtfitfun', lambdaarr[*,ipeaks], signalarr[*,ipeaks], sqrt(abs(signalarr[*,ipeaks])), amp, PARINFO=piguess, maxiter=100, perror=amperror, yfit=tcfmpguess, bestnorm=chisq, /quiet)
   ;do real fit with guess from the fixed line ratio fit
   tcfmpfit = MPFITFUN('he4686tivoigtfitfun', lambdaarr[*,ipeaks], signalarr[*,ipeaks], sqrt(abs(signalarr[*,ipeaks])), tcfmpfitguess, PARINFO=pi, maxiter=100, perror=amperror, yfit=tcfmp, bestnorm=chisq, /quiet)
+  print,tcfmpfit
   if n_elements(tcfmpfit) ne npeakfitparams then tcfmpfit = dblarr (npeakfitparams)                  ; there was a bad fit, returned NaN or something, just give zeros
   if plotit eq 1 then oplot, lambdaarr[*,ipeaks], tcfmp, color=254     ; mpfit output
+  if plotit eq 1 then begin
+  ;   print,"this is where you save individual orders for checking fits"
+ ;    write_png, 'FP_shot.png', tvrd(/true)
+;     stop
+  endif
  endif
  
  
