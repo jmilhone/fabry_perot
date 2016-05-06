@@ -19,7 +19,7 @@ xguess=xguessin  ; dummy variables
 yguess=yguessin  ; dummy variables
 
 
-
+;THIS IS THE FIRST PLOT THAT SHOWS UP IN MAIN_MPDX_FP EXECUTION
 if shadeit eq 1 then begin
  loadct,1
  window, 0, xsize=450, ysize=300, xpos=50, ypos=150
