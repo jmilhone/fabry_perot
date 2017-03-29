@@ -8,7 +8,7 @@ shot_number = 15676
 fname = join(folder, "{0:07d}_000.nef".format(shot_number))
 bg_fname = join(folder, "{0:07d}_001.nef".format(shot_number))
 print "getting image"
-data = get_image_data(fname, bg_fname)
+data = get_image_data(fname, bg_fname, color='b')
 print "done"
 
 ny, nx = data.shape
@@ -89,30 +89,30 @@ plt.plot(sarr, RL, 'og', ms=1)
 # # ufit = np.polyfit(uB, j, )
 plt.show(block=False)
 
-# fig, ax = plt.subplots()
-# ax.imshow(ULdata, cmap='gray')
-# ax.set_aspect(1.0)
-# plt.plot(x0, y0, '.r', ms=1)
-# plt.show(block=False)
+fig, ax = plt.subplots()
+ax.imshow(ULdata, cmap='gray')
+ax.set_aspect(1.0)
+plt.plot(x0, y0, '.r', ms=1)
+plt.show(block=False)
 # #
-# fig, ax = plt.subplots()
-# ax.plot(binarr, ULsigarr, label='UL', lw=1)
-# ax.plot(binarr, URsigarr, label='UR', lw=1)
-# ax.plot(binarr, BLsigarr, label='BL', lw=1)
-# ax.plot(binarr, BRsigarr, label='BR', lw=1)
-# plt.legend(loc='upper left')
+fig, ax = plt.subplots()
+ax.plot(binarr, ULsigarr, label='UL', lw=1)
+ax.plot(binarr, URsigarr, label='UR', lw=1)
+ax.plot(binarr, BLsigarr, label='BL', lw=1)
+ax.plot(binarr, BRsigarr, label='BR', lw=1)
+plt.legend(loc='upper left')
 
 
-# fig, ax = plt.subplots(2,2)
-# ax[0][0].imshow(ULdata)
-# ax[0][1].imshow(URdata)
-# ax[1][0].imshow(BLdata)
-# ax[1][1].imshow(BRdata)
+fig, ax = plt.subplots(2,2)
+ax[0][0].imshow(ULdata)
+ax[0][1].imshow(URdata)
+ax[1][0].imshow(BLdata)
+ax[1][1].imshow(BRdata)
 
 
-# for axis in ax:
-#     for a in axis:
-#         a.set_aspect(1.0)
+for axis in ax:
+    for a in axis:
+        a.set_aspect(1.0)
 plt.show()
 
 
