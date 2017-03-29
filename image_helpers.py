@@ -4,9 +4,19 @@ import matplotlib.pyplot as plt
 
 
 def read_image(filename):
-    image = rawpy.imread(filename).postprocess(output_bps=16,
-                                               no_auto_bright=True,
+    image = rawpy.imread(filename).postprocess(#output_color=rawpy.ColorSpace.raw,
+                                               gamma=(1, 1),# use_camera_wb=False,
+                                               output_bps=16,
+                                               #user_wb=[1.0, 1.0,1.0, 1.0],
+                                               no_auto_bright=True,# bright=1.0,
+                                               #demosaic_algorithm=rawpy.DemosaicAlgorithm.LINEAR,
                                                adjust_maximum_thr=0.)
+        # output_bps=16,
+        #                                        no_auto_bright=True,
+        #                                        adjust_maximum_thr=0.,
+        #                                        output_color=rawpy.ColorSpace.raw,
+        #                                        demosaic_algorithm=rawpy.DemosaicAlgorithm.LINEAR)
+        #                                        # highlight_mode=rawpy.HighlightMode.Ignore)
     return image[:, :, 2].astype('float64')
 
 
