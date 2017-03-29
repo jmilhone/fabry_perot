@@ -46,7 +46,7 @@ def real_data(plotit=0):
     # no_auto_bright=True turns off the auto-scaling of the image that makes the maximum pixel=2^16-1. This needs to
     # be set to True when doing background subtraction. adjust_maximum_thr=0. turns off some other weird normalization thing.
 
-    rgb = rawpy.imread('Images/0014700_000.nef').postprocess(output_bps=16, no_auto_bright=True, adjust_maximum_thr=0.)
+    rgb = rawpy.imread('Images/0015676_000.nef').postprocess(output_bps=16, no_auto_bright=True, adjust_maximum_thr=0.)
 
     center = (3066.33, 2031.42)  # center for 0014700_000.nef is (3066.33,2031.42) according to Cooper
 
@@ -62,7 +62,6 @@ def real_data(plotit=0):
     return (center, A)
 
 
-@profile
 def small_angle_sum(data, center, binsize=1, plotit=0, printit=0):
     data = data / data.max()  # Normalize the data to one
 
@@ -158,6 +157,6 @@ def find_center(data):
     (x0, y0) = (int(nx / 2), int(ny / 2))  # start with center of chip as a guess for the center
 
 
-(center, data) = real_data()
+(center, data) = real_data(plotit=True)
 # (center,data)=synthetic_data()
-(binarr, sigarr) = small_angle_sum(data, center, binsize=0.1)
+(binarr, sigarr) = small_angle_sum(data, center, binsize=0.1, plotit=True)
