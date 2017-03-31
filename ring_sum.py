@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from image_helpers import get_image_data
 from os.path import join
-
+import fitting
 
 def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
 
@@ -63,6 +63,7 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
 
 
 def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
+    print "Center finding:"
     for ii in range(maxiter):
         binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = quick_ringsum(data, xguess, yguess, binsize=binsize)
 
@@ -136,31 +137,25 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
 if __name__ == "__main__":
     binsize = 0.1
     folder = "Images"
+    # Normal Ar plasma shot
     # shot_number = 15676
     # fname = join(folder, "{0:07d}_000.nef".format(shot_number))
     # bg_fname = join(folder, "{0:07d}_001.nef".format(shot_number))
+
+    # Thorium Calibration with Ar 488 nm filter
     fname = join(folder, "thorium_ar_5_min_1.nef")
     bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
     data = get_image_data(fname, bg_fname, color='b')
 
     ny, nx = data.shape
-    x0 = nx/2.
-    y0 = ny/2.
-    x0, y0 = locate_center(data, x0, y0, plotit=True)
-    binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = quick_ringsum(data, x0, y0, binsize=binsize)
-    fig, ax = plt.subplots()
-    ax.plot(binarr, ULsigarr, label='UL', lw=1)
-    ax.plot(binarr, URsigarr, label='UR', lw=1)
-    ax.plot(binarr, BLsigarr, label='BL', lw=1)
-    ax.plot(binarr, BRsigarr, label='BR', lw=1)
-    plt.legend(loc='upper left')
-    plt.show(block=False)
+    # No initial guess
+    # x0 = nx/2.
+    # y0 = ny/2.
+    # Very close guess to calibration center
+    x0, y0 = (3069.688, 2032.854)
 
-    fig, ax = plt.subplots()
-    i = ax.imshow(data, cmap='gray', origin="lower")
-    fig.colorbar(i)
-    ax.plot([0, data.shape[1]], [y0] * 2, 'b')
-    ax.plot([x0] * 2, [0, data.shape[0]], 'r')
-    ax.set_aspect(1.0)
-    plt.show()
+    x0, y0 = locate_center(data, x0, y0, plotit=False)
+    binarr, sigarr = quick_ringsum(data, x0, y0, binsize=binsize, quadrants=False)
+
+    peaks = fitting.peak_and_fit(binarr, sigarr, thres=0.55, plotit=True)
 
