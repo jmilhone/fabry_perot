@@ -136,9 +136,11 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
 if __name__ == "__main__":
     binsize = 0.1
     folder = "Images"
-    shot_number = 15676
-    fname = join(folder, "{0:07d}_000.nef".format(shot_number))
-    bg_fname = join(folder, "{0:07d}_001.nef".format(shot_number))
+    # shot_number = 15676
+    # fname = join(folder, "{0:07d}_000.nef".format(shot_number))
+    # bg_fname = join(folder, "{0:07d}_001.nef".format(shot_number))
+    fname = join(folder, "thorium_ar_5_min_1.nef")
+    bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
     data = get_image_data(fname, bg_fname, color='b')
 
     ny, nx = data.shape
