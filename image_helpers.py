@@ -182,7 +182,6 @@ def quick_plot(image, color=None, block=False):
             im.append(axs[i].imshow(a[:, :, i], cmap='gray', origin='lower', vmin=a.min(), vmax=a.max()))
             axs[i].set_aspect('equal')
             axs[i].set_title(names[i])
-        divider = make_axes_locatable(axs[1])
         f.colorbar(im[2], ax=np.transpose(axs).ravel().tolist(), orientation='horizontal', extend='both', aspect=50, fraction=0.06)
         plt.show(block=block)
     else:
@@ -202,5 +201,5 @@ if __name__ == "__main__":
     fname = join(folder, "{0:07d}_000.nef".format(shot_number))
     bg_fname = join(folder, "{0:07d}_001.nef".format(shot_number))
     #fp_data = get_image_data(fname, bg_fname, color='b')
-    fp_data = read_image(fname, color='b')
+    fp_data = read_image(fname, color=None)
     quick_plot(fp_data, block=True)
