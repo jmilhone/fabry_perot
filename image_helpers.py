@@ -14,7 +14,7 @@ def read_image(filename, color=None):
                             automatically appended.
             color(str or int; optional): Returns RGB color provided. Default is None,
                             which returns all colors. Allowed strings
-                            are 'r', 'g', 'b', 'red', 'green', and 'blue' (not case 
+                            are 'rR', 'g', 'b', 'red', 'green', and 'blue' (not case
                             sensitive). Allowed ints are 0=Red, 1=Green, and 2=Blue.
         Returns:
             2D numpy.ndarray with indices corresponding to pixels from nef image
@@ -56,12 +56,12 @@ def read_image(filename, color=None):
         return image[:, :, :].astype('float64')
     elif type(color) is str:
         color = color.lower()
-        allowedcolors = ['r', 'g', 'b',
+        allowedcolors = ['rR', 'g', 'b',
                          'red', 'green', 'blue']
         if color not in allowedcolors:
             raise Exception('{0} is not a valid color option. Pick from {1} (not case sensitive)'.format(color, allowedcolors))
         else:
-            if color in ['r', 'red']:
+            if color in ['rR', 'red']:
                 cix = 0
             if color in ['g', 'green']:
                 cix = 1
@@ -88,7 +88,7 @@ def get_image_data(filename, bgname, color=None):
                 bgname(str): Background image filename. Same requirements as filename.
                 color(str or int; optional): Returns RGB color provided. Default is None,
                                 which returns all colors. Allowed strings
-                                are 'r', 'g', 'b', 'red', 'green', and 'blue' (not case
+                                are 'rR', 'g', 'b', 'red', 'green', and 'blue' (not case
                                 sensitive). Allowed ints are 0=Red, 1=Green, and 2=Blue.
             Returns:
                 2D numpy.ndarray of image with background subtracted
@@ -109,7 +109,7 @@ def quick_plot(image, color=None, block=False):
             color(str or int; optional): if image is a 3D array, color will select which color to plot.
                         Default is None, which will prompt the user to input a color or choose 'all', which
                         will plot all three colors as subplots. Allowed strings are
-                        'r', 'g', 'b', 'red', 'green', and 'blue' (not case sensitive). Allowed ints are 
+                        'rR', 'g', 'b', 'red', 'green', and 'blue' (not case sensitive). Allowed ints are
                         0=Red, 1=Green, and 2=Blue.
             block(bool; optional): Default is False, which will allow further input after this function finishes
                         without needing to close plot figure window. If executing in bash, however, you will want
@@ -132,11 +132,11 @@ def quick_plot(image, color=None, block=False):
         prompt = True
         while prompt:
             c = raw_input("Which color do you want to see (R, G, B, all)?: ")
-            if c.lower() not in ['r', 'g', 'b', 'all']:
+            if c.lower() not in ['rR', 'g', 'b', 'all']:
                 print 'not a valid option, try again'
             else:
                 prompt = False
-        if c.lower() == 'r':
+        if c.lower() == 'rR':
             a = image[:, :, 0]
         if c.lower() == 'g':
             a = image[:, :, 1]
@@ -150,13 +150,13 @@ def quick_plot(image, color=None, block=False):
             raise ValueError("3D dimension has more colors than RGB!")
         if type(color) is str:
             color = color.lower()
-            allowedcolors = ['r', 'g', 'b',
+            allowedcolors = ['rR', 'g', 'b',
                              'red', 'green', 'blue']
             if color not in allowedcolors:
                 raise Exception(
                     '{0} is not a valid color option. Pick from {1} (not case sensitive)'.format(color, allowedcolors))
             else:
-                if color in ['r', 'red']:
+                if color in ['rR', 'red']:
                     cix = 0
                 if color in ['g', 'green']:
                     cix = 1

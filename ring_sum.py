@@ -6,6 +6,18 @@ import fitting
 import time
 import multiprocessing as mp
 
+def proper_ringsum(data,rpeak, r0, maxr, minr, L):
+    # ny, nx = data.shape
+    # x = np.arange(1, nx+1, 1)
+    # y = np.arange(1, ny+1, 1)
+    #
+    # xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+    # R = np.sqrt(xx**2 + yy**2)
+
+
+
+    return None
+
 
 def _histogram(bins, R, weights, out=None, label=None):
 
@@ -37,13 +49,13 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
                              dtype='float64')
 
     """This is Cooper's way of building the bins"""
-    # r = 0
+    # rR = 0
     # r_arr = []
     # delta_r = [np.sqrt(2*binsize*ri + binsize**2)]
-    # while r < ri:
-    #     print r
-        # r += delta_r[-1]
-        # r_arr += [r]
+    # while rR < ri:
+    #     print rR
+        # rR += delta_r[-1]
+        # r_arr += [rR]
         # delta_r += [np.sqrt(r_arr[-1]**2 + 2*binsize*ri + binsize**2) - r_arr[-1]]
     # binarr = np.array(r_arr)
 
@@ -102,7 +114,7 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
         # BRsigarr, _ = np.histogram(RBR, bins=np.concatenate((np.array([0.]), binarr)), weights=BRdata)
         #
         # plt.plot(binarr, ULsigarr, 'b')
-        # plt.plot(binarr, sigs['UL'], 'r')
+        # plt.plot(binarr, sigs['UL'], 'rR')
         # plt.show()
 
         # fig, ax = plt.subplots(2)
@@ -185,7 +197,7 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         print "{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii)
         # if plotit:
         #     fig, ax = plt.subplots()
-        #     ax.plot(sarr, UB, 'r', lw=1, label='UD')
+        #     ax.plot(sarr, UB, 'rR', lw=1, label='UD')
         #     ax.plot(sarr, RL, 'b', lw=1, label='RL')
         #     ax.legend()
         #     plt.show()
