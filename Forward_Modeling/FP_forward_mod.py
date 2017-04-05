@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import convolve
 
 class InputSpec(object):
     def __init__(self, temp=1., vel=0., wavelength=488.):
@@ -38,33 +39,41 @@ class InputSpec(object):
             return spec
 
 class CCD(object):
-    def __init__(self, size=15.6, npx=4096, f=150., binsize=0.1):
+    def __init__(self, size=15.6, npx=4096, f=150., binsize=0.001):
         self.size = size
         self.npx = npx
         self.f = f
         self.binsize = binsize
         self.calc_r_arr()
     def calc_r_arr(self):
-        self.r_arr = np.arange(0.0, self.size, self.binsize)
+        self.r_arr = np.arange(0.0, self.size/2., self.binsize)
         self.cosTh = self.f / np.sqrt(self.f**2 + self.r_arr**2)
 
 
-# class FP(InputSpec, CCD):
-#     def __init__(self, temp=1., vel=0., wavelength=488., size=15.6, npx=4096, f=150., binsize=0.1, d=0.88, F=20.):
-#         InputSpec.__init__(self, temp=temp, vel=vel, wavelength=wavelength)
-#         CCD.__init__(self, size=size, npx=npx, f=f, binsize=binsize)
-#         self.d = d  #mm
-#         self.F = F  #finesse
-#         self.Q = (2. / np.pi) * self.F ** 2  # quality factor
-#         self.InputSpec = InputSpec()
-#         self.lam0 = self.InputSpec.lam0
-#         self.calc_m0()
-#         self.spec = self.eval(self.lam)
-#
-#     def calc_m0(self):
-#         self.m_max = 2. * self.d/self.lam0 * 1.e6   # 2d/lambda, 1.e6 is bc d(mm) and lambda(nm)
-#         self.m_arr = self.m_max * self.cosTh
-#         self.lam = 2. * self.d/self.m_arr * 1.e6
-#
-#     def calc_airy(self):
-#         self.airy = (1. + self.Q * np.sin(np.pi * ()))
+class FP(InputSpec, CCD):
+    def __init__(self, temp=1., vel=0., wavelength=488., size=15.6, npx=4096, f=150., binsize=0.001, d=0.88, F=20.):
+        InputSpec.__init__(self, temp=temp, vel=vel, wavelength=wavelength)
+        CCD.__init__(self, size=size, npx=npx, f=f, binsize=binsize)
+        self.d = d  #mm
+        self.F = F  #finesse
+        self.Q = (2. / np.pi) * self.F ** 2  # quality factor
+        self.calc_m0()
+        self.spec = self.eval(self.lam)
+        self.airy = (1. + self.Q * np.sin(np.pi * self.m_arr)**2.)**(-1.)
+
+    def calc_m0(self):
+        self.m_max = 2. * self.d/self.lam0 * 1.e6   # 2d/lambda, 1.e6 is bc d(mm) and lambda(nm)
+        self.m_arr = self.m_max * self.cosTh
+        self.lam = 2. * self.d/self.m_arr * 1.e6
+
+    def plot(self):
+        f, ax = plt.subplots(2,1)
+        ax[0].plot(self.r_arr, self.airy)
+        ax[0].set_title('FP Instrument Function')
+        ax[1].plot(self.lam, self.spec)
+        ax[1].set_title('Input Spec')
+        plt.show()
+
+if __name__ == "__main__":
+    a = FP()
+    a.plot()
