@@ -9,11 +9,13 @@ def gaussian(x, amp, shift, width):
 
 
 def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
-    print "Locating Peaks:"
+#     print "Locating Peaks:"
     smooth_points = kwargs.get("smooth_points", 20)
     thres_val = thres*np.max(data)
     up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points)
-    npeaks = len(up)
+    npeaks = min(len(up), len(down))
+    if npeaks == 0:
+        return []
     fits = []
     peaks = []
     for i in range(npeaks):
@@ -26,7 +28,7 @@ def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
         fits += [fit]
         peaks += [fit[1]]
 
-    print "Peak locations: ", peaks
+    # print "Peak locations: ", peaks
 
     if plotit:
         fig, ax = plt.subplots()
@@ -48,7 +50,14 @@ def find_peaks(x, data, maxval, smooth_points=20):
     up = np.where(np.logical_and(parse[1::] == 1.0, parse[0:-1] == 0.0))[0]
     down = np.where(np.logical_and(parse[1::] == 0.0, parse[0:-1] == 1.0))[0]
 
-    assert len(up) == len(down), "Uh oh...Double check the peak finding"
+    # assert len(up) == len(down), "Uh oh...Double check the peak finding"
+    # if len(up) != len(down):
+    #     plt.plot(x, data)
+    #     for i in up:
+    #         plt.plot(x[i], data[i], 'o')
+    #     for i in down:
+    #         plt.plot(x[i], data[i], 'o')
+    #     plt.show()
     return up, down
 
 

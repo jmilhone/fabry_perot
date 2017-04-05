@@ -6,7 +6,34 @@ import fitting
 import time
 import multiprocessing as mp
 
-def proper_ringsum(data,rpeak, r0, maxr, minr, L):
+
+def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda):
+    ringsum = []
+    for idx, peak in enumerate(peaks):
+        mm = m - idx
+        rmin = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_max)) ** 2 - L ** 2)
+        rmax = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_min)) ** 2 - L ** 2)
+        inds = np.where(np.logical_and(R > rmin, R < rmax))[0]
+
+        r0 = 2.*d*1.e6*L / mm / delta_lambda
+        dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rmin ** 2) - 1. / r0)) ** 2 - L ** 2) - rmin
+        rR = [rmin, rmin + dr]
+        j = 0
+        while len(rR) <= 512: #rR[-1] <= rmax:
+            j += 1
+            dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rR[-1] ** 2) - 1. / r0)) ** 2 - L ** 2) - rR[-1]
+            # print j, dr, rR[-1], rmax
+            rR += [rR[-1] + dr]
+        # print idx
+        # print len(rR)
+        # print rmin, rR[0]
+        # print rmax, rR[-1], "\n"
+
+        sig, _ = np.histogram(R[inds], bins=rR, weights=weights[inds])
+        # to correspond to my calibration wavelength array, sig is actually backwards...
+        sig = sig[::-1]
+        ringsum += [sig]
+    return ringsum
     # ny, nx = data.shape
     # x = np.arange(1, nx+1, 1)
     # y = np.arange(1, ny+1, 1)
@@ -235,6 +262,8 @@ if __name__ == "__main__":
     t1 = time.time()
     print t1-t0
     binarr, sigarr = quick_ringsum(data, x0, y0, binsize=binsize, quadrants=False)
+    plt.plot(binarr, sigarr)
+    plt.show()
     print time.time()-t1
     # plt.plot(binarr, sigarr)
     # plt.show()
