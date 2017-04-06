@@ -26,16 +26,9 @@ class InputSpec(object):
         ax.legend(loc='best')
         plt.show()
 
-    def eval(self, lam=None):
-        return_both = False
-        if lam is None:
-            lam = np.linspace(self.lam0 - 5. * self.FWHM, self.lam0 + 5. * self.FWHM, 1000)
-            return_both = True
+    def eval_spec(self, lam):
         spec = (2. * np.pi) ** (-2) * (self.sig) ** (-1) * np.exp(-0.5 * ((lam - self.lam0) / self.sig) ** 2)
-        if return_both:
-            return spec, lam
-        else:
-            return spec
+        return spec
 
 class CCD(object):
     def __init__(self, size=15.6, npx=4096, f=150., binsize=0.1):
