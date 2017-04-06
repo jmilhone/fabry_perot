@@ -14,14 +14,36 @@ global_L_limits = (37000, 38000)
 global_d_limits = (.87, .89)
 
 
-def minimize_shift_for_d_L(a, R, weights, m, npeaks, c_lambda, lambda_arr, lambda_min, lambda_max, delta_lambda):
+def minimize_shift_for_d_L(a, radius, weights, m, npks, w,
+                           warr, wmin, wmax, dw):
+    """
+    Calculates chi squared based on residual of wavelength peaks compared to
+    the central wavelength w.  It is varying d (the etalon spacing) and L (the
+    camera focal length) to get all of the peaks (npks of them) to line up as
+    close as they can to the central wavelength w.
+
+    Args:
+        a (list): first element is transformed L, second is transformed d
+        radius (np.array): flattened array matrix from camera
+        weights (np.array): flattened pixel value matrix from camera
+        m (float): highest order number (not an integer value)
+        npks (int): number of peaks to use starting at order m
+        w (float): central wavelength (in nm)
+        warr (np.array): wavelength array centered on w
+        wmin (float): minimum wavelength in array
+        wmax (float): maximum wavelength in array
+        dw (float): delta wavelength spacing
+
+    Returns:
+        chi squared based on residual of wavelength peaks compared to central wavelength w
+    """
     L = a[0] * (global_L_limits[1]-global_L_limits[0]) + global_L_limits[0]
     d = a[1] * (global_d_limits[1]-global_d_limits[0]) + global_d_limits[0]
-    # print L, d
-    ringsum = rs.proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda)
+
+    ringsum = rs.proper_ringsum(radius, weights, m, L, d, peaks, wmin, wmax, dw)
     lambda_peaks = []
-    for idx in range(npeaks):
-        temp = fitting.peak_and_fit(lambda_arr, ringsum[idx], thres=0.65)
+    for idx in range(npks):
+        temp = fitting.peak_and_fit(warr, ringsum[idx], thres=0.65)
         if len(temp) > 0.0:
             lambda_peaks += [temp[0]]
         else:
@@ -30,37 +52,64 @@ def minimize_shift_for_d_L(a, R, weights, m, npeaks, c_lambda, lambda_arr, lambd
     # print lambda_peaks
     chisq = 0.0
     for peak in lambda_peaks:
-        chisq += (c_lambda - peak)**2 / .0001**2  # binsize is 0.0001 nm
+        chisq += (w - peak) ** 2 / .0001 ** 2  # binsize is 0.0001 nm
     # print chisq
     return chisq
 
 
 def find_d_L(Luc, duc, radius, weights, m, npks, w, warr, wmin, wmax, dw):
+    """
+    Calculated L and d from the optimization process for lining up wavelength peaks
+    with the central wavelength w
 
+    Args:
+        Luc (float): uncalibrated camera focal length (in pixels)
+        duc (float): uncalibrated etalon spacing
+        radius (np.array): flattened array matrix from camera
+        weights (np.array): flattened pixel value matrix from camera
+        m (float): highest order number (not an integer value)
+        npks (int): number of peaks to use starting at order m
+        w (float): central wavelength (in nm)
+        warr (np.array): wavelength array centered on w
+        wmin (np.array): minimum wavelength in array
+        wmax (np.array): maximum wavelength in array
+        dw (float): delta wavelength spacing
+
+    Returns:
+        L (float): camera focal length
+        d (float): etalon spacing
+    """
     Ly = (Luc - global_L_limits[0]) / (global_L_limits[1] - global_L_limits[0])
     dy = (duc - global_d_limits[0]) / (global_d_limits[1] - global_d_limits[0])
     opt = fmin(minimize_shift_for_d_L, x0=[Ly, dy],
                args=(radius, weights, m, npks, w, warr, wmin,
                      wmax, dw))
 
-    Luc = opt[0] * (global_L_limits[1] - global_L_limits[0]) + global_L_limits[0]
-    duc = opt[1] * (global_d_limits[1] - global_d_limits[0]) + global_d_limits[0]
+    Lopt = opt[0] * (global_L_limits[1] - global_L_limits[0]) + global_L_limits[0]
+    dopt = opt[1] * (global_d_limits[1] - global_d_limits[0]) + global_d_limits[0]
 
-    return Luc, duc
+    return Lopt, dopt
 
 
-def find_initial_Lguess(r1, r2, wavelength, d):
-    f = lambda x: np.abs(2.*d*1.e6*x/wavelength * (1./np.sqrt(x**2 + r2**2) - 1./np.sqrt(x**2+r1**2)) + 1.0)
-    # (d in mm)*1.e6 = d in nm
+def find_initial_Lguess(radius1, radius2, wavelength, d):
+    """
+    Finds an initial guess for the camera focal length from the first 2 orders
+
+    Args:
+        radius1 (float): location of first peak in pixels
+        radius2 (float): location of second peak in pixels
+        wavelength (float): central wavelength in nm
+        d (float): etalon spacing in mm
+
+    Returns:
+        L (float): estimate of the camera focal length
+    """
+    f = lambda x: np.abs(2. * d * 1.e6 * x / wavelength *
+                         (1. / np.sqrt(x ** 2 + radius2 ** 2) -
+                          1. / np.sqrt(x ** 2 + radius1 ** 2)) + 1.0)
 
     opt = minimize_scalar(f, bounds=(1e4, 1e6), method='bounded')
 
-    # L = np.logspace(4, 6, 10000)
-    # plt.plot(L, f(L))
-    # plt.xlim(10000, 50000)
-    # plt.show()
-    # print opt
-    # print opt.x
     return opt.x
 
 if __name__ == "__main__":
@@ -72,9 +121,11 @@ if __name__ == "__main__":
 
     #Very close guess for center
     # x0, y0 = (3069., 2032.)
+    # Not very close guess
+    x0, y0 = (3067., 2035.)
     # REALLY close
-    x0, y0 = (3069.68678585, 2032.85668627)
-    x0, y0 = rs.locate_center(data, x0, y0, binsize=binsize, plotit=False)
+    # x0, y0 = (3069.68678585, 2032.85668627)
+    x0, y0 = rs.locate_center(data, x0, y0, binsize=binsize, plotit=True)
     #
     # x0, y0 = (3068.39, 2031.85)  # Cooper's center
 
@@ -141,73 +192,4 @@ if __name__ == "__main__":
     ax.set_ylabel("Counts", fontsize=20)
     plt.show()
 
-    # ringsums = rs.proper_ringsum(R, data, m1, L, d, peaks, lambda_min, lambda_max, delta_lambda)
-    # old_peaks = []
-    # for i in range(npeaks):
-    #     old_peaks += fitting.peak_and_fit(c_lambda_arr, ringsums[i])
-    # # find_d_L([L, d], R, data, m1, peaks, c_lambda, c_lambda_arr, lambda_min, lambda_max,
-    # #          delta_lambda)
-    # Ly = (L-global_L_limits[0]) / (global_L_limits[1]-global_L_limits[0])
-    # dy = (d-global_d_limits[0]) / (global_d_limits[1]-global_d_limits[0])
-    # t0 = time.time()
-    # opt = fmin(minimize_shift_for_d_L, x0=[Ly, dy],
-    #            args=(R, data, m1, peaks, c_lambda, c_lambda_arr, lambda_min,
-    #                  lambda_max, delta_lambda))
-    # print time.time()-t0
-
-    # fig, ax = plt.subplots()
-    # for idx, peak in enumerate(peaks):
-    #     plt.plot(c_lambda_arr, ringsums[idx], label='{0:f}'.format(m1))
-    # ax.legend()
-    # ax.set_title("Inital L, d ringsum")
-    # plt.show(block=False)
-
-    # print "Intial", L, d, m1
-    # L = opt[0] * (global_L_limits[1]-global_L_limits[0]) + global_L_limits[0]
-    # d = opt[1] * (global_d_limits[1]-global_d_limits[0]) + global_d_limits[0]
-    # m1 = 2 * d * 1.e6 * L / np.sqrt(L**2 + r1**2) / c_lambda
-
-    # ringsums_final = rs.proper_ringsum(R, data, m1, L, d, peaks, lambda_min, lambda_max, delta_lambda)
-    # peaks = []
-    # for i in range(npeaks):
-    #     peaks += fitting.peak_and_fit(c_lambda_arr, ringsums_final[i])#, thres=.35)
-    # print "Final", L, d, m1
-    # print old_peaks
-    # print peaks
-    # fig, ax = plt.subplots()
-    # print len(c_lambda_arr)
-    # for idx, peak in enumerate(peaks):
-    #     plt.plot(c_lambda_arr, ringsums_final[idx], label='{0:f}'.format(m1-idx))
-    # ax.legend()
-    # ax.set_title("Final L, d ringsum")
-    # plt.show()
-    # print time.time() - t1
-    # for i in range(npeaks):
-    #     t2 = time.time()
-    #     m = m1 - i
-    #     rmin = np.sqrt((2*d*L*1.e6/(m*lambda_max))**2 - L**2)
-    #     rmax = np.sqrt((2*d*L*1.e6/(m*lambda_min))**2 - L**2)
-    #     inds = np.where(np.logical_and(R > rmin, R<rmax))[0]
-
-        # r0 = 2.*d*1.e6*L / m / delta_lambda
-        # # print r0, rmin, rmax
-
-        # dr = np.sqrt((1./(1./np.sqrt(L**2 + rmin**2) - 1./r0))**2 - L**2) - rmin
-        # rR = [rmin, rmin + dr]
-        # j = 0
-        # while rR[-1] < rmax:
-        #     j += 1
-        #     dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rR[-1] ** 2) - 1. / r0)) ** 2 - L ** 2) - rR[-1]
-        #     # print j, dr, rR[-1], rmax
-        #     rR += [rR[-1] + dr]
-
-#         # print len(rR), len(c_lambda_arr)
-
-        # sig, _ = np.histogram(R[inds], bins=rR, weights=data[inds])
-        # # to correspond to my calibration wavelength array, sig is actually backwards...
-        # sig = sig[::-1]
-        # print time.time() - t2
-        # plt.plot(c_lambda_arr, sig)
-        # plt.title("idx: {0} order: {1}".format(i, m))
-        # plt.show()
 

@@ -8,6 +8,23 @@ import multiprocessing as mp
 
 
 def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda):
+    """
+    Performs a proper ringsum with constant lambda spacing for each peak.
+
+    Args:
+        R (np.array): flattened array matrix from camera
+        weights: flattened pixel value matrix from camera
+        m (float): highest order number (not an integer value)
+        L (float): camera focal length in pixels
+        d (float): etalon spacing in mm
+        peaks (list): location of peaks in pixels
+        lambda_min (float): minimum wavelength in array
+        lambda_max (float): maximum wavelength in array
+        delta_lambda (float): delta wavelength spacing
+
+    Returns:
+        ringsum (list): a list of ringsums for each peak (order) in peaks
+    """
     ringsum = []
     for idx, peak in enumerate(peaks):
         mm = m - idx
@@ -42,12 +59,22 @@ def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lam
     # R = np.sqrt(xx**2 + yy**2)
 
 
-
-    return None
-
-
 def _histogram(bins, R, weights, out=None, label=None):
 
+    """
+    Helper function for quick_ringsum to perform a histogram
+    Args:
+        bins (np.array): bins in radius pixel space (does not include origin)
+        R (np.ndarray): radius matrix for the camera
+        weights (np.ndarray): pixel values for the camera
+        out (mp.Queue): mulitprocessing.Queue to write data to
+        label (str): label for the quadrant being ringsummed
+
+    Returns:
+        None if used with an output Queue
+        sig (np.array): ringsum array
+        label (str): label for the quadrant
+    """
     sig, _ = np.histogram(R, bins=np.concatenate((np.array([0.]), bins)), weights=weights)
     if out and label:
         out.put((label, sig))
@@ -56,6 +83,22 @@ def _histogram(bins, R, weights, out=None, label=None):
 
 def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
 
+    """
+    Performs a constant area ring sum in pixel space.  Returns ring sums for
+     the 4 qudrants if quadrants is True
+
+    Args:
+        dat (np.ndarray): pixel values for the camera image
+        x0 (float): x location of the center of image
+        y0 (float): y location of the center of image
+        binsize (float): smallest radial bin size (occurs at the largest bin)
+        quadrants (bool): True if quadrant ring sums are returned
+
+    Returns:
+        binarr (np.array): bins for the ring sum in pixels
+        ringsum (np.array): ring sums (there are 4 of them if quadrants=True,
+         UL UR BL Br for the order)
+    """
     ny, nx = dat.shape
     x = np.arange(1, nx+1, 1)
     y = np.arange(1, ny+1, 1)
@@ -75,16 +118,6 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
     binarr = np.fromfunction(lambda i: np.sqrt(2. * (i + 1.) * ri * binsize + (i + 1.) * binsize ** 2.), (imax,),
                              dtype='float64')
 
-    """This is Cooper's way of building the bins"""
-    # rR = 0
-    # r_arr = []
-    # delta_r = [np.sqrt(2*binsize*ri + binsize**2)]
-    # while rR < ri:
-    #     print rR
-        # rR += delta_r[-1]
-        # r_arr += [rR]
-        # delta_r += [np.sqrt(r_arr[-1]**2 + 2*binsize*ri + binsize**2) - r_arr[-1]]
-    # binarr = np.array(r_arr)
 
     xi0 = int(round(x0))
     yi0 = int(round(y0))
@@ -93,26 +126,6 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
     i2 = [yi0+1, yi0+1, ny, ny]
     j1 = [0, xi0, 0, xi0]
     j2 = [xi0+1, nx, xi0+1, nx]
-
-    # ULdata = dat[0:yi0 + 1, 0:xi0 + 1]
-    # URdata = dat[0:yi0+1, xi0:]
-    # BLdata = dat[i1[2]:i2[2], 0:xi0 + 1]
-    # BRdata = dat[yi0:, xi0:]
-    #
-    # ULdata = dat[0:yi0 + 1, 0:xi0 + 1]
-    # URdata = dat[0:yi0+1, xi0:]
-    # BLdata = dat[yi0:, 0:xi0 + 1]
-    # BRdata = dat[yi0:, xi0:]
-
-    # RUL = R[0:yi0+1, 0:xi0+1]
-    # RUR = R[0:yi0+1, xi0:]
-    # RBL = R[yi0:, 0:xi0+1]
-    # RBR = R[yi0:, xi0:]
-    # print RBR == R[i1[3]:i2[3], j1[3]:j2[3]]
-    # print RUL.shape, RUR.shape, RBL.shape, RBR.shape
-    # for k in range(4):
-    #     print R[i1[k]:i2[k], j1[k]:j2[k]].shape
-    # This method behaves differently.... I have no idea why
 
     procs = []
     nprocs = 4
@@ -130,38 +143,39 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
 
     for p in procs:
         p.join()
-    # for k, label in enumerate(labels):
-    #     sigs[label], throwaway = np.histogram(R[i1[k]:i2[k], j1[k]:j2[k]], bins=np.concatenate((np.array([0.]), binarr)),
-    #                            weights=dat[i1[k]:i2[k], j1[k]:j2[k]])
-            # plt.plot(binarr, sigs[label])
-        # plt.show()
-        # ULsigarr, _ = np.histogram(RUL, bins=np.concatenate((np.array([0.]), binarr)), weights=ULdata)
-        # URsigarr, _ = np.histogram(RUR, bins=np.concatenate((np.array([0.]), binarr)), weights=URdata)
-        # BLsigarr, _ = np.histogram(RBL, bins=np.concatenate((np.array([0.]), binarr)), weights=BLdata)
-        # BRsigarr, _ = np.histogram(RBR, bins=np.concatenate((np.array([0.]), binarr)), weights=BRdata)
-        #
-        # plt.plot(binarr, ULsigarr, 'b')
-        # plt.plot(binarr, sigs['UL'], 'rR')
-        # plt.show()
 
-        # fig, ax = plt.subplots(2)
-        # ax[0].imshow(RUL)
-        # ax[1].imshow(R[i1[0]:i2[0], j1[0]:j2[0]])
-        # ax[0].set_aspect(1)
-        # ax[1].set_aspect(1)
-        # plt.show()
-        # return binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr
+    # Return all 4 quadrant rings sums or sum them into one
     if quadrants:
         return binarr, sigs['UL'], sigs['UR'], sigs['BL'], sigs['BR']
-
     else:
-        #sigarr, _ = np.histogram(R, bins=np.concatenate((np.array([0.]), binarr)), weights=dat)
         return binarr, sigs['UL']+sigs['UR']+sigs['BL']+sigs['BR']
 
 
 def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
+    """
+    Finds the center of the image by performing rings.
+
+    Args:
+        data (np.ndarray): pixel values for the camera image
+        xguess (float): guess of x location of the center of image
+        yguess (float): guess of y location of the center of image
+        maxiter (int): maximum number of iterations for center finding
+        binsize (float): smallest radial bin size (occurs at the largest bin)
+        plotit (bool): plots minimization for each iteration if True
+
+    Returns:
+        x0 (float): x location of center
+        y0 (float): y location of center
+    """
+    if plotit:
+        plt.ion()
+        fig, ax = plt.subplots()
+        line1 = None
+        line2 = None
+
     print "Center finding:"
     for ii in range(maxiter):
+
         t0 = time.time()
         binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = quick_ringsum(data, xguess, yguess, binsize=binsize)
         print time.time()-t0
@@ -222,16 +236,29 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         xguess -= RLcent * binsize
 
         print "{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii)
-        # if plotit:
-        #     fig, ax = plt.subplots()
-        #     ax.plot(sarr, UB, 'rR', lw=1, label='UD')
-        #     ax.plot(sarr, RL, 'b', lw=1, label='RL')
-        #     ax.legend()
-        #     plt.show()
+
+        if plotit:
+            # fig, ax = plt.subplots()
+            if line1 is not None:
+                line1.set_data(sarr, UB)
+            else:
+                line1, = ax.plot(sarr, UB, 'r', lw=1, label='UD')
+
+            if line2 is not None:
+                line2.set_data(sarr, RL)
+            else:
+                line2, = ax.plot(sarr, RL, 'b', lw=1, label='RL')
+            if ii == 0:
+                leg = ax.legend()
+            fig.canvas.draw()
+            plt.pause(0.0001)
+            # plt.show()
 
         if np.sqrt((UBcent*binsize)**2 + (RLcent*binsize)**2) / binsize < 0.1:
             break
-
+    if plotit:
+        plt.close(fig)
+        plt.ioff()
     return xguess, yguess
 
 
