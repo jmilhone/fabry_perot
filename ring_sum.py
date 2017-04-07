@@ -6,7 +6,6 @@ import fitting
 import time
 import multiprocessing as mp
 
-
 def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda):
     """
     Performs a proper ringsum with constant lambda spacing for each peak.
@@ -295,4 +294,6 @@ if __name__ == "__main__":
     # plt.plot(binarr, sigarr)
     # plt.show()
     peaks = fitting.peak_and_fit(binarr, sigarr, thres=0.55, plotit=True)
+
+
 

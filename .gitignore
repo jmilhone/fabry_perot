@@ -2,3 +2,10 @@
 *.nef
 *.h5
 .idea/*
+
+# Ipython Notebook files
+.ipynb_checkpoints/*
+*.ipynb
+
+# Pickle Files
+*.p

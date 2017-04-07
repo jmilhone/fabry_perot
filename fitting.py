@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import analysis.datahelpers as dh
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, fmin
 
 
 def gaussian(x, amp, shift, width):
@@ -92,3 +92,70 @@ def find_peaks(x, data, maxval, smooth_points=20):
     down = np.where(np.logical_and(parse[1::] == 0.0, parse[0:-1] == 1.0))[0]
 
     return up, down
+
+def norm_gaussian(x, a, shift, gamma):
+    """
+    Returns a normalized gaussian at shift with amplitude a and width gamma.  The area is a.
+
+    G(x) = a * np.exp(-0.5*((x-shift)/gamma)**2) / gamma / np.sqrt(2 * np.pi)
+    Args:
+        x (np.array): x values
+        a (float): amplitude
+        shift (float): center of gaussian
+        gamma (float): width of gaussian
+    """
+    return a * np.exp(-0.5*((x-shift)/gamma)**2) / gamma / np.sqrt(2 * np.pi)
+
+
+def norm_lorentzian(x, a, shift, gamma):
+    """
+    Returns a normalized lorentzian at shift with amplitude a and width gamma.  The area is a.
+
+    L(x) = a* 0.5*gamma / ((x-shift)**2 + (0.5*gamma)**2) / np.pi
+    Args:
+        x (np.array): x values
+        a (float): amplitude
+        shift (float): center of gaussian
+        gamma (float): width of gaussian
+    """
+    half_gamma = 0.5*gamma
+    return a * half_gamma / ((x-shift)**2 + half_gamma**2) / np.pi
+
+
+def instr_chisq(a, x, data, gaussian_kernel, w0, idx0, idx1, plotit=False):
+    """
+    Calculates chi squared with the gaussian kernel convolved with
+    lorentzian instrument function with the a parameters compared to
+    the ringsum data in the index range of (idx0, idx1)
+
+    Args:
+        a (list): parameters for finding instrument function
+            (amp, width, offset)
+        x (np.array): wavelength array to eval instrument function on
+        data (np.array): ring sum to match to
+        gaussian_kernel (np.array): lamp doppler broadenned gaussian
+            Note: sum(gaussian_kernel) == 1 !!!
+        w0 (float): wavelength shift in nm
+        idx0 (int): left index for fitting region
+        idx1 (int): right index for fitting region
+
+    Returns:
+        chisq (float)
+    """
+    amp = np.exp(a[0])
+    width = np.exp(a[1])
+    offset = a[2]
+    lor = norm_lorentzian(x, 1.0, w0, width)
+
+    voight = np.convolve(gaussian_kernel, lor, mode='valid')
+    voight = voight * amp + offset
+    print len(voight), data[idx0:idx0+2], voight[idx0:idx0+2]
+    chisq = np.sum((data[idx0:idx1] - voight[idx0:idx1])**2)
+    if plotit:
+        plt.plot(data)
+        plt.plot(voight)
+        plt.show()
+    return chisq
+
+
+
