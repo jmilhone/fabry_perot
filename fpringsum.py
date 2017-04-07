@@ -97,12 +97,12 @@ def small_angle_sum(data, center, binsize=1, plotit=0, printit=0):
     # plt.show()
 
     rmax = np.min(
-        np.abs([xmin, xmax, ymin, ymax]))  # the maximum r we want to go to is the nearest edge of CCD to center
+        np.abs([xmin, xmax, ymin, ymax]))  # the maximum rR we want to go to is the nearest edge of CCD to center
 
-    # The small angle approximation calls for bins in radius of equal area. Thus binsize of r decreases as a function of r.
-    # In order to maintain equal area we require that binsize_r(r)~sqrt(c+r^2)-r where c is a constant. The smallest binsize
-    # we will allow is the binsize keyword supplied (default to 1) and this binsize will occur at r=rmax. This tells us that
-    # c=2*rmax*binsize+binsize^2 and, therefore, binsize_r(r)=sqrt(r^2+2*rmax*binsize+binsize^2)-r. Now we can turn this into an
+    # The small angle approximation calls for bins in radius of equal area. Thus binsize of rR decreases as a function of rR.
+    # In order to maintain equal area we require that binsize_r(rR)~sqrt(c+rR^2)-rR where c is a constant. The smallest binsize
+    # we will allow is the binsize keyword supplied (default to 1) and this binsize will occur at rR=rmax. This tells us that
+    # c=2*rmax*binsize+binsize^2 and, therefore, binsize_r(rR)=sqrt(rR^2+2*rmax*binsize+binsize^2)-rR. Now we can turn this into an
     # iterable function such that binarr(i)=sqrt(2*i*rmax*binsize+i*binsize^2) with i->0-imax. Imax can be found from solving for
     # i with binarr=rmax. In python, indices start at 0 so the formula used in the below function has i->i+1.
 
@@ -110,7 +110,7 @@ def small_angle_sum(data, center, binsize=1, plotit=0, printit=0):
     binarr = np.fromfunction(lambda i: np.sqrt(2. * (i + 1.) * rmax * binsize + (i + 1.) * binsize ** 2.), (imax,),
                              dtype='float64')
 
-    # binarr is the array of equal area bins in r-space that is proportional to lambda space in the small angle approximation
+    # binarr is the array of equal area bins in rR-space that is proportional to lambda space in the small angle approximation
 
     R = R.reshape((npts,))  # ok now we are going to flatten both R and data into 1d arrays
     data = data.reshape(

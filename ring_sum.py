@@ -1,239 +1,298 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from image_helpers import get_image_data
+from image_helpers import get_image_data, quick_plot
 from os.path import join
-stepsize = 1
-folder = "Images"
-shot_number = 15676
-fname = join(folder, "{0:07d}_000.nef".format(shot_number))
-bg_fname = join(folder, "{0:07d}_001.nef".format(shot_number))
-print "getting image"
-data = get_image_data(fname, bg_fname, color='b')
-print "done"
-print data.shape
+import fitting
+import time
+import multiprocessing as mp
+
+
+def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda):
+    """
+    Performs a proper ringsum with constant lambda spacing for each peak.
+
+    Args:
+        R (np.array): flattened array matrix from camera
+        weights: flattened pixel value matrix from camera
+        m (float): highest order number (not an integer value)
+        L (float): camera focal length in pixels
+        d (float): etalon spacing in mm
+        peaks (list): location of peaks in pixels
+        lambda_min (float): minimum wavelength in array
+        lambda_max (float): maximum wavelength in array
+        delta_lambda (float): delta wavelength spacing
+
+    Returns:
+        ringsum (list): a list of ringsums for each peak (order) in peaks
+    """
+    ringsum = []
+    for idx, peak in enumerate(peaks):
+        mm = m - idx
+        rmin = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_max)) ** 2 - L ** 2)
+        rmax = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_min)) ** 2 - L ** 2)
+        inds = np.where(np.logical_and(R > rmin, R < rmax))[0]
+
+        r0 = 2.*d*1.e6*L / mm / delta_lambda
+        dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rmin ** 2) - 1. / r0)) ** 2 - L ** 2) - rmin
+        rR = [rmin, rmin + dr]
+        j = 0
+        while len(rR) <= 512: #rR[-1] <= rmax:
+            j += 1
+            dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rR[-1] ** 2) - 1. / r0)) ** 2 - L ** 2) - rR[-1]
+            # print j, dr, rR[-1], rmax
+            rR += [rR[-1] + dr]
+        # print idx
+        # print len(rR)
+        # print rmin, rR[0]
+        # print rmax, rR[-1], "\n"
+
+        sig, _ = np.histogram(R[inds], bins=rR, weights=weights[inds])
+        # to correspond to my calibration wavelength array, sig is actually backwards...
+        sig = sig[::-1]
+        ringsum += [sig]
+    return ringsum
+    # ny, nx = data.shape
+    # x = np.arange(1, nx+1, 1)
+    # y = np.arange(1, ny+1, 1)
+    #
+    # xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+    # R = np.sqrt(xx**2 + yy**2)
+
+
+def _histogram(bins, R, weights, out=None, label=None):
+
+    """
+    Helper function for quick_ringsum to perform a histogram
+    Args:
+        bins (np.array): bins in radius pixel space (does not include origin)
+        R (np.ndarray): radius matrix for the camera
+        weights (np.ndarray): pixel values for the camera
+        out (mp.Queue): mulitprocessing.Queue to write data to
+        label (str): label for the quadrant being ringsummed
+
+    Returns:
+        None if used with an output Queue
+        sig (np.array): ringsum array
+        label (str): label for the quadrant
+    """
+    sig, _ = np.histogram(R, bins=np.concatenate((np.array([0.]), bins)), weights=weights)
+    if out and label:
+        out.put((label, sig))
+    else:
+        return sig, label
 
 def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
 
-    ny, nx = dat.shape
+    """
+    Performs a constant area ring sum in pixel space.  Returns ring sums for
+     the 4 qudrants if quadrants is True
 
+    Args:
+        dat (np.ndarray): pixel values for the camera image
+        x0 (float): x location of the center of image
+        y0 (float): y location of the center of image
+        binsize (float): smallest radial bin size (occurs at the largest bin)
+        quadrants (bool): True if quadrant ring sums are returned
+
+    Returns:
+        binarr (np.array): bins for the ring sum in pixels
+        ringsum (np.array): ring sums (there are 4 of them if quadrants=True,
+         UL UR BL Br for the order)
+    """
+    ny, nx = dat.shape
     x = np.arange(1, nx+1, 1)
     y = np.arange(1, ny+1, 1)
-    xx, yy = np.meshgrid(x-x0, y-y0)
+
+    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
     R = np.sqrt(xx**2 + yy**2)
+
     xmin = xx[0, 0]
     xmax = xx[0, -1]
     ymin = yy[0, 0]
     ymax = yy[-1, 0]
 
-    ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])) - 1)
-    ri = int(.5 * 4020)
+    ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
     imax = int((ri ** 2. - 2. * ri - 1.) / (1. + 2. * ri) / binsize)
+
+    """Ken's way of building the bins"""
     binarr = np.fromfunction(lambda i: np.sqrt(2. * (i + 1.) * ri * binsize + (i + 1.) * binsize ** 2.), (imax,),
                              dtype='float64')
 
-    xi0 = int(round(x0))  # np.abs(x - x0).argmin()
-    yi0 = int(round(y0))  # np.abs(y - y0).argmin()
-    print binarr
+
+    xi0 = int(round(x0))
+    yi0 = int(round(y0))
+
+    i1 = [0, 0, yi0, yi0]
+    i2 = [yi0+1, yi0+1, ny, ny]
+    j1 = [0, xi0, 0, xi0]
+    j2 = [xi0+1, nx, xi0+1, nx]
+
+    procs = []
+    nprocs = 4
+    sigs = {}
+    out = mp.Queue()
+    labels = ['UL', 'UR', 'BL', 'BR']
+    for k in range(nprocs):
+        p = mp.Process(target=_histogram, args=(binarr, R[i1[k]:i2[k], j1[k]:j2[k]], dat[i1[k]:i2[k], j1[k]:j2[k]]), kwargs={'out':out, 'label': labels[k]})
+        procs.append(p)
+        p.start()
+
+    for i in range(nprocs):
+        tup = out.get()
+        sigs[tup[0]] = tup[1]
+
+    for p in procs:
+        p.join()
+
+    # Return all 4 quadrant rings sums or sum them into one
     if quadrants:
-        ULdata = dat[yi0 - ri:yi0 + 1, xi0 - ri:xi0 + 1]
-        URdata = dat[yi0 - ri:yi0 + 1, xi0:xi0 + ri + 1]
-        BLdata = dat[yi0:yi0 + ri + 1, xi0 - ri:xi0 + 1]
-        BRdata = dat[yi0:yi0 + ri + 1, xi0:xi0 + ri + 1]
-
-        RUL = R[yi0-ri:yi0+1, xi0-ri:xi0+1]
-        RUR = R[yi0-ri:yi0+1, xi0:xi0+ri+1]
-        RBL = R[yi0:yi0+ri+1, xi0-ri:xi0+1]
-        RBR = R[yi0:yi0+ri+1, xi0:xi0+ri+1]
-        print RUL[-1, -1]
-        print RUR[-1, 0]
-        print RBL[0, -1]
-        print RBR[0, 0]
-        ULsigarr, _ = np.histogram(R[yi0-ri:yi0+1, xi0-ri:xi0+1], bins=np.concatenate((np.array([0.]), binarr)), weights=ULdata)
-        URsigarr, _ = np.histogram(R[yi0-ri:yi0+1, xi0:xi0+ri+1], bins=np.concatenate((np.array([0.]), binarr)), weights=URdata)
-        BLsigarr, _ = np.histogram(R[yi0:yi0+ri+1, xi0-ri:xi0+1], bins=np.concatenate((np.array([0.]), binarr)), weights=BLdata)
-        BRsigarr, _ = np.histogram(R[yi0:yi0+ri+1, xi0:xi0+ri+1], bins=np.concatenate((np.array([0.]), binarr)), weights=BRdata)
-        return binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr
+        return binarr, sigs['UL'], sigs['UR'], sigs['BL'], sigs['BR']
     else:
-        sigarr, _ = np.histogram(R, bins=np.concatenate((np.array([0.]), binarr)), weights=dat)
-        return binarr, sigarr
-
-# ny, nx = data.shape
-
-x0, y0 = (3066.44,#+0.7+.31+.14+.069,
-          2036.44)#+.8+.27+.107+.0416)
-binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = quick_ringsum(data, x0, y0)
-
-fig, ax = plt.subplots()
-# ax.plot(binarr, ULsigarr, label='UL', lw=1)
-# ax.plot(binarr, URsigarr, label='UR', lw=1)
-# ax.plot(binarr, BLsigarr, label='BL', lw=1)
-# ax.plot(binarr, BRsigarr, label='BR', lw=1)
-ax.plot(binarr, ULsigarr + URsigarr, label="U")
-ax.plot(binarr, BLsigarr + BRsigarr, label="B")
-plt.legend(loc='upper left')
-plt.show(block=False)
-
-thres = 0.5 * np.max(ULsigarr + URsigarr)
-i = np.where(ULsigarr + URsigarr > thres)[0]
-ni = len(i)
-# print ni
-# j = np.arange(-25, 26, 1)
-# sarr = stepsize * j
-# UB = np.zeros(len(j))
-# RL = np.zeros(len(j))
-ns = 25
-sarr = stepsize * np.arange(-ns, ns+1, 1)
-# print sarr
-UB = np.zeros(len(sarr))
-RL = np.zeros(len(sarr))
-
-ULsigarr *= 1.0
-URsigarr *= 1.0
-ULsigarr *= 1.0
-URsigarr *= 1.0
+        return binarr, sigs['UL']+sigs['UR']+sigs['BL']+sigs['BR']
 
 
-# for idx, ix in enumerate(j):
-# for ix in range(ns):
-#     UB[ns+ix] = np.sum(((ULsigarr[i-ix]+URsigarr[i-ix]) - (BLsigarr[i+ix]+BRsigarr[i+ix]))**2) / (1.*ni-ix)
-#     RL[ns+ix] = np.sum(((URsigarr[i-ix]+BRsigarr[i-ix]) - (ULsigarr[i+ix]+BLsigarr[i+ix]))**2) / (1.*ni-ix)
-#     UB[ns-ix] = np.sum(((ULsigarr[i+ix]+URsigarr[i+ix]) - (BLsigarr[i-ix]+BRsigarr[i-ix]))**2) / (1.*ni-ix)
-#     RL[ns-ix] = np.sum(((URsigarr[i+ix]+BRsigarr[i+ix]) - (ULsigarr[i-ix]+BLsigarr[i-ix]))**2) / (1.*ni-ix)
-fig, ax = plt.subplots()
-plt.plot(ULsigarr[i])
-plt.show()
-for idx, ix in enumerate(sarr):
-    UB[idx] = np.sum((ULsigarr[i-ix]+URsigarr[i-ix] - BLsigarr[i+ix]-BRsigarr[i+ix])**2) / (1.*ni-np.abs(ix))
-    RL[idx] = np.sum((URsigarr[i-ix]+BRsigarr[i-ix] - ULsigarr[i+ix]-BLsigarr[i+ix])**2) / (1.*ni-np.abs(ix))
-fig, ax = plt.subplots()
-ax.plot(sarr, UB, 'or', ms=1)
-ax.plot(sarr, RL, 'og', ms=1)
-RLfit = np.polyfit(sarr, RL, 2)
-print RLfit, RLfit[1] / (2. * RLfit[0])
-UBfit = np.polyfit(sarr, UB, 2)
-print UBfit, UBfit[1] / (2. * UBfit[0])
-plt.show(block=False)
+def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
+    """
+    Finds the center of the image by performing rings.
+
+    Args:
+        data (np.ndarray): pixel values for the camera image
+        xguess (float): guess of x location of the center of image
+        yguess (float): guess of y location of the center of image
+        maxiter (int): maximum number of iterations for center finding
+        binsize (float): smallest radial bin size (occurs at the largest bin)
+        plotit (bool): plots minimization for each iteration if True
+
+    Returns:
+        x0 (float): x location of center
+        y0 (float): y location of center
+    """
+    if plotit:
+        plt.ion()
+        fig, ax = plt.subplots()
+        line1 = None
+        line2 = None
+
+    print "Center finding:"
+    for ii in range(maxiter):
+
+        t0 = time.time()
+        binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = quick_ringsum(data, xguess, yguess, binsize=binsize)
+        print time.time()-t0
+
+        thres = 0.35 * np.max(ULsigarr + URsigarr)
+        i = np.where(ULsigarr + URsigarr > thres)[0]
+
+        # A cheat if the i goes to the edge of the array.  Makes sliding them past each other hard
+        if len(ULsigarr) - i.max() < 50:
+            i = i[0:-50]
+        ni = len(i)
+        ns = 25
+        sarr = 2 * np.arange(-ns, ns+1, 1)
+        sarr_max = 2 * ns
+        UB = np.zeros(len(sarr))
+        RL = np.zeros(len(sarr))
+
+        for idx, ix in enumerate(sarr):
+            UB[idx] = np.sum((ULsigarr[i-ix]+URsigarr[i-ix] - BLsigarr[i+ix]-BRsigarr[i+ix])**2) / (1.*ni-np.abs(ix))
+            RL[idx] = np.sum((URsigarr[i-ix]+BRsigarr[i-ix] - ULsigarr[i+ix]-BLsigarr[i+ix])**2) / (1.*ni-np.abs(ix))
+
+        RLfit = np.polyfit(sarr, RL, 2)
+        UBfit = np.polyfit(sarr, UB, 2)
 
 
+        """
+        The logic for the center jump is matching A(x-x0)^2 = C0 x^2 + C1 x + C2
+        x0 = - C1 / (2 C0)
+        """
+        if RLfit[0] < 0.0:
+            # print "RL concave down"
+            # Concave down fit
+            RLcent = -2 * np.max(sarr) * np.sign(RLfit[1])
+        else:
+            # concave up
+            RLcent = -RLfit[1] / (2*RLfit[0])
+
+        # Dont jump fartther than max(sarr)
+        if RLcent > sarr_max:
+            RLcent = np.sign(RLcent) * np.max(sarr)
 
 
+        if UBfit[0] < 0.0:
+            # concave down
+            # print "UB concave down"
+            UBcent = -2 * np.max(sarr) * np.sign(UBfit[1])
+        else:
+            # concave up
+            UBcent = -UBfit[1] / (2*UBfit[0])
 
-# # x0, y0 = (3068.39, 2031.85)
-# # x0, y0 = (3000., 2100.0)
+        # Dont jump fartther than max(sarr)
+        if RLcent > sarr_max:
+            UBcent = np.sign(UBcent) * np.max(sarr)
 
-# x = np.arange(1, nx+1, 1)
-# y = np.arange(1, ny+1, 1)
-# xx, yy = np.meshgrid(x-x0, y-y0)
-# print xx
+        # Rough conversion to pixels
+        # yguess -= UBcent * binsize
+        yguess += UBcent * binsize
+        xguess -= RLcent * binsize
 
+        print "{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii)
 
-# xmin = xx[0, 0]
-# xmax = xx[0, -1]
-# ymin = yy[0, 0]
-# ymax = yy[-1, 0]
+        if plotit:
+            # fig, ax = plt.subplots()
+            if line1 is not None:
+                line1.set_data(sarr, UB)
+            else:
+                line1, = ax.plot(sarr, UB, 'r', lw=1, label='UD')
 
-# rmax = np.min(np.abs([xmin, xmax, ymin, ymax])) - 1
-# print rmax
-# ri = int(np.floor(rmax))
+            if line2 is not None:
+                line2.set_data(sarr, RL)
+            else:
+                line2, = ax.plot(sarr, RL, 'b', lw=1, label='RL')
+            if ii == 0:
+                leg = ax.legend()
+            fig.canvas.draw()
+            plt.pause(0.0001)
+            # plt.show()
 
-# R = np.sqrt(xx**2 + yy**2)
-# binsize = 0.1
-
-# imax = int((rmax ** 2. - 2. * rmax - 1.) / (1. + 2. * rmax) / binsize)
-# binarr = np.fromfunction(lambda i: np.sqrt(2. * (i + 1.) * rmax * binsize + (i + 1.) * binsize ** 2.), (imax,),
-#                          dtype='float64')
-
-# xi0 = int(round(x0))  # np.abs(x - x0).argmin()
-# yi0 = int(round(y0))  # np.abs(y - y0).argmin()
-
-# # chop data matrix into a quadrant for now
-# # ULdata = data[0:yi0+1, 0:xi0+1]
-# # URdata = data[0:yi0+1, xi0:]
-# # BLdata = data[yi0:, 0:xi0+1]
-# # BRdata = data[yi0:, xi0:]
-
-# ULdata = data[yi0-ri:yi0+1, xi0-ri:xi0+1]
-# URdata = data[yi0-ri:yi0+1, xi0:xi0+ri+1]
-# BLdata = data[yi0:yi0+ri+1, xi0-ri:xi0+1]
-# BRdata = data[yi0:yi0+ri+1, xi0:xi0+ri+1]
-# # fig, ax = plt.subplots()
-# # ax.plot(data[yi0, 0:xi0+1], lw=1)
-# # plt.show()
-# print "UL", ULdata.shape
-# print "UR", URdata.shape
-# print "BL", BLdata.shape
-# print "BR", BRdata.shape
-
-# ULsigarr, _ = np.histogram(R[yi0-ri:yi0+1, xi0-ri:xi0+1], bins=np.concatenate((np.array([0.]), binarr)), weights=ULdata)
-# URsigarr, _ = np.histogram(R[yi0-ri:yi0+1, xi0:xi0+ri+1], bins=np.concatenate((np.array([0.]), binarr)), weights=URdata)
-# BLsigarr, _ = np.histogram(R[yi0:yi0+ri+1, xi0-ri:xi0+1], bins=np.concatenate((np.array([0.]), binarr)), weights=BLdata)
-# BRsigarr, _ = np.histogram(R[yi0:yi0+ri+1, xi0:xi0+ri+1], bins=np.concatenate((np.array([0.]), binarr)), weights=BRdata)
-# # plt.plot(np.concatenate((np.array([0.]), binarr))**2)
-# # plt.show()
-# print type(ULsigarr)
-# ULsigarr *= 1.0
-# URsigarr *= 1.0
-# BLsigarr *= 1.0
-# BRsigarr *= 1.0
-
-# # print ULsigarr.shape
-# # print URsigarr.shape
-# # print BLsigarr.shape
-# # print BRsigarr.shape
-# thres = 0.3 * np.max(ULsigarr + URsigarr)
-# i = np.where(ULsigarr + URsigarr > thres)[0]
-# ni = len(i)
-# print ni
-# # j = np.arange(-25, 26, 1)
-# # sarr = stepsize * j
-# # UB = np.zeros(len(j))
-# # RL = np.zeros(len(j))
-# ns = 25
-# sarr = stepsize * np.arange(-ns, ns+1, 1)
-# print sarr
-# UB = np.zeros(len(sarr))
-# RL = np.zeros(len(sarr))
-# # for idx, ix in enumerate(j):
-# for ix in range(ns):
-#     UB[ns+ix] = np.sum(((ULsigarr[i-ix]+URsigarr[i-ix]) - (BLsigarr[i+ix]+BRsigarr[i+ix]))**2) / (ni-ix)
-#     RL[ns+ix] = np.sum(((URsigarr[i-ix]+BRsigarr[i-ix]) - (ULsigarr[i+ix]+BLsigarr[i+ix]))**2) / (ni-ix)
-#     UB[ns-ix] = np.sum(((ULsigarr[i+ix]+URsigarr[i+ix]) - (BLsigarr[i-ix]+BRsigarr[i-ix]))**2) / (ni-ix)
-#     RL[ns-ix] = np.sum(((URsigarr[i+ix]+BRsigarr[i+ix]) - (ULsigarr[i-ix]+BLsigarr[i-ix]))**2) / (ni-ix)
-# plt.plot(sarr, UB, 'or', ms=1)
-# plt.plot(sarr, RL, 'og', ms=1)
-# # RLfit = np.polyfit(RL, j, 2)
-# # print RLfit
-# plt.show(block=False)
-
-# fig, ax = plt.subplots()
-# i = ax.imshow(data, cmap='gray')
-# fig.colorbar(i)
-# plt.show(block=False)
-# # fig, ax = plt.subplots()
-# # ax.imshow(ULdata, cmap='gray')
-# # ax.set_aspect(1.0)
-# # plt.plot(x0, y0, '.r', ms=1)
-# # plt.show(block=False)
-# # #
-# fig, ax = plt.subplots()
-# ax.plot(binarr, ULsigarr, label='UL', lw=1)
-# # ax.plot(binarr, URsigarr, label='UR', lw=1)
-# # ax.plot(binarr, BLsigarr, label='BL', lw=1)
-# # ax.plot(binarr, BRsigarr, label='BR', lw=1)
-# plt.legend(loc='upper left')
-# plt.show(block=False)
-
-# # fig, ax = plt.subplots(2,2)
-# # ax[0][0].imshow(ULdata)
-# # ax[0][1].imshow(URdata)
-# # ax[1][0].imshow(BLdata)
-# # ax[1][1].imshow(BRdata)
+        if np.sqrt((UBcent*binsize)**2 + (RLcent*binsize)**2) / binsize < 0.1:
+            break
+    if plotit:
+        plt.close(fig)
+        plt.ioff()
+    return xguess, yguess
 
 
-# # for axis in ax:
-# #     for a in axis:
-# #         a.set_aspect(1.0)
+if __name__ == "__main__":
+    binsize = 0.1
+    folder = "Images"
+    # Normal Ar plasma shot
+    # shot_number = 15676
+    # fname = join(folder, "{0:07d}_000.nef".format(shot_number))
+    # bg_fname = join(folder, "{0:07d}_001.nef".format(shot_number))
 
-plt.show()
+    # Thorium Calibration with Ar 488 nm filter
+    fname = join(folder, "thorium_ar_5_min_1.nef")
+    bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
+    data = get_image_data(fname, bg_fname, color='b')
 
+    # quick_plot(data)
+    ny, nx = data.shape
+    # No initial guess
+    x0 = nx/2.
+    y0 = ny/2.
+    # Very close guess to calibration center
+    # x0, y0 = (3069.688, 2032.854)
+    # plt.plot(data[y0, 0:x0])
+    # plt.show()
+    t0 = time.time()
+    x0, y0 = locate_center(data, x0, y0, plotit=True)
+    t1 = time.time()
+    print t1-t0
+    binarr, sigarr = quick_ringsum(data, x0, y0, binsize=binsize, quadrants=False)
+    plt.plot(binarr, sigarr)
+    plt.show()
+    print time.time()-t1
+    # plt.plot(binarr, sigarr)
+    # plt.show()
+    peaks = fitting.peak_and_fit(binarr, sigarr, thres=0.55, plotit=True)
 
