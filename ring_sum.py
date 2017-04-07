@@ -175,9 +175,9 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
     print "Center finding:"
     for ii in range(maxiter):
 
-        t0 = time.time()
+        # t0 = time.time()
         binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = quick_ringsum(data, xguess, yguess, binsize=binsize)
-        print time.time()-t0
+        # print time.time()-t0
 
         thres = 0.35 * np.max(ULsigarr + URsigarr)
         i = np.where(ULsigarr + URsigarr > thres)[0]

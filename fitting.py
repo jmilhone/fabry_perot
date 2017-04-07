@@ -149,7 +149,7 @@ def instr_chisq(a, x, data, gaussian_kernel, w0, idx0, idx1, plotit=False):
 
     voight = np.convolve(gaussian_kernel, lor, mode='valid')
     voight = voight * amp + offset
-    print len(voight), data[idx0:idx0+2], voight[idx0:idx0+2]
+    # print len(voight), data[idx0:idx0+2], voight[idx0:idx0+2]
     chisq = np.sum((data[idx0:idx1] - voight[idx0:idx1])**2)
     if plotit:
         plt.plot(data)
