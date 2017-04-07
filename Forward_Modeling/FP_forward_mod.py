@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import convolve
+from scipy.integrate import quad
 
 class InputSpec(object):
     def __init__(self, temp=1., vel=0., wavelength=488.):
@@ -17,6 +17,7 @@ class InputSpec(object):
         self.lam0 = self.wavelength * (1. - 3.336e-6 * self.vel)  # nm, +vel=blueshift and -vel=redshift
         self.sig = 3.276569e-5 * np.sqrt((self.temp * self.lam0**2)/self.mu)    #nm
         self.FWHM = 2. * np.sqrt(2. * np.log(2.)) * self.sig    #nm
+        self.bounds = (self.lam0 - 5.*self.FWHM, self.lam0 + 5.*self.FWHM)
 
     def plot(self):
         lam = np.linspace(self.lam0 - 5. * self.FWHM, self.lam0 + 5. * self.FWHM, 1000)
@@ -42,31 +43,69 @@ class CCD(object):
         self.r_arr = np.arange(0.0, self.size/2., self.binsize)
         self.cosTh = self.f / np.sqrt(self.f**2 + self.r_arr**2)
 
+class OutputFP(object):
+    def __init__(self, d, lam0, f, r):
+        self.r = r
+        self.costh = f / np.sqrt(f**2 + self.r**2)
+        self.m_max = 2. * d/lam0 * 1.e6
+        self.m = self.m_max * self.costh
+        self.num_pks = int(np.floor(np.floor(self.m_max) - self.m.min() + 1))
+        self.pk_r = f * np.sqrt((self.m_max / (np.floor(self.m_max) - np.arange(self.num_pks)))**2 - 1.)
 
-class FP(InputSpec, CCD):
-    def __init__(self, temp=1., vel=0., wavelength=488., size=15.6, npx=4096, f=150., binsize=0.001, d=0.88, F=20.):
-        InputSpec.__init__(self, temp=temp, vel=vel, wavelength=wavelength)
-        CCD.__init__(self, size=size, npx=npx, f=f, binsize=binsize)
+class FP(object):
+    def __init__(self, d=0.88, F=20.):
         self.d = d  #mm
         self.F = F  #finesse
         self.Q = (2. / np.pi) * self.F ** 2  # quality factor
-        self.calc_m0()
-        self.spec = self.eval(self.lam)
-        self.airy = (1. + self.Q * np.sin(np.pi * self.m_arr)**2.)**(-1.)
 
-    def calc_m0(self):
-        self.m_max = 2. * self.d/self.lam0 * 1.e6   # 2d/lambda, 1.e6 is bc d(mm) and lambda(nm)
-        self.m_arr = self.m_max * self.cosTh
-        self.lam = 2. * self.d/self.m_arr * 1.e6
+    def eval_airy(self, lam, n, costh):
+        m = ((2. * self.d * 1.e6)/lam)*costh - n * np.floor(((2. * self.d * 1.e6)/lam))
+        return (1. + self.Q * np.sin(np.pi * m)**2)**(-1)
+
+    def convolve_quad(self, npks, costh):
+        out = np.zeros((npks, costh.size))
+        for i,n in enumerate(range(npks)):
+            for j, c in enumerate(costh):
+                print i, j
+                out[i, j] = quad(lambda x: self.InputSpec.eval_spec(x) * self.eval_airy(x, n, c), self.InputSpec.bounds[0], self.InputSpec.bounds[1])[0]
+        return np.sum(out, axis=0)
+
+    def convolve_trapz(self, costh, ns=None):
+        lam = np.linspace(self.InputSpec.bounds[0], self.InputSpec.bounds[1], 1000, endpoint=True)
+        ll, cth = np.meshgrid(lam, costh, indexing='ij')
+        if ns is None:
+            out = np.trapz(self.InputSpec.eval_spec(ll) * self.eval_airy(ll, 0, cth), lam, axis=0)
+        else:
+            out = np.zeros_like(costh)
+            for i in range(ns):
+                out += np.trapz(self.InputSpec.eval_spec(ll) * self.eval_airy(ll, i, cth), lam, axis=0)
+                print "{0} of {1} done".format(i, ns)
+        return out/out.max()
+
+    def run_spec(self, input_spec=InputSpec(), ccd=CCD(), ns=None):
+        self.InputSpec = input_spec
+        self.CCD = ccd
+        self.Output = OutputFP(self.d, self.InputSpec.lam0, self.CCD.f, self.CCD.r_arr)
+        self.instrument_func = self.eval_airy(self.InputSpec.lam0, 0., self.Output.costh)
+        self.Output.output = self.convolve_trapz(self.Output.costh, ns=ns)
 
     def plot(self):
-        f, ax = plt.subplots(2,1)
-        ax[0].plot(self.r_arr, self.airy)
-        ax[0].set_title('FP Instrument Function')
-        ax[1].plot(self.lam, self.spec)
-        ax[1].set_title('Input Spec')
-        plt.show()
+        f, ax = plt.subplots()
+        ax.plot(self.Output.r, self.Output.output, label='Output')
+        ax.plot(self.Output.r, self.instrument_func, label='FP Func.')
+        for rr in self.Output.pk_r:
+            ax.plot([rr]*2, [0, 1], 'k--')
+        ax.legend(loc='best')
+        plt.show(block=False)
 
 if __name__ == "__main__":
     a = FP()
-    a.plot()
+    a.run_spec()
+    f, ax = plt.subplots()
+    ax.plot(a.Output.r, a.Output.output, label='n=0')
+    for i,n in enumerate([5, 10, 50, 100, 500, 1000, 5000, 10000]):
+        a = FP()
+        a.run_spec(ns=n)
+        ax.plot(a.Output.r, a.Output.output, label='n={0}'.format(n))
+    ax.legend(loc='best')
+    plt.show()
