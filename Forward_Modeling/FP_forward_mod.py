@@ -3,33 +3,33 @@ import matplotlib.pyplot as plt
 from scipy.integrate import quad
 
 class InputSpec(object):
-    def __init__(self, temp=1., vel=0., wavelength=488.):
+    def __init__(self, temp=1., vel=0., lam0=488.):
         self.temp = temp    #eV
         self.vel = vel  #km/s
-        self.wavelength = wavelength    #nm
-        if wavelength == 488.:
+        self.lam0 = lam0    #nm
+        if lam0 == 488.:
             self.mu = 40.
         else:
             self.mu = 4.
         self.calc_coeffs()
 
     def calc_coeffs(self):
-        self.lam0 = self.wavelength * (1. - 3.336e-6 * self.vel)  # nm, +vel=blueshift and -vel=redshift
+        self.wavelength = self.lam0 * (1. - 3.336e-6 * self.vel)  # nm, +vel=blueshift and -vel=redshift
         self.sig = 3.276569e-5 * np.sqrt((self.temp * self.lam0**2)/self.mu)    #nm
         self.FWHM = 2. * np.sqrt(2. * np.log(2.)) * self.sig    #nm
-        self.bounds = (self.lam0 - 5.*self.FWHM, self.lam0 + 5.*self.FWHM)
+        self.bounds = (self.wavelength - 5.*self.FWHM, self.wavelength + 5.*self.FWHM)
 
     def plot(self):
-        lam = np.linspace(self.lam0 - 5. * self.FWHM, self.lam0 + 5. * self.FWHM, 1000)
-        spec = (2. * np.pi)**(-2) * (self.sig)**(-1) * np.exp(-0.5 * ((lam - self.lam0) / self.sig)**2)
+        lam = np.linspace(self.bounds[0], self.bounds[1], 1000)
+        spec = (2. * np.pi)**(-2) * (self.sig)**(-1) * np.exp(-0.5 * ((lam - self.wavelength) / self.sig)**2)
         f, ax = plt.subplots()
         ax.plot(lam, spec, lw=2)
-        ax.plot([self.wavelength]*2, [0, spec.max()], 'k--')
+        ax.plot([self.lam0]*2, [0, spec.max()], 'k--')
         ax.legend(loc='best')
         plt.show()
 
     def eval_spec(self, lam):
-        spec = (2. * np.pi) ** (-2) * (self.sig) ** (-1) * np.exp(-0.5 * ((lam - self.lam0) / self.sig) ** 2)
+        spec = (2. * np.pi) ** (-2) * (self.sig) ** (-1) * np.exp(-0.5 * ((lam - self.wavelength) / self.sig) ** 2)
         return spec
 
 class CCD(object):
@@ -44,10 +44,10 @@ class CCD(object):
         self.cosTh = self.f / np.sqrt(self.f**2 + self.r_arr**2)
 
 class OutputFP(object):
-    def __init__(self, d, lam0, f, r):
+    def __init__(self, d, wavelength, f, r):
         self.r = r
         self.costh = f / np.sqrt(f**2 + self.r**2)
-        self.m_max = 2. * d/lam0 * 1.e6
+        self.m_max = 2. * d/wavelength * 1.e6
         self.m = self.m_max * self.costh
         self.num_pks = int(np.floor(np.floor(self.m_max) - self.m.min() + 1))
         self.pk_r = f * np.sqrt((self.m_max / (np.floor(self.m_max) - np.arange(self.num_pks)))**2 - 1.)
@@ -73,20 +73,19 @@ class FP(object):
     def convolve_trapz(self, costh, ns=None):
         lam = np.linspace(self.InputSpec.bounds[0], self.InputSpec.bounds[1], 1000, endpoint=True)
         ll, cth = np.meshgrid(lam, costh, indexing='ij')
+        out = np.zeros_like(costh)
         if ns is None:
-            out = np.trapz(self.InputSpec.eval_spec(ll) * self.eval_airy(ll, 0, cth), lam, axis=0)
-        else:
-            out = np.zeros_like(costh)
-            for i in range(ns):
-                out += np.trapz(self.InputSpec.eval_spec(ll) * self.eval_airy(ll, i, cth), lam, axis=0)
-                print "{0} of {1} done".format(i, ns)
+            ns = self.Output.num_pks
+        for i in range(ns+1):
+            out += np.trapz(self.InputSpec.eval_spec(ll) * self.eval_airy(ll, i, cth), lam, axis=0)
+            print "{0} of {1} done".format(i, ns)
         return out/out.max()
 
     def run_spec(self, input_spec=InputSpec(), ccd=CCD(), ns=None):
         self.InputSpec = input_spec
         self.CCD = ccd
-        self.Output = OutputFP(self.d, self.InputSpec.lam0, self.CCD.f, self.CCD.r_arr)
-        self.instrument_func = self.eval_airy(self.InputSpec.lam0, 0., self.Output.costh)
+        self.Output = OutputFP(self.d, self.InputSpec.wavelength, self.CCD.f, self.CCD.r_arr)
+        self.instrument_func = self.eval_airy(self.InputSpec.wavelength, 0., self.Output.costh)
         self.Output.output = self.convolve_trapz(self.Output.costh, ns=ns)
 
     def plot(self):
@@ -101,11 +100,5 @@ class FP(object):
 if __name__ == "__main__":
     a = FP()
     a.run_spec()
-    f, ax = plt.subplots()
-    ax.plot(a.Output.r, a.Output.output, label='n=0')
-    for i,n in enumerate([5, 10, 50, 100, 500, 1000, 5000, 10000]):
-        a = FP()
-        a.run_spec(ns=n)
-        ax.plot(a.Output.r, a.Output.output, label='n={0}'.format(n))
-    ax.legend(loc='best')
+    a.plot()
     plt.show()

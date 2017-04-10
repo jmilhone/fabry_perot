@@ -2,3 +2,7 @@
 *.nef
 *.h5
 .idea/*
+*.aux
+*.log
+*.synctex.gz
+*-converted-to.pdf
