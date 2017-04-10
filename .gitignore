@@ -9,3 +9,10 @@
 
 # Pickle Files
 *.p
+
+# Tex Files
+*.aux
+*.log
+*.synctex.gz
+*-converted-to.pdf
+*.pdf
