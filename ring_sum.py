@@ -6,7 +6,7 @@ import fitting
 import time
 import multiprocessing as mp
 
-def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda):
+def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda, ndl=512):
     """
     Performs a proper ringsum with constant lambda spacing for each peak.
 
@@ -35,7 +35,7 @@ def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lam
         dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rmin ** 2) - 1. / r0)) ** 2 - L ** 2) - rmin
         rR = [rmin, rmin + dr]
         j = 0
-        while len(rR) <= 512: #rR[-1] <= rmax:
+        while len(rR) <= ndl: #rR[-1] <= rmax:
             j += 1
             dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rR[-1] ** 2) - 1. / r0)) ** 2 - L ** 2) - rR[-1]
             # print j, dr, rR[-1], rmax

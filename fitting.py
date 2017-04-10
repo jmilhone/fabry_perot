@@ -157,5 +157,7 @@ def instr_chisq(a, x, data, gaussian_kernel, w0, idx0, idx1, plotit=False):
         plt.show()
     return chisq
 
-
-
+# def argon_chisq(a, x, data, instr_kernel, w0, idx0, idx1, plotit=False):
+#     amp = np.exp(a[0])
+#     Ti = np.exp(a[1])
+#     width = 7.7e-5 * w0 * np.sqrt(Ti/)

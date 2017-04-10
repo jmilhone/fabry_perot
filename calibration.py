@@ -215,7 +215,8 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
     with open("calibration_data.p", 'wb') as outfile:
         pickle.dump(data_to_save, outfile)
 
-    gammaT = 7.7e-5 * c_lambda * np.sqrt(Tlamp / lampmu)
+    #gammaT = 7.7e-5 * c_lambda * np.sqrt(Tlamp / lampmu)
+    gammaT = 3.265e-5 * c_lambda * np.sqrt(Tlamp / lampmu)
 
     xpadL = np.arange(-512 / 2., 0) * delta_lambda + lambda_min
     xpadR = np.arange(1, 512 / 2.) * delta_lambda + lambda_max + delta_lambda
