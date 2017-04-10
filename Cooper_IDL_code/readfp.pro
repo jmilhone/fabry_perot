@@ -444,8 +444,8 @@ aaasubt2 = MPFITFUN('gaussfitfun', lambdaarr[subtstart2:subtend2,ipeaks], signal
   
   if plotit eq 1 then begin
    wset,1
-   plot, lambdaarr[*,ipeaks], signalarr[*,ipeaks], color=0, background=255
-   oplot, lambdaarr[*,ipeaks], *!machbroadening/max(*!machbroadening)*max(signalarr[*,ipeaks]), color=69
+   plot, lambdaarr[*,ipeaks], signalarr[*,ipeaks], color=0, background=255 ;0=black, 255=white
+   oplot, lambdaarr[*,ipeaks], *!machbroadening/max(*!machbroadening)*max(signalarr[*,ipeaks]), color=69 ;69=blue
    ;write_png, 'FP_shot.png', tvrd(/true)
    ;stop
    ;;other test fitting things for debugging/trial
@@ -453,7 +453,7 @@ aaasubt2 = MPFITFUN('gaussfitfun', lambdaarr[subtstart2:subtend2,ipeaks], signal
    ;oplot, lambdaarr[*,ipeaks], testfit, color=100     ; full guess fit, 
    ;oplot, lambdaarr[*,ipeaks], testtifraw, color=210  ; raw guess, no offset
    tcf = curvefit(lambdaarr[*,ipeaks], signalarr[*,ipeaks], 1./abs(signalarr[*,ipeaks]), A4, Asigma, function_name='singlelinevoigtfit', /noderivative, status=thestatus, itmax=100, /double, tol=1.E-3, chisq=chisq); fita=[1,1,1,1], 
-   if plotit eq 1 then oplot, lambdaarr[*,ipeaks], tcf, color=130         ; idl curvefit guess, frequently doesnt coverge
+   if plotit eq 1 then oplot, lambdaarr[*,ipeaks], tcf, color=130         ; idl curvefit guess, frequently doesnt coverge, 130=green
   endif
 
   ; do mpfit
@@ -468,7 +468,7 @@ aaasubt2 = MPFITFUN('gaussfitfun', lambdaarr[subtstart2:subtend2,ipeaks], signal
   print,amp
   tcfmpfit = MPFITFUN('singlelinevoigtfitfun', lambdaarr[*,ipeaks], signalarr[*,ipeaks], sqrt(abs(signalarr[*,ipeaks])), amp, PARINFO=pi, maxiter=300, perror=amperror, yfit=tcfmp, bestnorm=chisq, /quiet)
   if n_elements(tcfmpfit) ne npeakfitparams then tcfmpfit = dblarr (npeakfitparams)                  ; there was a bad fit, returned NaN or something, just give zeros
-  if plotit eq 1 then oplot, lambdaarr[*,ipeaks], tcfmp, color=254      ; mpfit output
+  if plotit eq 1 then oplot, lambdaarr[*,ipeaks], tcfmp, color=254      ; mpfit output, 254=red
   if printit then print, 'IDL curvefit thestatus (0 is good) ='+ string(thestatus) 
   if thestatus ne 0 then begin
    if printit then print, 'had a problem with this shot, the IDL curvefit did not converge, check the official mpfit'

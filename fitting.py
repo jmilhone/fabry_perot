@@ -144,18 +144,23 @@ def instr_chisq(a, x, data, gaussian_kernel, w0, idx0, idx1, plotit=False):
     """
     amp = np.exp(a[0])
     width = np.exp(a[1])
-    offset = a[2]
+    offset = np.exp(a[2])
     lor = norm_lorentzian(x, 1.0, w0, width)
-
+    sigma = np.sqrt(data) + 10.0  #10 is to avoid division by zero
     voight = np.convolve(gaussian_kernel, lor, mode='valid')
     voight = voight * amp + offset
     # print len(voight), data[idx0:idx0+2], voight[idx0:idx0+2]
-    chisq = np.sum((data[idx0:idx1] - voight[idx0:idx1])**2)
+    chisq = np.sum((data[idx0:idx1] - voight[idx0:idx1])**2 / sigma[idx0:idx1]**2)
     if plotit:
         plt.plot(data)
         plt.plot(voight)
         plt.show()
     return chisq
+
+
+def argon_Ti_chisq():
+    pass
+
 
 # def argon_chisq(a, x, data, instr_kernel, w0, idx0, idx1, plotit=False):
 #     amp = np.exp(a[0])

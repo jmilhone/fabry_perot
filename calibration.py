@@ -228,15 +228,15 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
     idx0 = np.abs(c_lambda_arr - 487.867).argmin()
     idx1 = np.abs(c_lambda_arr - 487.882).argmin()
 
-    p0 = [np.log(0.1), np.log(5.0*gammaT), 0.0]
+    p0 = [np.log(0.1), np.log(5.0*gammaT), -1.e6]
     srs = smooth(ringsums[0], 10)
     maxval = srs.max()
     times += [time.time()]
-    opt = fmin(fitting.instr_chisq, p0, args=(xpad, ringsums[0]/maxval, g, c_lambda, idx0, idx1))
+    opt = fmin(fitting.instr_chisq, p0, args=(xpad, ringsums[0]/maxval, g, c_lambda, idx0, idx1), ftol=1e-5)
     times += [time.time()]
 
     print "Instrument function found, {0} seconds".format(times[-1]-times[-2])
-    print np.exp(opt[0]), np.exp(opt[1]), opt[2]
+    print np.exp(opt[0]), np.exp(opt[1]), np.exp(opt[2])
     fitting.instr_chisq(opt, xpad, ringsums[0]/maxval, g, c_lambda, idx0, idx1, plotit=True)
     return L, d, np.exp(opt[1])
 

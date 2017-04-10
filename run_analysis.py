@@ -79,21 +79,31 @@ if __name__ == "__main__":
     xpadR = np.arange(1, n_dlambda / 2.) * delta_lambda + lambda_max + delta_lambda
     xpad = np.hstack((xpadL, lambda_arr, xpadR))
 
-    instr_width = .007264
-    instr = fitting.norm_lorentzian(xpad, 1.0, w, instr_width)
+    instr_width = .00725
+    # instr_width = .0067
+    w_instr = np.arange(-512.0 / 2, 512.0 / 2, 1) * 0.0001 + 487.8733
+    instr = fitting.norm_lorentzian(w_instr, 1.0, 487.8733, instr_width)
+    # instr = fitting.norm_lorentzian(xpad, 1.0, w, instr_width)
+    # plt.plot(w_instr, instr)
+    # plt.show()
     # instr = instr / instr.sum()  # normalize the kernel
 
-    Ti = 0.6 # eV
+    Ti = 0.8 # eV
     # gamma = 7.7e-5 * w * np.sqrt(Ti/40.0)
     gamma = 3.265e-5 * w * np.sqrt(Ti/40.0)
 
     g = fitting.gaussian(lambda_arr, 1.0, w, gamma)
 
-    cv = np.convolve(instr, g, mode='valid')
+    # cv = np.convolve(g, instr, mode='valid')
+    cv = np.convolve(g, instr, mode='same')
 
     fig, ax = plt.subplots()
-    ax.plot(lambda_arr, ringsums[0], 'r')
-    ax1 = plt.twinx()
-    ax1.plot(lambda_arr, cv, 'b')
+    # ax.plot(lambda_arr, ringsums[0] / ringsums[0].max(), 'r')
+    # ax1 = plt.twinx()
+    # ax.plot(lambda_arr, cv / cv.max(), 'b')
+    temp = fitting.norm_lorentzian(lambda_arr, 1.0, w, .0067)
+    ax.plot(lambda_arr, temp/temp.max(), 'c')
+    temp = fitting.norm_lorentzian(lambda_arr, 1.0, w, 0.00725)
+    ax.plot(lambda_arr, temp/temp.max(), 'g')
     plt.show()
 
