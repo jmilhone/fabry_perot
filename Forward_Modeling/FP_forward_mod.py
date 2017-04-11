@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import quad
+from scipy.interpolate import griddata
 
 class InputSpec(object):
     def __init__(self, temp=1., vel=0., lam0=488.):
@@ -33,15 +33,24 @@ class InputSpec(object):
         return spec
 
 class CCD(object):
-    def __init__(self, size=15.6, npx=4096, f=150., binsize=0.001):
+    def __init__(self, size=(23.5, 15.6), npx=(6036, 4020), f=150., binsize=0.001):
         self.size = size
         self.npx = npx
         self.f = f
         self.binsize = binsize
         self.calc_r_arr()
+        self.calc_pixel_arr()
+
     def calc_r_arr(self):
-        self.r_arr = np.arange(0.0, self.size/2., self.binsize)
+        self.r_arr = np.arange(0.0, max(self.size)/2. + self.binsize/2., self.binsize)
         self.cosTh = self.f / np.sqrt(self.f**2 + self.r_arr**2)
+
+    def calc_pixel_arr(self):
+        dx_pix, dy_pix = self.size[0]/self.npx[0], self.size[1]/self.npx[1]
+        X, Y = np.meshgrid(np.arange(-(self.size[0]-dx_pix)/2., (self.size[0]+dx_pix)/2., dx_pix),
+                           np.arange(-(self.size[1]-dy_pix)/2., (self.size[1]+dy_pix)/2., dy_pix))
+        self.extent = [-(self.size[0]-dx_pix)/2., (self.size[0]-dx_pix)/2., -(self.size[1]-dy_pix)/2., (self.size[1]-dy_pix)/2.]
+        self.pixel_arr = np.sqrt(X**2 + Y**2)
 
 class OutputFP(object):
     def __init__(self, d, wavelength, f, r):
@@ -58,35 +67,22 @@ class FP(object):
         self.F = F  #finesse
         self.Q = (2. / np.pi) * self.F ** 2  # quality factor
 
-    def eval_airy(self, lam, n, costh):
-        m = ((2. * self.d * 1.e6)/lam)*costh - n * np.floor(((2. * self.d * 1.e6)/lam))
-        return (1. + self.Q * np.sin(np.pi * m)**2)**(-1)
+    def eval_airy(self, lam, costh):
+        return (1. + self.Q * np.sin(np.pi * 2 * self.d * 1.e6 * costh * (1./lam))**2)**(-1)
 
-    def convolve_quad(self, npks, costh):
-        out = np.zeros((npks, costh.size))
-        for i,n in enumerate(range(npks)):
-            for j, c in enumerate(costh):
-                print i, j
-                out[i, j] = quad(lambda x: self.InputSpec.eval_spec(x) * self.eval_airy(x, n, c), self.InputSpec.bounds[0], self.InputSpec.bounds[1])[0]
-        return np.sum(out, axis=0)
-
-    def convolve_trapz(self, costh, ns=None):
+    def convolve_trapz(self, costh):
         lam = np.linspace(self.InputSpec.bounds[0], self.InputSpec.bounds[1], 1000, endpoint=True)
         ll, cth = np.meshgrid(lam, costh, indexing='ij')
-        out = np.zeros_like(costh)
-        if ns is None:
-            ns = self.Output.num_pks
-        for i in range(ns+1):
-            out += np.trapz(self.InputSpec.eval_spec(ll) * self.eval_airy(ll, i, cth), lam, axis=0)
-            print "{0} of {1} done".format(i, ns)
+        out = np.trapz(self.InputSpec.eval_spec(ll) * self.eval_airy(ll, cth), lam, axis=0)
         return out/out.max()
 
-    def run_spec(self, input_spec=InputSpec(), ccd=CCD(), ns=None):
+    def run_spec(self, input_spec=InputSpec(), ccd=CCD()):
         self.InputSpec = input_spec
         self.CCD = ccd
         self.Output = OutputFP(self.d, self.InputSpec.wavelength, self.CCD.f, self.CCD.r_arr)
-        self.instrument_func = self.eval_airy(self.InputSpec.wavelength, 0., self.Output.costh)
-        self.Output.output = self.convolve_trapz(self.Output.costh, ns=ns)
+        self.instrument_func = self.eval_airy(self.InputSpec.wavelength, self.Output.costh)
+        self.Output.output = self.convolve_trapz(self.Output.costh)
+        self.Output.ccd = griddata(self.Output.r, self.Output.output, self.CCD.pixel_arr, fill_value=0.0)
 
     def plot(self):
         f, ax = plt.subplots()
@@ -94,11 +90,16 @@ class FP(object):
         ax.plot(self.Output.r, self.instrument_func, label='FP Func.')
         for rr in self.Output.pk_r:
             ax.plot([rr]*2, [0, 1], 'k--')
+        ax.set_xlim([0, min(self.CCD.size)/2.])
         ax.legend(loc='best')
+        plt.show(block=False)
+
+        f, ax = plt.subplots()
+        ax.imshow(self.Output.ccd, cmap='gray', origin='lower', extent=self.CCD.extent)
         plt.show(block=False)
 
 if __name__ == "__main__":
     a = FP()
-    a.run_spec()
+    a.run_spec(input_spec=InputSpec(), ccd=CCD())
     a.plot()
     plt.show()
