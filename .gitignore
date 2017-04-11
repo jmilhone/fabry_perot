@@ -2,7 +2,17 @@
 *.nef
 *.h5
 .idea/*
+
+# Ipython Notebook files
+.ipynb_checkpoints/*
+*.ipynb
+
+# Pickle Files
+*.p
+
+# Tex Files
 *.aux
 *.log
 *.synctex.gz
 *-converted-to.pdf
+*.pdf
