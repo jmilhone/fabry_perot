@@ -9,6 +9,7 @@
 
 # Pickle Files
 *.p
+*.npy
 
 # Tex Files
 *.aux

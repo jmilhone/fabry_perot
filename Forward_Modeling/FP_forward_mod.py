@@ -95,11 +95,16 @@ class FP(object):
         plt.show(block=False)
 
         f, ax = plt.subplots()
-        ax.imshow(self.Output.ccd, cmap='gray', origin='lower', extent=self.CCD.extent)
+        ax.imshow(self.Output.ccd, cmap='gray')#, origin='lower', extent=self.CCD.extent)
+        ax.set_aspect(1.0)
         plt.show(block=False)
 
-if __name__ == "__main__":
+def output_for_Jason(v, fname):
     a = FP()
-    a.run_spec(input_spec=InputSpec(), ccd=CCD())
-    a.plot()
-    plt.show()
+    a.run_spec(input_spec=InputSpec(vel=v))
+    np.save(fname, a.Output.ccd)
+
+if __name__ == "__main__":
+    v_arr = [0., 1., 2., 3.]
+    for v in v_arr:
+        output_for_Jason(v, fname='Ar_V{0}'.format(int(v)))
