@@ -109,6 +109,67 @@ A Fabry-P\'{e}rot interferometer consists of a set of highly-reflective parallel
 With basic theory of an \'{e}talon layed out let's look at how we can use this as a spectrometer.
 
 
+\section{Line Shape Math}
+
+\subsection{Doppler Broadened Shifted Maxwellian}
+
+\begin{equation}
+f = f_0 ( 1 + \frac{V+v}{c} )
+\end{equation}
+
+\begin{equation}
+\frac{\Delta \lambda}{\lambda} = - \frac{\Delta f}{f}
+\end{equation}
+
+\begin{equation}
+v = c (1 - \frac{\lambda}{\lambda_0}) - V
+\end{equation}
+
+\begin{equation}
+P_v(v) dv = P_{\lambda} d \lambda = P_v ( v(\lambda) ) \frac{c}{\lambda_0} d\lambda
+\end{equation}
+
+\begin{equation}
+P_v(v) dv = \sqrt{\frac{m}{2 \pi k_B T}} e^{- \frac{m v^2}{2 k_B T}}
+\end{equation}
+
+\begin{equation}
+P_{\lambda}(\lambda) d \lambda = \sqrt{\frac{m c^2}{2 \pi k_B T \lambda^2}} e^{-\frac{m}{2 k_B T} \left(c(1-\lambda / \lambda_0 ) - V \right)^2}
+\end{equation}
+
+\begin{equation}
+P_{\lambda}(\lambda) d \lambda = \frac{1}{\sqrt{2 \pi} \sigma} e^{-\frac{\left(\lambda - \lambda_0(1 - V/c)\right)^2}{2 \sigma^2}}
+\end{equation}
+
+\begin{equation}
+\sigma = \sqrt{\frac{k_B T}{m}} \frac{\lambda_0}{c} = \frac{V_{th}}{c} \lambda_0
+\end{equation}
+
+\subsection{Instrument Function and Doppler Broadening}
+
+Instrument function is a Lorentzian
+
+\begin{equation}
+L(x;\mu,\gamma) = \frac{\gamma / \pi}{(x-\mu)^2 + \gamma^2}
+\end{equation}
+
+where $\mu$ is the center, and $\gamma$ is the half-width at half-maximum.  The doppler broadened line shape is given by a gaussian.
+
+\begin{equation}
+G(x;\mu, \sigma) = \frac{1}{\sigma \sqrt{2 \pi}} e^{-(x-\mu)^2 / 2 \sigma^2}
+\end{equation}
+
+The line profile imaged by the CCD in $\lambda$-space is given by
+
+\begin{equation}
+V(x;\mu,\sigma,\gamma) = \int_{-\infty}^{\infty} G(x';\mu,\sigma) L(x-x';\mu,\gamma) dx' 
+\end{equation}
+
+This can be rewritten in terms of the complex Faddeeva function, $w(z)$.
+
+\begin{equation}
+ V(x;\mu,\sigma,\gamma) = \frac{\rm{Re}[w(z)]}{\sigma \sqrt{2 \pi}} \quad z=\frac{x - \mu + i \gamma}{\sigma \sqrt{2}}
+\end{equation} 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------

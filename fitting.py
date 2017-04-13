@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import analysis.datahelpers as dh
 from scipy.optimize import curve_fit, fmin
-
+from scipy.special import wofz
 
 def gaussian(x, amp, shift, width):
     """
@@ -36,12 +36,15 @@ def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
     Returns:
         peaks (list): locations of the peaks in x
     """
-    smooth_points = kwargs.get("smooth_points", 20)
+    smooth_points = kwargs.get("smooth_points", 5)
     thres_val = thres * np.max(data)
     up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points)
+    peaks2fit = kwargs.get('npeaks', 10)
     npeaks = min(len(up), len(down))
     if npeaks == 0:
         return []
+    else:
+        npeaks = min(npeaks, peaks2fit)
     fits = []
     peaks = []
     for i in range(npeaks):
@@ -49,10 +52,17 @@ def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
         val_max = data.max()
         vals /= val_max
         xx = x[up[i]:down[i]]
-        fit = curve_fit(gaussian, xx, vals, p0=[1.0, np.mean(xx), 0.5 * (xx[-1] - xx[0])])[0]
-        fit[0] *= val_max
-        fits += [fit]
-        peaks += [fit[1]]
+        # print type(vals), type(xx)
+        # print xx
+        # print vals
+        # plt.plot(xx, vals)
+        # plt.show()
+        if len(xx) > 10:
+            fit, fit_cov = curve_fit(gaussian, xx, vals, p0=[1.0, np.mean(xx), 0.5 * (xx[-1] - xx[0])])
+            # print fit_cov
+            fit[0] *= val_max
+            fits += [fit]
+            peaks += [fit[1]]
 
     # print "Peak locations: ", peaks
 
@@ -69,7 +79,7 @@ def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
     return peaks
 
 
-def find_peaks(x, data, maxval, smooth_points=20):
+def find_peaks(x, data, maxval, smooth_points=5, plotit=False):
     """
 
     Args:
@@ -90,7 +100,13 @@ def find_peaks(x, data, maxval, smooth_points=20):
 
     up = np.where(np.logical_and(parse[1::] == 1.0, parse[0:-1] == 0.0))[0]
     down = np.where(np.logical_and(parse[1::] == 0.0, parse[0:-1] == 1.0))[0]
-
+    if plotit:
+        plt.plot(x,d)
+        for xx in up:
+            plt.plot(x[xx], d[xx], 'oc')
+        for xx in down:
+            plt.plot(x[xx], d[xx], 'og')
+        plt.show()
     return up, down
 
 def norm_gaussian(x, a, shift, gamma):
@@ -147,19 +163,81 @@ def instr_chisq(a, x, data, gaussian_kernel, w0, idx0, idx1, plotit=False):
     offset = np.exp(a[2])
     lor = norm_lorentzian(x, 1.0, w0, width)
     sigma = np.sqrt(data) + 10.0  #10 is to avoid division by zero
-    voight = np.convolve(gaussian_kernel, lor, mode='valid')
-    voight = voight * amp + offset
-    # print len(voight), data[idx0:idx0+2], voight[idx0:idx0+2]
-    chisq = np.sum((data[idx0:idx1] - voight[idx0:idx1])**2 / sigma[idx0:idx1]**2)
+    voigt = np.convolve(gaussian_kernel, lor, mode='valid')
+    voigt = voigt * amp + offset
+    # print len(voigt), data[idx0:idx0+2], voigt[idx0:idx0+2]
+    chisq = np.sum((data[idx0:idx1] - voigt[idx0:idx1])**2 / sigma[idx0:idx1]**2)
     if plotit:
-        plt.plot(data)
-        plt.plot(voight)
+        plt.plot(data, lw=1)
+        plt.plot(voigt, '--', lw=1)
         plt.show()
     return chisq
 
 
-def argon_Ti_chisq():
-    pass
+def argon_Ti_chisq(a, x, data, lor_kernel, w0, idx0, idx1, plotit=False):
+    """
+
+    Args:
+        a:
+        x:
+        data:
+        lor_kernel:
+        w0:
+        idx0:
+        idx1:
+    """
+    amp = np.exp(a[0])
+    Ti = np.exp(a[1])
+    offset = np.exp(a[2])
+    width = 3.265e-5 * w0 * np.sqrt(Ti / 40.0)
+    g = norm_gaussian(x, 1.0, w0, width)
+
+    voigt = np.convolve(g, lor_kernel, mode='valid')
+    # voigt = np.convolve(g, lor_kernel, mode='same')
+    voigt = amp * voigt + offset
+    n = len(data[idx0:idx1])
+    sigma = np.sqrt(np.abs(data)) + 10.0
+    chisq = np.sum((data[idx0:idx1] - voigt[idx0:idx1])**2 / sigma[idx0:idx1]**2) / (n - 4.0)
+    if plotit:
+        print np.trapz(g, x=x)
+        fig, ax = plt.subplots()
+        ax.plot(x, data, 'r', lw=1)
+        # ax1 = ax.twinx()
+        # ax1.plot(voigt, '--b')
+        ax.plot(x, voigt, 'b', lw=1)
+        low, high = ax.get_ylim()
+
+        left = x[idx0]
+        right = x[idx1]
+
+        ax.plot([left]*2, [low, high], '--k')
+        ax.plot([right]*2, [low, high], '--k')
+
+        # h = np.max(data) / np.max(lor_kernel)
+        # npts = len(x)
+        # print npts, len(lor_kernel)
+        # ax.plot(x+.03, h*lor_kernel[npts/2:npts+npts/2], '--g', lw=1)
+        plt.tight_layout()
+        plt.show()
+    return chisq
+
+
+def voigt_profile(x, amp, gamma, sigma, mu):
+    """
+    G(x;sigma,mu) = exp(-(x-mu)**2/(2 sigma)**2) / (sigma sqrt(2 pi))
+    L(x;gamma,mu) = gamma/pi / ( (x-mu)**2 + gamma**2)
+    gamma is half-width at half maximum for L(x;gamma,mu)
+
+    V(x;sigma,gamma,mu) = Re[w(z)]/(sigma sqrt(2pi))
+    z = (x-mu + i*gamma) / (sigma sqrt(2))
+
+    Returns:
+
+    """
+    z = x - mu + 1j*gamma
+    z *= 1.0 / (sigma * np.sqrt(2.0))
+    norm = sigma * np.sqrt(2.0 * np.pi)
+    return amp * np.real(wofz(z)) / norm
 
 
 # def argon_chisq(a, x, data, instr_kernel, w0, idx0, idx1, plotit=False):
