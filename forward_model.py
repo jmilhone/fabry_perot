@@ -29,6 +29,16 @@ class Source(object):
         spec = (2. * np.pi) ** (-2) * (self.sig) ** (-1) * np.exp(-0.5 * ((lam - self.wavelength) / self.sig) ** 2)
         return spec
 
+class Argon(Source):
+    def __init__(self, temp=1., vel=0.):
+        super(Argon, self).__init__(temp=temp, vel=vel, lam0=487.98634, mu=39.948)
+
+class Thorium(Source):
+    def __init__(self):
+        #temp=1000K -> 0.0861733eV
+        super(Thorium, self).__init__(temp=0.0861733, vel=0.0, lam0=487.8733020, mu=232.03806)
+
+
 class CCD(object):
     def __init__(self, f=37500., npx=(6036, 4020)):
         self.npx = npx
@@ -48,6 +58,20 @@ class CCD(object):
         self.lin_arr = np.linspace(0.0, max(self.npx)/2., 2.*max(self.npx))
         self.cos_th = self.f / np.sqrt(self.f**2 + self.lin_arr**2)
 
+class NikonD5200(CCD):
+    def __init__(self, lens=150.):
+        self.lens = lens #mm
+        self.px_size = 3.9 #mu m
+        self.f = lens / (self.px_size * 1.e-3)
+        super(NikonD5200, self).__init__(f=self.f, npx=(6036, 4020))
+
+class Andor(CCD):
+    def __init__(self, lens=150.):
+        self.lens = lens #mm
+        self.px_size = 13.0 #mu m
+        self.f = lens / (self.px_size * 1.e-3)
+        super(Andor, self).__init__(f=self.f, npx=(1024, 1024))
+
 class Etalon(object):
     def __init__(self, d=0.88, F=20.):
         self.d = d  #mm
@@ -66,12 +90,12 @@ def eval_lin_fabry(source, ccd, etalon):
 def interpolate_fabry_to_ccd(lin_arr, lin_data, ccd_grid):
     return griddata(lin_arr, lin_data, ccd_grid, fill_value=0.0)
 
-def main_argon(temp=1.0, vel=0.0, npx=(6036, 4020), f=37500., d=0.88, F=20., plotit=True):
-    source = Source(temp=temp, vel=vel, lam0=487.8733)
-    ccd = CCD(f=f, npx=npx)
+def main_argon(temp=1.0, vel=0.0, lens=150., d=0.88, F=20., plotit=True):
+    source = Argon(temp=temp, vel=vel)
+    ccd = NikonD5200(lens=lens)
     etalon = Etalon(d=d, F=F)
 
-    inputs = {"T": temp, "V": vel, "npx": npx, "f": f, "d": d, "F": F}
+    inputs = {"T": temp, "V": vel, "lens": lens, "d": d, "F": F}
 
     pixel_arr = ccd.lin_arr
     costh_arr = ccd.cos_th
@@ -95,8 +119,8 @@ def main_argon(temp=1.0, vel=0.0, npx=(6036, 4020), f=37500., d=0.88, F=20., plo
         ax.plot(pixel_arr, lin_data, label='data')
         ax.plot(pixel_arr, instrument_func, label='instr. f')
         ax.set_xlabel('pixels')
-        ax.set_xlim([0, min(npx) / 2.])
-        last_pk_ix = np.where(pk_locations > min(npx) / 2.)[0][0]
+        ax.set_xlim([0, min(ccd.npx) / 2.])
+        last_pk_ix = np.where(pk_locations > min(ccd.npx) / 2.)[0][0]
         ax2 = ax.twiny()
         ax2.set_xlim(ax.get_xlim())
         ax2.set_xticks(pk_locations[0:last_pk_ix])
