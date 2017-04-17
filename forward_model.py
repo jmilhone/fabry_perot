@@ -30,10 +30,10 @@ class Source(object):
         return spec
 
 class CCD(object):
-    def __init__(self, f=37500., npx=(6036, 4020)):
+    def __init__(self, f=37500., npx=(6036, 4020), lin_pts=5e4):
         self.npx = npx
         self.f = f
-        self.calc_lin_arr()
+        self.calc_lin_arr(lin_pts)
         self.calc_pix_arr()
 
     def calc_pix_arr(self):
@@ -44,8 +44,8 @@ class CCD(object):
         self.pix_arr = np.sqrt(X**2 + Y**2)
         self.center = (self.center[1], self.center[0])
 
-    def calc_lin_arr(self):
-        self.lin_arr = np.linspace(0.0, max(self.npx)/2., 2.*max(self.npx))
+    def calc_lin_arr(self, lin_pts):
+        self.lin_arr = np.linspace(0.0, max(self.npx)/2., lin_pts, endpoint=True)
         self.cos_th = self.f / np.sqrt(self.f**2 + self.lin_arr**2)
 
 class Etalon(object):
@@ -59,8 +59,15 @@ class Etalon(object):
 
 def eval_lin_fabry(source, ccd, etalon):
     lam_arr = np.linspace(source.bounds[0], source.bounds[1], 1000, endpoint=True)
-    ll, cth = np.meshgrid(lam_arr, ccd.cos_th, indexing='ij')
-    lin_out = np.trapz(source.eval_spec(ll) * etalon.eval_airy(ll, cth), lam_arr, axis=0)
+    if ccd.cos_th.size < 1.e5:
+        ll, cth = np.meshgrid(lam_arr, ccd.cos_th, indexing='ij')
+        lin_out = np.trapz(source.eval_spec(ll) * etalon.eval_airy(ll, cth), lam_arr, axis=0)
+    else:
+        lin_out = np.zeros_like(ccd.cos_th)
+        spec = source.eval_spec(lam_arr)
+        for i, cth in enumerate(ccd.cos_th):
+            lin_out[i] = np.trapz(spec * etalon.eval_airy(lam_arr, cth), lam_arr)
+            print "{0:.2f}% done...".format(i*(100./ccd.cos_th.size))
     return lin_out/lin_out.max()
 
 def interpolate_fabry_to_ccd(lin_arr, lin_data, ccd_grid):
