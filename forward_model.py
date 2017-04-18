@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 import h5py
+import cPickle as pickle
 
 class Source(object):
     def __init__(self, temp=1., vel=0., lam0=488., mu=40.):
@@ -60,6 +61,7 @@ class CCD(object):
 
 class NikonD5200(CCD):
     def __init__(self, lens=150., lin_pts=5e4):
+        self.name = 'Nikon D5200'
         self.lens = lens #mm
         self.px_size = 3.9 #mu m
         self.f = lens / (self.px_size * 1.e-3)
@@ -67,6 +69,7 @@ class NikonD5200(CCD):
 
 class Andor(CCD):
     def __init__(self, lens=150., lin_pts=5e4):
+        self.name = 'Andor iStar334T'
         self.lens = lens #mm
         self.px_size = 13.0 #mu m
         self.f = lens / (self.px_size * 1.e-3)
@@ -98,7 +101,8 @@ def eval_lin_fabry(source, ccd, etalon):
 def interpolate_fabry_to_ccd(lin_arr, lin_data, ccd_grid):
     return griddata(lin_arr, lin_data, ccd_grid, fill_value=0.0)
 
-def main_argon(temp=1.0, vel=0.0, lens=150., d=0.88, F=20., lin_pts=5e4, plotit=True, savedic=None, saveccd=None):
+def main_argon(temp=1.0, vel=0.0, lens=150., d=0.88, F=20., lin_pts=5e4, plotit=True,
+               savedic=None, saveccd=None, saveparams=None):
     source = Argon(temp=temp, vel=vel)
     ccd = NikonD5200(lens=lens, lin_pts=lin_pts)
     etalon = Etalon(d=d, F=F)
@@ -119,23 +123,27 @@ def main_argon(temp=1.0, vel=0.0, lens=150., d=0.88, F=20., lin_pts=5e4, plotit=
     pk_locations = ccd.f * np.sqrt((m_max / (np.floor(m_max) - np.arange(num_pks)))**2 - 1.)
     pk_m_arr = m_max * ccd.f/np.sqrt(ccd.f**2 + pk_locations**2)
 
-    out_dict = {"pixel_grid": pixel_grid, "ccd_data": ccd_data, "m_max": m_max,
-                     "pk_locations": pk_locations, "pk_m_arr": pk_m_arr, "T": temp, "V": vel, "lens": lens,
-                     "d": d, "F": F, "pixel_arr": pixel_arr, "costh_arr": costh_arr, "lin_data": lin_data,
-                     "instrument_func": instrument_func, "m_arr": m_arr}
+    param_dict = {"T": temp, "V": vel, "f": (lens, ccd.f), "d": d, "F": F, "Q": etalon.Q, "lam0": source.lam0,
+                  "mu": source.mu, "FWHM": source.FWHM, "lam_shfit": source.wavelength, "ccd_type": ccd.name,
+                  "npx": ccd.npx, "px_size": ccd.px_size, "ccd_center": ccd.center, "m_max": m_max,
+                  "pk_locations": pk_locations, "pk_m": pk_m_arr}
+
+    arr_dict = {"pixel_grid": pixel_grid, "ccd_data": ccd_data, "pixel_arr": pixel_arr, "costh_arr": costh_arr,
+                "lin_data": lin_data, "instrument_func": instrument_func, "m_arr": m_arr}
 
     if savedic is not None:
         f = h5py.File(savedic, 'w')
-        for k in out_dict.keys():
-            if type(out_dict[k]) is np.ndarray:
-                print 'compressing {0}...'.format(k)
-                f.create_dataset(k, data=out_dict[k], compression='lzf')
-            else:
-                f.create_dataset(k, data=out_dict[k])
+        for k in arr_dict.keys():
+            f.create_dataset(k, data=arr_dict[k], compression='lzf')
+        for k in param_dict.keys():
+            f.create_dataset(k, data=param_dict[k])
         print 'Output saved as h5 file: {0}'.format(savedic)
 
     if saveccd is not None:
         np.save(saveccd, ccd_data)
+
+    if saveparams is not None:
+        pickle.dump(param_dict, open(saveparams, 'wb'))
 
     if plotit:
         print 'Plotting...'
@@ -162,7 +170,7 @@ def main_argon(temp=1.0, vel=0.0, lens=150., d=0.88, F=20., lin_pts=5e4, plotit=
 
     print 'Done!'
 
-    return out_dict
+    return param_dict, arr_dict
 
 if __name__ == "__main__":
-    _ = main_argon()
+    _, _ = main_argon()
