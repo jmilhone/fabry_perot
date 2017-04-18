@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
+import h5py
 
 class Source(object):
     def __init__(self, temp=1., vel=0., lam0=488., mu=40.):
@@ -38,7 +39,6 @@ class Thorium(Source):
         #temp=1000K -> 0.0861733eV
         super(Thorium, self).__init__(temp=0.0861733, vel=0.0, lam0=487.8733020, mu=232.03806)
 
-
 class CCD(object):
     def __init__(self, f=37500., npx=(6036, 4020), lin_pts=5e4):
         self.npx = npx
@@ -59,18 +59,18 @@ class CCD(object):
         self.cos_th = self.f / np.sqrt(self.f**2 + self.lin_arr**2)
 
 class NikonD5200(CCD):
-    def __init__(self, lens=150.):
+    def __init__(self, lens=150., lin_pts=5e4):
         self.lens = lens #mm
         self.px_size = 3.9 #mu m
         self.f = lens / (self.px_size * 1.e-3)
-        super(NikonD5200, self).__init__(f=self.f, npx=(6036, 4020))
+        super(NikonD5200, self).__init__(f=self.f, npx=(6036, 4020), lin_pts=lin_pts)
 
 class Andor(CCD):
-    def __init__(self, lens=150.):
+    def __init__(self, lens=150., lin_pts=5e4):
         self.lens = lens #mm
         self.px_size = 13.0 #mu m
         self.f = lens / (self.px_size * 1.e-3)
-        super(Andor, self).__init__(f=self.f, npx=(1024, 1024))
+        super(Andor, self).__init__(f=self.f, npx=(1024, 1024), lin_pts=lin_pts)
 
 class Etalon(object):
     def __init__(self, d=0.88, F=20.):
@@ -89,20 +89,19 @@ def eval_lin_fabry(source, ccd, etalon):
     else:
         lin_out = np.zeros_like(ccd.cos_th)
         spec = source.eval_spec(lam_arr)
+        per_print = (100./ccd.cos_th.size)
         for i, cth in enumerate(ccd.cos_th):
             lin_out[i] = np.trapz(spec * etalon.eval_airy(lam_arr, cth), lam_arr)
-            print "{0:.2f}% done...".format(i*(100./ccd.cos_th.size))
+            print "{0:.2f}% done...".format(i * per_print)
     return lin_out/lin_out.max()
 
 def interpolate_fabry_to_ccd(lin_arr, lin_data, ccd_grid):
     return griddata(lin_arr, lin_data, ccd_grid, fill_value=0.0)
 
-def main_argon(temp=1.0, vel=0.0, lens=150., d=0.88, F=20., plotit=True):
+def main_argon(temp=1.0, vel=0.0, lens=150., d=0.88, F=20., lin_pts=5e4, plotit=True, savedic=None, saveccd=None):
     source = Argon(temp=temp, vel=vel)
-    ccd = NikonD5200(lens=lens)
+    ccd = NikonD5200(lens=lens, lin_pts=lin_pts)
     etalon = Etalon(d=d, F=F)
-
-    inputs = {"T": temp, "V": vel, "lens": lens, "d": d, "F": F}
 
     pixel_arr = ccd.lin_arr
     costh_arr = ccd.cos_th
@@ -119,6 +118,24 @@ def main_argon(temp=1.0, vel=0.0, lens=150., d=0.88, F=20., plotit=True):
     num_pks = int(np.floor(np.floor(m_max) - m_arr.min() + 1))
     pk_locations = ccd.f * np.sqrt((m_max / (np.floor(m_max) - np.arange(num_pks)))**2 - 1.)
     pk_m_arr = m_max * ccd.f/np.sqrt(ccd.f**2 + pk_locations**2)
+
+    out_dict = {"pixel_grid": pixel_grid, "ccd_data": ccd_data, "m_max": m_max,
+                     "pk_locations": pk_locations, "pk_m_arr": pk_m_arr, "T": temp, "V": vel, "lens": lens,
+                     "d": d, "F": F, "pixel_arr": pixel_arr, "costh_arr": costh_arr, "lin_data": lin_data,
+                     "instrument_func": instrument_func, "m_arr": m_arr}
+
+    if savedic is not None:
+        f = h5py.File(savedic, 'w')
+        for k in out_dict.keys():
+            if type(out_dict[k]) is np.ndarray:
+                print 'compressing {0}...'.format(k)
+                f.create_dataset(k, data=out_dict[k], compression='lzf')
+            else:
+                f.create_dataset(k, data=out_dict[k])
+        print 'Output saved as h5 file: {0}'.format(savedic)
+
+    if saveccd is not None:
+        np.save(saveccd, ccd_data)
 
     if plotit:
         print 'Plotting...'
@@ -145,9 +162,7 @@ def main_argon(temp=1.0, vel=0.0, lens=150., d=0.88, F=20., plotit=True):
 
     print 'Done!'
 
-    return {"pixel_arr": pixel_arr, "costh_arr": costh_arr, "lin_data": lin_data, "instrument_func": instrument_func,
-            "pixel_grid": pixel_grid, "ccd_data": ccd_data, "m_max": m_max, "m_arr": m_arr,
-            "pk_locations": pk_locations, "pk_m_arr": pk_m_arr, "inputs": inputs}
+    return out_dict
 
 if __name__ == "__main__":
-    a = main_argon()
+    _ = main_argon()
