@@ -21,6 +21,52 @@ def gaussian(x, amp, shift, width):
     """
     return amp * np.exp(-(x - shift) ** 2 / (2. * width) ** 2)
 
+def peak_and_fit2(x, data, thres=0.55, plotit=False, **kwargs):
+    smooth_points = kwargs.get("smooth_points", 5)
+    thres_val = thres * np.max(data)
+    print type(data)
+    up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points, plotit=True)
+
+    peaks2fit = kwargs.get('npeaks', 10)
+
+    npeaks = min(len(up), len(down))
+    if npeaks == 0:
+        return []
+    else:
+        npeaks = min(npeaks, peaks2fit)
+    if plotit:
+        fig, ax = plt.subplots()
+        ax.plot(x**2, data)
+    peaks = []
+    for i in range(npeaks):
+        vals = data[up[i]:down[i]].copy()
+        new_thres = 0.8 * np.max(vals)
+        xx = x[up[i]:down[i]].copy()
+
+        pk =  np.sqrt(np.trapz(xx**2 * vals, x=xx**2) / np.trapz(vals, x=xx**2))
+        print pk
+        peaks.append(pk)
+        # print up[i] - down[i]
+        # u, d = find_peaks(xx, vals, new_thres, smooth_points=10)
+        # new_fig = plt.figure()
+        # plt.plot(xx[u[0]:d[0]]**2, dh.smooth(vals[u[0]:d[0]], 5))
+        # plt.show()
+        # inds = range(u[0], d[0])
+        # new_vals = dh.smooth(vals[inds], 1)
+        # new_vals /= new_vals.max()
+        # new_xx = xx[inds]**2
+        # fit, fit_cov = curve_fit(gaussian, new_xx, new_vals,
+        #                          p0=[1.0, np.mean(new_xx), 0.5*(new_xx[-1] - new_xx[0])])
+
+        # print u, d
+        # print xx[u[0]], xx[d[0]], np.sqrt(fit[1])
+
+        # if plotit:
+        #     plt.plot(xx[u[0]]**2, vals[u[0]], 'or')
+        #     plt.plot(xx[d[0]]**2, vals[d[0]], 'og')
+    if plotit:
+        plt.show()
+    return peaks
 
 def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
     """
@@ -39,6 +85,7 @@ def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
     smooth_points = kwargs.get("smooth_points", 5)
     thres_val = thres * np.max(data)
     up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points)
+    print up, down
     peaks2fit = kwargs.get('npeaks', 10)
     npeaks = min(len(up), len(down))
     if npeaks == 0:
@@ -51,31 +98,56 @@ def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
         vals = data[up[i]:down[i]].copy()
         val_max = data.max()
         vals /= val_max
-        xx = x[up[i]:down[i]]
+        xx = x[up[i]:down[i]]**2
+        # print np.trapz(xx * vals, x=xx) / np.trapz(vals, x=xx)
         # print type(vals), type(xx)
         # print xx
         # print vals
         # plt.plot(xx, vals)
         # plt.show()
-        if len(xx) > 10:
+        if len(xx) > 5:
+            # new_thres = .3 * np.max(data[up[i]:down[i]])
+            # L = np.max(np.where(data[0:up[i]] < new_thres))
+            # R = np.min(np.where(data[down[i]:] < new_thres)) + down[i]
+
             fit, fit_cov = curve_fit(gaussian, xx, vals, p0=[1.0, np.mean(xx), 0.5 * (xx[-1] - xx[0])])
+            # fit, fit_cov = curve_fit(gaussian, x[L:R], data[L:R] / data[L:R].max(), p0=[1.0, np.mean(x[L:R]), 0.5 * (x[R] - x[L])])
             # print fit_cov
             fit[0] *= val_max
             fits += [fit]
-            peaks += [fit[1]]
+            peaks += [np.sqrt(fit[1])]
 
+
+            # print "\n",L, up[i]
+            # print R, down[i]
+
+            # print np.trapz(x[L:R] * data[L:R], x=x[L:R]) / np.trapz(data[L:R], x=x[L:R])
     # print "Peak locations: ", peaks
-
     if plotit:
         fig, ax = plt.subplots()
-        ax.plot([x[0], x[-1]], [thres_val] * 2, '--k')
-        ax.plot(x, data, lw=1)
-        ax.plot(x[up], data[up], 'or', ms=4)
-        ax.plot(x[down], data[down], 'oc', ms=4)
+        ax.plot([x[0]**2, x[-1]**2], [thres_val] * 2, '--k')
+        ax.plot(x**2, data, lw=1)
+        ax.plot(x[up]**2, data[up], 'or', ms=4)
+        ax.plot(x[down]**2, data[down], 'oc', ms=4)
         for i, fit in enumerate(fits):
-            xx = x[up[i]:down[i]]
+            xx = x[up[i]:down[i]]**2
             plt.plot(xx, gaussian(xx, *fit), '--g')
+        ax.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
+        ax.set_xlabel(r"$r^2$ (Pixels${}^2$)")
+        ax.set_ylabel("Counts")
+        plt.tight_layout()
         plt.show()
+    # if plotit:
+    #     fig, ax = plt.subplots()
+    #     ax.plot([x[0], x[-1]], [thres_val] * 2, '--k')
+    #     ax.plot(x, data, lw=1)
+    #     ax.plot(x[up], data[up], 'or', ms=4)
+    #     ax.plot(x[down], data[down], 'oc', ms=4)
+    #     for i, fit in enumerate(fits):
+    #         xx = x[up[i]:down[i]]
+    #         plt.plot(xx, gaussian(xx, *fit), '--g')
+    #     plt.show()
+    # print peaks
     return peaks
 
 
@@ -94,9 +166,13 @@ def find_peaks(x, data, maxval, smooth_points=5, plotit=False):
         down (list): list of the x values that end on the downward side of
             peak at maxval
     """
-    d = dh.smooth(data, smooth_points)
+    if smooth_points > 1:
+        d = dh.smooth(data, smooth_points)
+    else:
+        d = data.copy()
+
     parse = np.zeros_like(data)
-    parse[np.where(d > maxval)] = 1.0
+    parse[np.where(d >= maxval)] = 1.0
 
     up = np.where(np.logical_and(parse[1::] == 1.0, parse[0:-1] == 0.0))[0]
     down = np.where(np.logical_and(parse[1::] == 0.0, parse[0:-1] == 1.0))[0]

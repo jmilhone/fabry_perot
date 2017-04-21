@@ -5,7 +5,7 @@ import image_helpers as im
 import ring_sum as rs
 from os.path import join
 import fitting
-from scipy.optimize import minimize_scalar, fmin, curve_fit
+from scipy.optimize import minimize_scalar, fmin, curve_fit, differential_evolution
 import time
 import cPickle as pickle
 from analysis.datahelpers import smooth
@@ -19,9 +19,9 @@ global_d_limits = (.87, .89)
 Ar_params = {
     'binsize': 0.1,
     'c_lambda': 487.8733,
-    'delta_lambda': 0.0001,
+    'delta_lambda': 0.0001*4,
     'duc': 0.88,
-    'n_dlambda': 512,
+    'n_dlambda': 512 /4 ,
     'Tlamp': 1000.0 * .025 / 300.0,  # .025 eV per 300 K
     'lampmu': 232.0,
 }
@@ -34,6 +34,42 @@ He_params = {
     'Tlamp': 1000.0 * .025 / 300.0,  # .025 eV per 300 K
     'lampmu': 232.0,
 }
+
+def chisq_d_L(a, radius, weights, pks, dw, w0, ndl=512):
+
+    # L = a[0] * (global_L_limits[1] - global_L_limits[0]) + global_L_limits[0]
+    # d = a[1] * (global_d_limits[1] - global_d_limits[0]) + global_d_limits[0]
+    L = a[0]
+    d = np.exp(a[1])
+    m0 = np.floor(2 * d * 1.e6 / w0)
+    npks = len(pks)
+
+
+
+    rj = [L * np.sqrt((2.e6 * d / ((m0-j)*w0))**2 -1.0) for j in range(npks)]
+    print m0,L, d
+    print rj
+    print pks
+    chisq = 0.0
+    for idx, r in enumerate(rj):
+        chisq += (r - pks[idx])**2 / .02**2
+    print chisq,"\n"
+    # print L, d, m0
+    # rings, warr = rs.ringsum(radius, weights, m0, L, d, pks, dw, ndl=ndl)
+    # npks = len(rings) - 1
+    # lambda_peaks = []
+    # for idx in range(npks):
+    #     temp = fitting.peak_and_fit(warr, rings[idx], thres=0.55, plotit=False)
+    #     if len(temp) > 0.0:
+    #         lambda_peaks += [temp[0]]
+    #     else:
+    #         print "no peaks\n"
+    #         return 1.e3
+    # chisq = 0.0
+    # for peak in lambda_peaks:
+    #     chisq += peak**2 / dw**2
+    # # print chisq, "\n"
+    return chisq
 
 
 def minimize_shift_for_d_L(a, radius, weights, m0, pks, w,
@@ -72,6 +108,7 @@ def minimize_shift_for_d_L(a, radius, weights, m0, pks, w,
     npks = len(pks[0:-1])
     for idx in range(npks):
         temp = fitting.peak_and_fit(warr, ringsum[idx], thres=0.65)
+        # print temp
         if len(temp) > 0.0:
             lambda_peaks += [temp[0]]
         else:
@@ -105,15 +142,26 @@ def find_d_L(Luc, duc, radius, weights, m, pks, w, warr, wmin, wmax, dw, ndl=512
         L (float): camera focal length
         d (float): etalon spacing
     """
-    Ly = (Luc - global_L_limits[0]) / (global_L_limits[1] - global_L_limits[0])
-    dy = (duc - global_d_limits[0]) / (global_d_limits[1] - global_d_limits[0])
-    opt = fmin(minimize_shift_for_d_L, x0=[Ly, dy],
-               args=(radius, weights, m, pks, w, warr, wmin,
-                     wmax, dw, ndl), ftol=1.e-6)
+    # Ly = (Luc - global_L_limits[0]) / (global_L_limits[1] - global_L_limits[0])
+    # dy = (duc - global_d_limits[0]) / (global_d_limits[1] - global_d_limits[0])
+    # opt = fmin(minimize_shift_for_d_L, x0=[Ly, dy],
+    #            args=(radius, weights, m, pks, w, warr, wmin,
+    #                  wmax, dw, ndl), ftol=1.e-6)
 
-    Lopt = opt[0] * (global_L_limits[1] - global_L_limits[0]) + global_L_limits[0]
-    dopt = opt[1] * (global_d_limits[1] - global_d_limits[0]) + global_d_limits[0]
-
+    # opt = fmin(chisq_d_L, x0=[Ly, dy],
+    #            args=(radius, weights, pks, dw, w, ndl), ftol=1.e-6)
+    # Lopt = opt[0] * (global_L_limits[1] - global_L_limits[0]) + global_L_limits[0]
+    # dopt = opt[1] * (global_d_limits[1] - global_d_limits[0]) + global_d_limits[0]
+    t = time.time()
+    mybounds = [(145.0/.0039, 155./.0039), (np.log(.88-.1), np.log(.88+.1))]
+    res = differential_evolution(chisq_d_L, bounds=mybounds,
+                                 args=(radius, weights, pks, dw, w, ndl), tol=1.e-8)
+    Lopt, dopt = res.x
+    print res
+    dopt = np.exp(dopt)
+    # print res.success, res.message
+    print mybounds
+    print time.time()-t
     return Lopt, dopt
 
 
@@ -180,40 +228,66 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
     else:
         print "Did not recognize gas.  Exiting..."
         return None
-
-    data = im.get_image_data(f, f_bg, color='b')
+    # f_bg=None
+    data = im.get_image_data(f, bgname=f_bg, color='b')
     # im.quick_plot(data)
     # plt.show()
-
+    # data = np.load("100M_Ar.npy")
+    # data = np.load("Ar_image.npy")
+    # data = np.load("Ar_image.npy") + np.load("Th_image.npy")
+    print data.shape
+    # x0 = data.shape[1]/2
+    # y0 = data.shape[0]/2
+    print x0, y0, "My artificial center"
     times += [time.time()]
     print "Image done reading, {0} seconds".format(times[-1] - times[-2])
     x0, y0 = rs.locate_center(data, x0, y0, binsize=binsize, plotit=False)
     times += [time.time()]
     print "Center found, {0} seconds".format(times[-1] - times[-2])
+    print x0, y0
 
     binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=binsize, quadrants=False)
+    new_binarr = np.concatenate(([0.0], binarr))
+    n = len(new_binarr)
+
+    # rarr = np.array([0.5 * (new_binarr[i] + new_binarr[i+1]) for i in range(n-1)])
+    rarr = binarr
+    # plt.plot(rarr, sigarr)
+    # plt.show()
     # plt.plot(binarr, sigarr)
     # plt.show()
 
-    # peaks = fitting.peak_and_fit(binarr, sigarr, thres=0.55, plotit=True)
-    peaks = fitting.peak_and_fit(binarr, sigarr, thres=0.65, plotit=False)
+    # new_peaks = fitting.peak_and_fit2(rarr, sigarr, thres=0.3, plotit=True, smooth_points=10)
+    peaks = fitting.peak_and_fit(rarr, sigarr, thres=0.3, plotit=False, smooth_points=10)
+
+    th_peaks = peaks[0::2]
+    ar_peaks = peaks[1::2]
+    print th_peaks
+    print ar_peaks
+    # new_ar_peaks = new_peaks[0::2]
+    # new_th_peaks = new_peaks[1::2]
+    # peaks = fitting.peak_and_fit(binarr, sigarr, thres=0.65, plotit=False)
+    # print "new method peaks: ", new_peaks
     print "Peak locations: ", peaks
+    # print "Ar peaks: ", new_ar_peaks
+    # print "Th peaks: ", new_th_peaks
     r1 = peaks[0]
     r2 = peaks[1]
 
     Luc = find_initial_Lguess(peaks[0], peaks[1], c_lambda, duc)
+    print Luc
     # Luc = find_L(peaks)
     # print "new luc", Luc
-    m1 = 2.0 * duc * 1.0e6 * Luc / np.sqrt(Luc ** 2 + r1 ** 2) / c_lambda
-    m2 = 2.0 * duc * 1.0e6 * Luc / np.sqrt(Luc ** 2 + r2 ** 2) / c_lambda
+    # m1 = 2.0 * duc * 1.0e6 * Luc / np.sqrt(Luc ** 2 + r1 ** 2) / c_lambda
+    # m2 = 2.0 * duc * 1.0e6 * Luc / np.sqrt(Luc ** 2 + r2 ** 2) / c_lambda
 
     # Recalculate L and d with m1 and m2 being integers
-    L = np.sqrt(((m2 * r2) ** 2 - (m1 * r1) ** 2) / (m1 ** 2 - m2 ** 2))
-    d = m1 * c_lambda * np.sqrt(L ** 2 + r1 ** 2) / (2 * L * 1.e6)
+    # L = np.sqrt(((m2 * r2) ** 2 - (m1 * r1) ** 2) / (m1 ** 2 - m2 ** 2))
+    # d m1 * c_lambda * np.sqrt(L ** 2 + r1 ** 2) / (2 * L * 1.e6)
 
     ny, nx = data.shape
-    x = np.arange(1, nx + 1, 1)
-    y = np.arange(1, ny + 1, 1)
+    x = np.arange(0, nx, 1)
+    y = np.arange(0, ny, 1)
     xx, yy = np.meshgrid(1. * x - x0, 1. * y - y0)
     R = np.sqrt(xx ** 2 + yy ** 2)
 
@@ -221,125 +295,225 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
     R = R.flatten()
     data = data.flatten()
 
-    c_lambda_arr = np.arange(-n_dlambda / 2, n_dlambda / 2, 1) * delta_lambda + c_lambda
-    lambda_min = c_lambda_arr.min()
-    lambda_max = c_lambda_arr.max()
-    npeaks = len(peaks)
+    # i = np.argsort(R)
+    # plt.plot(R[i], data[i])
+    # plt.show()
 
-    times += [time.time()]
-    L, d = find_d_L(L, d, R, data, m1, peaks, c_lambda, c_lambda_arr,
-                    lambda_min, lambda_max, delta_lambda, ndl=n_dlambda)
-    times += [time.time()]
-    marr = [2.0 * d * 1.0e6 * L / np.sqrt(L ** 2 + r ** 2) / c_lambda for r in peaks]
-    print "\nOrder Numbers: ", marr
-    print "Order Differences: ", np.diff(marr), "\n"
-    # print "Overwrote L and d"
-    # L =37561.3832261
-    # d =0.879999606156
+    # print "Overriding L and d"
+    # L = 150.1 / 0.0039
+    # d = 0.881
 
-    m1 = 2 * d * 1.e6 * L / np.sqrt(L ** 2 + r1 ** 2) / c_lambda
-    print "\nL, d solver took {0:f} seconds".format(times[-1] - times[-2])
-    print "L={0} pixels".format(L)
-    print "d={0} mm".format(d)
-    print "Highest order m={0}\n".format(m1)
-    ringsums = rs.proper_ringsum(R, data, m1, L, d, peaks, lambda_min,
-                                 lambda_max, delta_lambda, ndl=n_dlambda)
-    wpeaks = []
-    for idx in range(npeaks):
-        wpeaks += fitting.peak_and_fit(c_lambda_arr, ringsums[idx], thres=0.65, plotit=True)
-    wpeaks = [wp for wp in wpeaks if np.abs(wp-c_lambda) < 0.05]
-    print "Wavelength peaks (nm) for each order:"
-    print wpeaks, "\n"
+    # L = 37554.6185682
+    # d = 0.879904383091
 
-    # gammaT = 7.7e-5 * c_lambda * np.sqrt(Tlamp / lampmu)
-    # gammaT = 3.265e-5 * c_lambda * np.sqrt(Tlamp / lampmu)
-    sigmaT = 3.265e-5 * c_lambda * np.sqrt(Tlamp / lampmu)
+    # print L, d
+    L = 38584.6420858
+    d = 0.881218270681
+    m0 = np.floor(2*d*1.e6 / c_lambda)
 
-    # xpadL = np.arange(-512 / 2., 0) * delta_lambda + lambda_min
-    # xpadR = np.arange(1, 512 / 2.) * delta_lambda + lambda_max + delta_lambda
-    # xpad = np.hstack((xpadL, c_lambda_arr, xpadR))
-    #
-    # g = fitting.norm_gaussian(c_lambda_arr, 1.0, c_lambda, gammaT)
-    # g = g / np.sum(g)
 
-    # Ar
-    # idx0 = np.abs(c_lambda_arr - 487.867).argmin()
-    # idx1 = np.abs(c_lambda_arr - 487.882).argmin()
 
-    # He
-    idx0 = np.abs(c_lambda_arr - 468.615).argmin()
-    idx1 = np.abs(c_lambda_arr - 468.625).argmin()
+    # print "Testing a new method"
+    maxiter = 10j
+    # for i in range(maxiter):
+    #     print i
+    #     L = np.sqrt((r2**2*(m0-1)**2 - r1**2*m0**2)/(2 * m0 - 1))
+    #     darr = [0.5 * (m0 - x) * np.sqrt(L**2 + peaks[x]**2) * c_lambda / (1.e6 *L) for x in range(3)]
+    #     print darr
+    #     d = np.mean(darr)
+    #     m0 = np.floor(2 * d * 1.e6 / c_lambda)
+    #     print m0, L, d, "\n"
+    # L, d = find_d_L(37500.0, duc, R, data, m0, peaks, c_lambda, 0.0, 0.0, 0.0, delta_lambda, ndl=512)
+    print L, d
+    ringsums, lambda_arr = rs.ringsum(R, data, m0, L, d, th_peaks, delta_lambda, ndl=n_dlambda)
 
-    widths = []
-    for idx in range(npeaks):
-        srs = smooth(ringsums[idx], 10)
-        maxval = srs.max()
-        vals = ringsums[idx] / maxval
-        # test_vals = fitting.voigt_profile(c_lambda_arr, sigmaT * np.sqrt(2.0 * np.pi), .005, sigmaT, c_lambda)
-        # print c_lambda_arr
-        # print test_vals
-        # fig, ax = plt.subplots()
-        # ax.plot(c_lambda_arr, test_vals, '--r')
-        # ax1 = plt.twinx()
-        # ax1.plot(c_lambda_arr, vals, 'b')
-        # plt.show()
-        opt, cov = curve_fit(
-            lambda x, amp, a, offset: fitting.voigt_profile(x, amp, a, sigmaT, wpeaks[idx]) + offset,
-            c_lambda_arr[idx0:idx1], vals[idx0:idx1], p0=[1.0, .005, np.mean(vals[1:n_dlambda/10])]
-        )
-        print opt
-        widths.append(opt[1])
+    w_peaks = []
+    for rsum in ringsums:
+        # plt.plot(lambda_arr, rsum)
+        # pk = fitting.peak_and_fit(lambda_arr, rsum)
+        # w_peaks += pk
+        i = np.abs(lambda_arr).argmin() # close enough to the peak
+        thres = .5 * rsum[i]
+        iL = np.max(np.where(rsum[0:i] < thres))
+        iR = np.min(np.where(rsum[i:] < thres)) + i
+        # print iL, iR, lambda_arr[iL], lambda_arr[iR]
+        inds = range(iL, iR+1)
+        pk = np.trapz(lambda_arr[inds] * rsum[inds], x=lambda_arr[inds]) / np.trapz(rsum[inds], x=lambda_arr[inds])
+        w_peaks += [pk]
+        # print pk
+    #     print pk
+    # plt.show()
+    print w_peaks
+    print c_lambda - 487.867
+    print 487.882 - c_lambda
+
+
+    #Find fitting region:
+    iL = np.abs((lambda_arr + .006)).argmin()
+    iR = np.abs((lambda_arr - .006)).argmin()
+
+    print iL, iR
+    ind = range(iL, iR)
+
+    Ti = 1000.0 * .025 / 300.0
+    sigma = 3.265e-5 * c_lambda * np.sqrt(Ti / lampmu)
+    print 'sigma', sigma
+
+    for i, pk in enumerate(w_peaks):
+        maxval = np.max(ringsums[i][ind])
+        xdata = lambda_arr[ind]
+        ydata = ringsums[i][ind] / maxval
+
+        opt, cov = curve_fit(lambda x, a, b: fitting.voigt_profile(x, a, b, sigma, pk),
+                             xdata, ydata, p0=[0.01, 0.0036])
+        print "{0}: opt: {1}\n".format(i, opt)
+
+
+        voigt = fitting.voigt_profile(lambda_arr, opt[0], opt[1], sigma, pk)
+        # voigt = fitting.voigt_profile(lambda_arr, .01, .0036, sigma, 0.0)
+
         fig, ax = plt.subplots()
-        ax.plot(c_lambda_arr, vals, 'b')
-        fitvals = opt[2] + fitting.voigt_profile(c_lambda_arr, opt[0], opt[1], sigmaT, wpeaks[idx])
-        ax.plot(c_lambda_arr, fitvals, '--r')
+        # ax.plot(xdata, ydata, 'b')
+        ax.plot(lambda_arr, maxval*voigt, 'r')
+        # fig, ax = plt.subplots()
+        ax.plot(lambda_arr, ringsums[i], 'b')
         plt.show()
-        # print np.mean(vals[1:50])
-        # p0 = [np.log(0.1), np.log(5.0*gammaT), np.log(np.mean(vals[1:50]))]
-        # times += [time.time()]
-        # opt = fmin(fitting.instr_chisq, p0, args=(xpad, vals, g, c_lambda, idx0, idx1), ftol=1e-5)
-        # times += [time.time()]
-        #
-        # print "Instrument function found, {0} seconds".format(times[-1]-times[-2])
-        # print np.exp(opt)
-        # print np.exp(opt[0]), np.exp(opt[1]), np.exp(opt[2])
-        # fitting.instr_chisq(opt, xpad, vals, g, c_lambda, idx0, idx1, plotit=True)
-        # widths += [np.exp(opt[1])]
+    # ax1 = ax.twinx()
+    # gamma = .0036
 
-    data_to_save = {
-        "ringsum": ringsums,
-        "peaks": wpeaks,
-        "m": m1,
-        "delta_lambda": delta_lambda,
-        "n_dlambda": n_dlambda,
-        "c_lambda_arr": c_lambda_arr,
-        "c_lambda": c_lambda,
-        "lambda_min": lambda_min,
-        "lambda_max": lambda_max,
-        "L": L,
-        "d": d,
-        "HWHM": widths
-    }
-    with open("calibration_data.p", 'wb') as outfile:
-        pickle.dump(data_to_save, outfile)
+    ii = np.argmin(np.abs(lambda_arr))
+    # print ii-iL, iR-ii
+    # voigt *= ringsums[0][ii]/voigt.max()
+    # ax.plot(lambda_arr, voigt, '--r')
+    # plt.show()
+    # c_lambda_arr = np.arange(-n_dlambda / 2, n_dlambda / 2, 1) * delta_lambda + c_lambda
+    # lambda_min = c_lambda_arr.min()
+    # lambda_max = c_lambda_arr.max()
+    # print lambda_min, lambda_max
+    # npeaks = len(peaks)
 
-    return L, d, widths
+    # times += [time.time()]
+    # L, d = find_d_L(L, d, R, data, m1, peaks, c_lambda, c_lambda_arr,
+    #                 lambda_min, lambda_max, delta_lambda, ndl=n_dlambda)
+    # # L = 150.0 / .004
+    # # d = 0.88
+    # times += [time.time()]
+    # marr = [2.0 * d * 1.0e6 * L / np.sqrt(L ** 2 + r ** 2) / c_lambda for r in peaks]
+    # print "\nOrder Numbers: ", marr
+    # print "Order Differences: ", np.diff(marr), "\n"
+    # # print "Overwrote L and d"
+    # # L =37561.3832261
+    # # d =0.879999606156
+
+    # m1 = 2 * d * 1.e6 * L / np.sqrt(L ** 2 + r1 ** 2) / c_lambda
+    # print "\nL, d solver took {0:f} seconds".format(times[-1] - times[-2])
+    # print "L={0} pixels".format(L)
+    # print "d={0} mm".format(d)
+    # print "Highest order m={0}\n".format(m1)
+    # ringsums = rs.proper_ringsum(R, data, m1, L, d, peaks, lambda_min,
+    #                              lambda_max, delta_lambda, ndl=n_dlambda)
+    # wpeaks = []
+    # for idx in range(npeaks):
+    #     wpeaks += fitting.peak_and_fit(c_lambda_arr, ringsums[idx], thres=0.65, plotit=True)
+    # # wpeaks = [wp for wp in wpeaks if np.abs(wp-c_lambda) < 0.05]
+    # print "Wavelength peaks (nm) for each order:"
+    # print wpeaks, "\n"
+
+    # # gammaT = 7.7e-5 * c_lambda * np.sqrt(Tlamp / lampmu)
+    # # gammaT = 3.265e-5 * c_lambda * np.sqrt(Tlamp / lampmu)
+    # sigmaT = 3.265e-5 * c_lambda * np.sqrt(Tlamp / lampmu)
+
+#     # xpadL = np.arange(-512 / 2., 0) * delta_lambda + lambda_min
+#     # xpadR = np.arange(1, 512 / 2.) * delta_lambda + lambda_max + delta_lambda
+#     # xpad = np.hstack((xpadL, c_lambda_arr, xpadR))
+#     #
+#     # g = fitting.norm_gaussian(c_lambda_arr, 1.0, c_lambda, gammaT)
+#     # g = g / np.sum(g)
+
+    # # Ar
+    # # idx0 = np.abs(c_lambda_arr - 487.867).argmin()
+    # # idx1 = np.abs(c_lambda_arr - 487.882).argmin()
+    # # Fake Ar
+    # idx0 = np.abs(c_lambda_arr - 487.98).argmin()
+    # idx1 = np.abs(c_lambda_arr - 488.02).argmin()
+
+#     # He
+#     # idx0 = np.abs(c_lambda_arr - 468.615).argmin()
+#     # idx1 = np.abs(c_lambda_arr - 468.625).argmin()
+
+    # widths = []
+    # for idx in range(npeaks):
+    #     srs = smooth(ringsums[idx], 10)
+    #     maxval = srs.max()
+    #     vals = ringsums[idx] / maxval
+    #     # test_vals = fitting.voigt_profile(c_lambda_arr, sigmaT * np.sqrt(2.0 * np.pi), .005, sigmaT, c_lambda)
+    #     # print c_lambda_arr
+    #     # print test_vals
+    #     # fig, ax = plt.subplots()
+    #     # ax.plot(c_lambda_arr, test_vals, '--r')
+    #     # ax1 = plt.twinx()
+    #     # ax1.plot(c_lambda_arr, vals, 'b')
+    #     # plt.show()
+    #     opt, cov = curve_fit(
+    #         lambda x, amp, a: fitting.voigt_profile(x, amp, a, sigmaT, wpeaks[idx]),# + offset,
+    #         c_lambda_arr[idx0:idx1], vals[idx0:idx1], p0=[1.0, .005],# np.mean(vals[1:n_dlambda/10])]
+    #     )
+    #     print opt
+    #     widths.append(opt[1])
+    #     fig, ax = plt.subplots()
+    #     ax.plot(c_lambda_arr, vals, 'b')
+    #     #fitvals = opt[2] + fitting.voigt_profile(c_lambda_arr, opt[0], opt[1], sigmaT, wpeaks[idx])
+    #     fitvals = fitting.voigt_profile(c_lambda_arr, opt[0], opt[1], sigmaT, wpeaks[idx])
+    #     ax.plot(c_lambda_arr, fitvals, '--r')
+    #     plt.show()
+    #     # print np.mean(vals[1:50])
+    #     # p0 = [np.log(0.1), np.log(5.0*gammaT), np.log(np.mean(vals[1:50]))]
+    #     # times += [time.time()]
+    #     # opt = fmin(fitting.instr_chisq, p0, args=(xpad, vals, g, c_lambda, idx0, idx1), ftol=1e-5)
+    #     # times += [time.time()]
+    #     #
+    #     # print "Instrument function found, {0} seconds".format(times[-1]-times[-2])
+    #     # print np.exp(opt)
+    #     # print np.exp(opt[0]), np.exp(opt[1]), np.exp(opt[2])
+    #     # fitting.instr_chisq(opt, xpad, vals, g, c_lambda, idx0, idx1, plotit=True)
+    #     # widths += [np.exp(opt[1])]
+
+    # data_to_save = {
+    #     "ringsum": ringsums,
+    #     "peaks": wpeaks,
+    #     "m": m1,
+    #     "delta_lambda": delta_lambda,
+    #     "n_dlambda": n_dlambda,
+    #     "c_lambda_arr": c_lambda_arr,
+    #     "c_lambda": c_lambda,
+    #     "lambda_min": lambda_min,
+    #     "lambda_max": lambda_max,
+    #     "L": L,
+    #     "d": d,
+    #     "HWHM": widths
+    # }
+    # with open("calibration_data.p", 'wb') as outfile:
+    #     pickle.dump(data_to_save, outfile)
+
+    # return L, d, widths
 
 
 if __name__ == "__main__":
     binsize = 0.1
     folder = "Images"
-    # fname = join(folder, "thorium_ar_5_min_1.nef")
-    # bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
-    fname = join(folder, "thorium_5_min_he_3.nef")
-    bg_fname = join(folder, "thorium_5_min_he_bg.nef")
+    fname = join(folder, "thorium_ar_5_min_1.nef")
+    bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
+    # fname = join(folder, "thorium_5_min_he_3.nef")
+    # bg_fname = join(folder, "thorium_5_min_he_bg.nef")
     # center_guess = (3068.39, 2031.85)
     center_guess = (3068.56, 2033.17)
     # He guess
-    center_guess = (3040.05627213, 2024.06787634)
+    # center_guess = (3040.05627213, 2024.06787634)
 
-    L, d, width = run_calibration(fname, bg_fname, center_guess, gas='He')
-    print "FWHM: ", [2 * ww for ww in width]
+    # L, d, width = run_calibration(fname, bg_fname, center_guess, gas='He')
+    # L, d, width = run_calibration(fname, bg_fname, center_guess, gas='Ar')
+    run_calibration(fname, bg_fname, center_guess, gas='Ar')
+    # print "FWHM: ", [2 * ww for ww in width]
 
     # data = im.get_image_data(fname, bg_fname, color='b')
 

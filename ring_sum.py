@@ -6,6 +6,64 @@ import fitting
 import time
 import multiprocessing as mp
 
+
+
+def ringsum(R, weights, m0, L, d, peaks, delta_lambda, ndl=512):
+    # L = np.float64(L)
+    # d = np.float64(d)
+    # peaks = np.array(peaks, dtype=np.float64)
+    # delta_lambda = np.float64(delta_lambda)
+    d_lam_arr = np.arange(-ndl/2, ndl/2+1, 1) * delta_lambda
+    # print d_lam_arr
+    ringsums = []
+    for j, peak in enumerate(peaks):
+
+
+        sq = np.sqrt(1.0 + (peak/L)**2)
+        num = 2 * d * 1.e6 * sq
+        denom = 2*d*1.e6 + d_lam_arr[::-1] * (m0-j) * sq * -1.0  # added -1 to fix signs
+        temp = num / denom
+        # print temp
+        rarr = L * np.sqrt(temp**2 - 1.0)
+        # print m0, rarr.min(), rarr.max(), d_lam_arr.max() - d_lam_arr.min()
+        # rarr = rarr[::-1]
+        rmin = np.nanmin(rarr)
+        rmax = np.nanmax(rarr)
+        # inds = np.where( np.logical_and(R >= rmin, R < rmax))
+
+        # rmin = 600.0
+        # rmax = 750.0
+        # rarr = np.linspace(rmin, rmax, 100)
+        inds = np.where( np.logical_and(R >= rmin, R < rmax))
+        # print rmin, rmax, peak
+        # print inds
+        # print rmin, rmax
+        # print len(inds)
+        sig, _ = np.histogram(R[inds], bins=rarr[::-1], weights=weights[inds])
+        # print len(sig), len(rarr), len(d_lam_arr)
+        # plt.plot(rarr[0:-1], sig)
+        # plt.plot(d_lam_arr[0:-1], sig[::-1], '.')
+        # plt.plot(d_lam_arr, rarr)
+        # plt.show()
+        # ringsums += [y(sig[::-1])]
+
+        ringsums.append(sig[::-1])
+        # plt.plot(R[inds], weights[inds])
+        # print rarr
+        # plt.plot(np.diff(rarr))
+
+
+        # fig, ax = plt.subplots()
+        # ax.imshow(weights)
+        # ax.set_aspect(1.0)
+        # theta = np.linspace(0, 2*np.pi, 1000)
+        # plt.plot(rmin*np.cos(theta)+3018.5, rmin*np.sin(theta)+2010.5, 'r')
+        # plt.plot(rmax*np.cos(theta)+3018.5, rmax*np.sin(theta)+2010.5, 'g')
+        # plt.show()
+        # print rarr
+    print type(ringsums), type(ringsums[0])
+    return ringsums, d_lam_arr[0:-1]
+
 def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda, ndl=512):
     """
     Performs a proper ringsum with constant lambda spacing for each peak.
@@ -102,8 +160,8 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
          UL UR BL Br for the order)
     """
     ny, nx = dat.shape
-    x = np.arange(1, nx+1, 1)
-    y = np.arange(1, ny+1, 1)
+    x = np.arange(0, nx, 1)
+    y = np.arange(0, ny, 1)
 
     xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
     R = np.sqrt(xx**2 + yy**2)
@@ -116,10 +174,11 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
     ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
     imax = int((ri ** 2. - 2. * ri - 1.) / (1. + 2. * ri) / binsize)
 
-    """Ken's way of building the bins"""
-    binarr = np.fromfunction(lambda i: np.sqrt(2. * (i + 1.) * ri * binsize + (i + 1.) * binsize ** 2.), (imax,),
-                             dtype='float64')
-
+    # """Ken's way of building the bins"""
+    # binarr = np.fromfunction(lambda i: np.sqrt(2. * (i + 1.) * ri * binsize + (i + 1.) * binsize ** 2.), (imax,),
+    #                          dtype='float64')
+    norm_radius = np.sqrt(2*binsize*ri + binsize**2)
+    binarr = np.sqrt(range(1, imax))*norm_radius
 
     # xi0 = int(round(x0))
     # yi0 = int(round(y0))
@@ -188,6 +247,7 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         line4 = None
 
     print "Center finding:"
+    print "start x0: {0} y0: {1}".format(xguess, yguess)
     for ii in range(maxiter):
 
         # t0 = time.time()

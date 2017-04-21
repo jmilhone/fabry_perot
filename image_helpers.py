@@ -76,7 +76,7 @@ def read_image(filename, color=None):
     return image[:, :, cix].astype('float64')
 
 
-def get_image_data(filename, bgname, color=None):
+def get_image_data(filename, bgname=None, color=None):
     """ This function reads in .nef image files and returns a 2D numpy array for a given color
         with the 'bgname' image subtracted from the 'filename' image.
             Dependency: read_image
@@ -95,9 +95,12 @@ def get_image_data(filename, bgname, color=None):
                 unless color is None, which returns 3D numpy.ndarray with last dimension being RGB.
     """
     ring_data = read_image(filename, color=color)
-    bg_data = read_image(bgname, color=color)
+    if bgname is not None:
+        bg_data = read_image(bgname, color=color)
 
-    return ring_data - bg_data
+        return ring_data - bg_data
+    else:
+        return ring_data
 
 def quick_plot(image, color=None, block=False):
     """ This function reads in a numpy.ndarray as an image and plots it with imshow quickly. If the numpy.ndarray
