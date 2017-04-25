@@ -61,7 +61,6 @@ def ringsum(R, weights, m0, L, d, peaks, delta_lambda, ndl=512):
         # plt.plot(rmax*np.cos(theta)+3018.5, rmax*np.sin(theta)+2010.5, 'g')
         # plt.show()
         # print rarr
-    print type(ringsums), type(ringsums[0])
     return ringsums, d_lam_arr[0:-1]
 
 def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda, ndl=512):
@@ -316,7 +315,7 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         # print "subtracting 1 from yguess for no reason other than trying to match Cooper"
 
         print "{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii)
-        print "{0}, {1}".format(UBcent, RLcent)
+        #print "{0}, {1}".format(UBcent, RLcent)
         if plotit:
             # fig, ax = plt.subplots()
             if line1 is not None:

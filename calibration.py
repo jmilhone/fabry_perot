@@ -9,6 +9,8 @@ from scipy.optimize import minimize_scalar, fmin, curve_fit, differential_evolut
 import time
 import cPickle as pickle
 from analysis.datahelpers import smooth
+import multinest_solver as mns
+
 
 np.seterr(invalid='ignore')  # I got sick of invalid values that happening during minimization
 rcParams['xtick.direction'] = 'in'
@@ -18,7 +20,7 @@ global_d_limits = (.87, .89)
 
 Ar_params = {
     'binsize': 0.1,
-    'c_lambda': 487.8733,
+    'c_lambda': 487.873302,
     'delta_lambda': 0.0001*4,
     'duc': 0.88,
     'n_dlambda': 512 /4 ,
@@ -235,16 +237,15 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
     # data = np.load("100M_Ar.npy")
     # data = np.load("Ar_image.npy")
     # data = np.load("Ar_image.npy") + np.load("Th_image.npy")
-    print data.shape
+    #print data.shape
     # x0 = data.shape[1]/2
     # y0 = data.shape[0]/2
-    print x0, y0, "My artificial center"
+    #print x0, y0, "My artificial center"
     times += [time.time()]
     print "Image done reading, {0} seconds".format(times[-1] - times[-2])
     x0, y0 = rs.locate_center(data, x0, y0, binsize=binsize, plotit=False)
     times += [time.time()]
     print "Center found, {0} seconds".format(times[-1] - times[-2])
-    print x0, y0
 
     binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=binsize, quadrants=False)
     new_binarr = np.concatenate(([0.0], binarr))
@@ -262,20 +263,26 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
 
     th_peaks = peaks[0::2]
     ar_peaks = peaks[1::2]
-    print th_peaks
-    print ar_peaks
+
+
+
+    #print "Overwrote Peaks!"
+    #peaksAr = [734.47460093036864, 1166.1300952876536, 1477.9307337048338, 1734.9492968399895]
+    #peaksTh = [636.93352662090467, 1106.2487027848206, 1431.5667637305719, 1693.6561601893175]
+    #print th_peaks
+    #print ar_peaks
     # new_ar_peaks = new_peaks[0::2]
     # new_th_peaks = new_peaks[1::2]
     # peaks = fitting.peak_and_fit(binarr, sigarr, thres=0.65, plotit=False)
     # print "new method peaks: ", new_peaks
-    print "Peak locations: ", peaks
+    print "Ar Peak locations: ", ar_peaks
+    print "Th Peak locations: ", th_peaks
     # print "Ar peaks: ", new_ar_peaks
     # print "Th peaks: ", new_th_peaks
     r1 = peaks[0]
     r2 = peaks[1]
 
     Luc = find_initial_Lguess(peaks[0], peaks[1], c_lambda, duc)
-    print Luc
     # Luc = find_L(peaks)
     # print "new luc", Luc
     # m1 = 2.0 * duc * 1.0e6 * Luc / np.sqrt(Luc ** 2 + r1 ** 2) / c_lambda
@@ -294,7 +301,16 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
     # Flatten data for simplicity
     R = R.flatten()
     data = data.flatten()
+    #save_dir = mns.fix_save_directory("test1")
+    save_dir="realpeaks1_.5_err"
+    analysis = mns.solve_L_d(save_dir, th_peaks, ar_peaks, L_lim=(149.0/.004, 151.0/.004) )
+    L, d, Lsd, dsd = mns.L_d_results(analysis, th_peaks, ar_peaks)
 
+    # Now run with finer resolution
+    save_dir = save_dir + "_refined"
+    analysis = mns.solve_L_d(save_dir, th_peaks, ar_peaks, L_lim=(L-5.0*Lsd, L+5.0*Lsd) )
+    L, d, Lsd, dsd = mns.L_d_results(analysis, th_peaks, ar_peaks)
+    m0 = 2.0e6 * d / c_lambda
     # i = np.argsort(R)
     # plt.plot(R[i], data[i])
     # plt.show()
@@ -307,24 +323,24 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
     # d = 0.879904383091
 
     # print L, d
-    L = 38584.6420858
-    d = 0.881218270681
-    m0 = np.floor(2*d*1.e6 / c_lambda)
+    #L = 38584.6420858
+    #d = 0.881218270681
+    #m0 = np.floor(2*d*1.e6 / c_lambda)
 
-
+    
 
     # print "Testing a new method"
-    maxiter = 10j
-    # for i in range(maxiter):
-    #     print i
-    #     L = np.sqrt((r2**2*(m0-1)**2 - r1**2*m0**2)/(2 * m0 - 1))
-    #     darr = [0.5 * (m0 - x) * np.sqrt(L**2 + peaks[x]**2) * c_lambda / (1.e6 *L) for x in range(3)]
-    #     print darr
-    #     d = np.mean(darr)
-    #     m0 = np.floor(2 * d * 1.e6 / c_lambda)
-    #     print m0, L, d, "\n"
-    # L, d = find_d_L(37500.0, duc, R, data, m0, peaks, c_lambda, 0.0, 0.0, 0.0, delta_lambda, ndl=512)
-    print L, d
+    #maxiter = 10
+    ## for i in range(maxiter):
+    ##     print i
+    ##     L = np.sqrt((r2**2*(m0-1)**2 - r1**2*m0**2)/(2 * m0 - 1))
+    ##     darr = [0.5 * (m0 - x) * np.sqrt(L**2 + peaks[x]**2) * c_lambda / (1.e6 *L) for x in range(3)]
+    ##     print darr
+    ##     d = np.mean(darr)
+    ##     m0 = np.floor(2 * d * 1.e6 / c_lambda)
+    ##     print m0, L, d, "\n"
+    ## L, d = find_d_L(37500.0, duc, R, data, m0, peaks, c_lambda, 0.0, 0.0, 0.0, delta_lambda, ndl=512)
+    ##print L, d
     ringsums, lambda_arr = rs.ringsum(R, data, m0, L, d, th_peaks, delta_lambda, ndl=n_dlambda)
 
     w_peaks = []
@@ -340,25 +356,26 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
         inds = range(iL, iR+1)
         pk = np.trapz(lambda_arr[inds] * rsum[inds], x=lambda_arr[inds]) / np.trapz(rsum[inds], x=lambda_arr[inds])
         w_peaks += [pk]
-        # print pk
-    #     print pk
-    # plt.show()
+    #    # print pk
+    ##     print pk
+    ## plt.show()
     print w_peaks
-    print c_lambda - 487.867
-    print 487.882 - c_lambda
+    ##print c_lambda - 487.867
+    ##print 487.882 - c_lambda
 
 
-    #Find fitting region:
+    ##Find fitting region:
     iL = np.abs((lambda_arr + .006)).argmin()
     iR = np.abs((lambda_arr - .006)).argmin()
 
-    print iL, iR
+    ##print iL, iR
     ind = range(iL, iR)
 
     Ti = 1000.0 * .025 / 300.0
     sigma = 3.265e-5 * c_lambda * np.sqrt(Ti / lampmu)
-    print 'sigma', sigma
-
+    ##print 'sigma', sigma
+    
+    hwhm = []
     for i, pk in enumerate(w_peaks):
         maxval = np.max(ringsums[i][ind])
         xdata = lambda_arr[ind]
@@ -366,8 +383,8 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
 
         opt, cov = curve_fit(lambda x, a, b: fitting.voigt_profile(x, a, b, sigma, pk),
                              xdata, ydata, p0=[0.01, 0.0036])
-        print "{0}: opt: {1}\n".format(i, opt)
-
+        print "Peak {0}: HWHM gamma= {1} nm".format(i, opt[1])
+        hwhm.append(opt[1]) 
 
         voigt = fitting.voigt_profile(lambda_arr, opt[0], opt[1], sigma, pk)
         # voigt = fitting.voigt_profile(lambda_arr, .01, .0036, sigma, 0.0)
@@ -378,10 +395,12 @@ def run_calibration(f, f_bg, center_guess, gas='Ar'):
         # fig, ax = plt.subplots()
         ax.plot(lambda_arr, ringsums[i], 'b')
         plt.show()
-    # ax1 = ax.twinx()
-    # gamma = .0036
 
-    ii = np.argmin(np.abs(lambda_arr))
+    return L, d, hwhm, x0, y0
+    ## ax1 = ax.twinx()
+    ## gamma = .0036
+
+    #ii = np.argmin(np.abs(lambda_arr))
     # print ii-iL, iR-ii
     # voigt *= ringsums[0][ii]/voigt.max()
     # ax.plot(lambda_arr, voigt, '--r')
@@ -512,7 +531,7 @@ if __name__ == "__main__":
 
     # L, d, width = run_calibration(fname, bg_fname, center_guess, gas='He')
     # L, d, width = run_calibration(fname, bg_fname, center_guess, gas='Ar')
-    run_calibration(fname, bg_fname, center_guess, gas='Ar')
+    L, d, hwhm, x0, y0 = run_calibration(fname, bg_fname, center_guess, gas='Ar')
     # print "FWHM: ", [2 * ww for ww in width]
 
     # data = im.get_image_data(fname, bg_fname, color='b')

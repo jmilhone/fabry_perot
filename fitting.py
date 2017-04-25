@@ -24,7 +24,6 @@ def gaussian(x, amp, shift, width):
 def peak_and_fit2(x, data, thres=0.55, plotit=False, **kwargs):
     smooth_points = kwargs.get("smooth_points", 5)
     thres_val = thres * np.max(data)
-    print type(data)
     up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points, plotit=True)
 
     peaks2fit = kwargs.get('npeaks', 10)
@@ -44,7 +43,6 @@ def peak_and_fit2(x, data, thres=0.55, plotit=False, **kwargs):
         xx = x[up[i]:down[i]].copy()
 
         pk =  np.sqrt(np.trapz(xx**2 * vals, x=xx**2) / np.trapz(vals, x=xx**2))
-        print pk
         peaks.append(pk)
         # print up[i] - down[i]
         # u, d = find_peaks(xx, vals, new_thres, smooth_points=10)
@@ -85,7 +83,6 @@ def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
     smooth_points = kwargs.get("smooth_points", 5)
     thres_val = thres * np.max(data)
     up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points)
-    print up, down
     peaks2fit = kwargs.get('npeaks', 10)
     npeaks = min(len(up), len(down))
     if npeaks == 0:
