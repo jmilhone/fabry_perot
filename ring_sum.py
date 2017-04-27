@@ -7,6 +7,34 @@ import time
 import multiprocessing as mp
 
 
+def ringsum2(R, weights, m0, L, d, peaks, dlambda_arr, out=None, index=None):
+
+    ringsums = np.zeros( (len(peaks), len(dlambda_arr)-1) )
+    #print ringsums.shape
+    #ringsums = np.zeros( (1, len(dlambda_arr)-1) )
+    for j, peak in enumerate(peaks):
+        sq = np.sqrt(1.0 + (peak/L)**2)
+        num = 2.e6 * d * sq
+        denom = 2.e6 * d + dlambda_arr * (m0 - j) * sq
+        temp = num / denom
+        rarr = L * np.sqrt(temp**2 - 1.0)
+
+        # rarr is the right direction, but the histogram requires the bins increase
+        rmin = np.nanmin(rarr)
+        rmax = np.nanmax(rarr)
+        #t0 = time.time()
+        inds = np.where(np.logical_and(R >= rmin, R< rmax))
+        #print time.time()-t0
+        #sig, _ = np.histogram(R[inds], bins=rarr[::-1], weights=weights[inds])
+        sig, _ = np.histogram(R[inds], bins=rarr, weights=weights[inds])
+        sig = sig[::-1]  # correct the order again
+        ringsums[j, :] = sig
+
+    if out:
+        #print "exiting..."
+        out.put((index, ringsums))
+    else:
+        return ringsums
 
 def ringsum(R, weights, m0, L, d, peaks, delta_lambda, ndl=512):
     # L = np.float64(L)

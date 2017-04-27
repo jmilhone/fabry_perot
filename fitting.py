@@ -24,7 +24,7 @@ def gaussian(x, amp, shift, width):
 def peak_and_fit2(x, data, thres=0.55, plotit=False, **kwargs):
     smooth_points = kwargs.get("smooth_points", 5)
     thres_val = thres * np.max(data)
-    up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points, plotit=True)
+    up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points, plotit=False)
 
     peaks2fit = kwargs.get('npeaks', 10)
 
@@ -36,10 +36,11 @@ def peak_and_fit2(x, data, thres=0.55, plotit=False, **kwargs):
     if plotit:
         fig, ax = plt.subplots()
         ax.plot(x**2, data)
+        yLow, yHigh = ax.get_ylim()
     peaks = []
     for i in range(npeaks):
         vals = data[up[i]:down[i]].copy()
-        new_thres = 0.8 * np.max(vals)
+        #new_thres = 0.8 * np.max(vals)
         xx = x[up[i]:down[i]].copy()
 
         pk =  np.sqrt(np.trapz(xx**2 * vals, x=xx**2) / np.trapz(vals, x=xx**2))
@@ -59,9 +60,10 @@ def peak_and_fit2(x, data, thres=0.55, plotit=False, **kwargs):
         # print u, d
         # print xx[u[0]], xx[d[0]], np.sqrt(fit[1])
 
-        # if plotit:
-        #     plt.plot(xx[u[0]]**2, vals[u[0]], 'or')
-        #     plt.plot(xx[d[0]]**2, vals[d[0]], 'og')
+        if plotit:
+            plt.plot(x[up[i]]**2, data[up[i]], 'or')
+            plt.plot(x[down[i]]**2, data[down[i]], 'og')
+            plt.plot([pk**2]*2, [yLow, yHigh], '--k')
     if plotit:
         plt.show()
     return peaks

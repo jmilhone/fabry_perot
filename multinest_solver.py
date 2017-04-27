@@ -21,25 +21,25 @@ def fix_save_directory(save_directory):
             print "Error making directory, other process probably already maded it.  Moving on gracefully"
     return save_dir
 
-def solve_L_d(savedir, peaksTh, peaksAr, d_lim=(0.88-0.0001, 0.88+0.0001),
-        L_lim=(149.0/.004, 151.0/.004), wTh=487.873302, wAr=487.98634):
+def solve_L_d(savedir, peaksTh, peaksAr, d_lim=(0.88-0.01, 0.88+0.01),
+        L_lim=(148.0/.004, 152.0/.004), wTh=487.873302, wAr=487.98634):
     
     def log_prior(cube, ndim, nparams):
 
         cube[0] = cube[0]*(L_lim[1]-L_lim[0]) + L_lim[0]
-        #cube[1] = 10**(cube[1]*(log_d_lim[1] - log_d_lim[0]) + log_d_lim[0])
+        cube[1] = 10**(cube[1]*(log_d_lim[1] - log_d_lim[0]) + log_d_lim[0])
 
     def log_likelihood(cube, ndim, nparams):
 
         
-        dm = [wAr / 2.e6 / cube[0] / ( 1.0 / np.sqrt(cube[0]**2 + peaksAr[j]**2) - 1.0 / np.sqrt(cube[0]**2 + peaksAr[j+1]**2)) for j in range(npeaks-1)]
-        dn = [wTh / 2.e6 / cube[0] / ( 1.0 / np.sqrt(cube[0]**2 + peaksTh[j]**2) - 1.0 / np.sqrt(cube[0]**2 + peaksTh[j+1]**2)) for j in range(npeaks-1)]
-        d = np.mean(dm + dn)
-        m = 2.e6 * d / wAr
-        n = 2.e6 * d / wTh
+        #dm = [wAr / 2.e6 / cube[0] / ( 1.0 / np.sqrt(cube[0]**2 + peaksAr[j]**2) - 1.0 / np.sqrt(cube[0]**2 + peaksAr[j+1]**2)) for j in range(npeaks-1)]
+        #dn = [wTh / 2.e6 / cube[0] / ( 1.0 / np.sqrt(cube[0]**2 + peaksTh[j]**2) - 1.0 / np.sqrt(cube[0]**2 + peaksTh[j+1]**2)) for j in range(npeaks-1)]
+        #d = np.mean(dm + dn)
+        #m = 2.e6 * d / wAr
+        #n = 2.e6 * d / wTh
 
-        #m = 2.e6 * cube[1] / wAr
-        #n = 2.e6 * cube[1] / wTh
+        m = 2.e6 * cube[1] / wAr
+        n = 2.e6 * cube[1] / wTh
     
         rAr = [cube[0] * np.sqrt( m**2 / (np.floor(m) - 1.*j)**2 - 1.0) for j in range(npeaks)]
         rTh = [cube[0] * np.sqrt( n**2 / (np.floor(n) - 1.*j)**2 - 1.0) for j in range(npeaks)]
@@ -52,7 +52,7 @@ def solve_L_d(savedir, peaksTh, peaksAr, d_lim=(0.88-0.0001, 0.88+0.0001),
 
     log_d_lim = [np.log10(x) for x in d_lim]
     npeaks = min(len(peaksTh), len(peaksAr))
-    n_params = 1 
+    n_params = 2 
 
     print "Th peaks: ", peaksTh
     print "Ar peaks: ", peaksAr
@@ -66,32 +66,34 @@ def solve_L_d(savedir, peaksTh, peaksAr, d_lim=(0.88-0.0001, 0.88+0.0001),
     return analysis
 
 def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, plotit=True):
-    nparams = 1 
+    nparams = 2 
     stats = analysis.get_stats()
     marginals = stats['marginals']
 
     L = marginals[0]['median']
     Lsd = marginals[0]['sigma']
 
-    d = None
-    dsd = None
+    #d = None
+    #dsd = None
 
-    #d = marginals[1]['median']
-    #dsd = marginals[1]['1sigma']
+    d = marginals[1]['median']
+    dsd = marginals[1]['sigma']
     #for x in marginals[1]:
     #    print x, marginals[1][x]
     print "L = {0} +/- {1}".format(L, Lsd) 
     print L * .004
-    #print "d = {0} +/- {1}".format(d, dsd) 
+    print "d = {0} +/- {1}".format(d, dsd) 
     npeaks = np.min((len(peaksTh), len(peaksAr)))
-    dm = np.array([wAr / 2.e6 / L / ( 1.0 / np.sqrt(L**2 + peaksAr[j]**2) - 1.0 / np.sqrt(L**2 + peaksAr[j+1]**2)) for j in range(npeaks-1)])
-    dn = np.array([wTh / 2.e6 / L / ( 1.0 / np.sqrt(L**2 + peaksTh[j]**2) - 1.0 / np.sqrt(L**2 + peaksTh[j+1]**2)) for j in range(npeaks-1)])
+    #dm = np.array([wAr / 2.e6 / L / ( 1.0 / np.sqrt(L**2 + peaksAr[j]**2) - 1.0 / np.sqrt(L**2 + peaksAr[j+1]**2)) for j in range(npeaks-1)])
+    #dn = np.array([wTh / 2.e6 / L / ( 1.0 / np.sqrt(L**2 + peaksTh[j]**2) - 1.0 / np.sqrt(L**2 + peaksTh[j+1]**2)) for j in range(npeaks-1)])
     #d = np.mean(dm + dn)
-    m = 2.e6 * dm / wAr
-    n = 2.e6 * dn / wTh
+    #m = 2.e6 * dm / wAr
+    #n = 2.e6 * dn / wTh
+    m = 2.e6 * d / wAr
+    n = 2.e6 * d / wTh
     print " "
-    print "Ar d: ", dm
-    print "Th d: ", dn
+    print "Ar d: ", d
+    print "Th d: ", d
     print " "
     print "Ar m: ", m
     print "Th n: ", n
@@ -99,8 +101,8 @@ def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, ploti
 
 
     #d = 0.5 * (np.mean(dm) + np.mean(dn))  # dm and dn are the same length
-    d = (np.sum(dm) + np.sum(dn)) / (len(dm) + len(dn))
-    print d
+    #d = (np.sum(dm) + np.sum(dn)) / (len(dm) + len(dn))
+    #print d
     mAr =  2.e6 * d / wAr
     nTh = 2.e6 * d / wTh
     
@@ -122,26 +124,28 @@ def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, ploti
     chisq = chisqAr + chisqTh
 
     print chisqAr, chisqTh, chisq
-
+    
     if plotit:
         names = ['L', 'd']
         p = multinest_plotting.PlotMarginalModes(analysis)
-        p.plot_marginal(0, with_ellipses=True, with_points=False, grid_points=100)
-        plt.show()
-        #for i in range(nparams):
-        #    ax = plt.subplot(nparams, nparams, nparams*i + i +1)
-        #    p.plot_marginal(i, with_ellipses=True, with_points=False, grid_points=100)
-        #    ax.set_xlabel(names[i])
-        #    ax.set_ylabel("Probability")
-        #    #ax.plot(vals[i], 0, 'ro', ms=8)
-
-        #    for j in range(i):
-        #        ax = plt.subplot(nparams, nparams, nparams*j+i+1)
-        #        cb = p.plot_conditional(i, j, with_ellipses=False, with_points=False, ax=ax)
-        #        #ax.plot(vals[i], vals[j], 'ro', ms=8)
-        #        ax.set_xlabel(names[j])
-        #        ax.set_ylabel(names[i])
-
+        post = analysis.get_equal_weighted_posterior()
+        print post.shape
+        #p.plot_marginal(0, with_ellipses=True, with_points=False, grid_points=100)
         #plt.show()
+        for i in range(nparams):
+            ax = plt.subplot(nparams, nparams, nparams*i + i +1)
+            p.plot_marginal(i, with_ellipses=True, with_points=False, grid_points=75)
+            ax.set_xlabel(names[i])
+            ax.set_ylabel("Probability")
+            #ax.plot(vals[i], 0, 'ro', ms=8)
+
+            for j in range(i):
+                ax = plt.subplot(nparams, nparams, nparams*j+i+1)
+                cb = p.plot_conditional(i, j, with_ellipses=False, with_points=False, ax=ax)
+                #ax.plot(vals[i], vals[j], 'ro', ms=8)
+                ax.set_xlabel(names[i])
+                ax.set_ylabel(names[j])
+
+        plt.show()
 
     return L, d, Lsd, dsd
