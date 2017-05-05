@@ -11,6 +11,7 @@ import cPickle as pickle
 from analysis.datahelpers import smooth
 import multinest_solver as mns
 import multiprocessing as mp
+import plottingtools.core as ptools
 
 np.seterr(invalid='ignore')  # I got sick of invalid values that happening during minimization
 rcParams['xtick.direction'] = 'in'
@@ -90,9 +91,21 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
         print "Did not recognize gas.  Exiting..."
         return None
     # f_bg=None
-    data = im.get_image_data(f, bgname=f_bg, color='b')
-    # im.quick_plot(data)
-    # plt.show()
+    print f[-3:].lower()
+    if f[-3:].lower() == "nef":
+        data = im.get_image_data(f, bgname=f_bg, color='b')
+    elif f[-3:].lower() == "npy":
+        data = np.load(f)
+    else:
+        print "need a valid file"
+        return
+    #im.quick_plot(data)
+    #ax = plt.gca()
+    #plt.tight_layout()
+    ##ax.tick_params(labelsize=16)
+    #fig = plt.gcf()
+    #fig.savefig("th_lamp_rings.pdf")
+    #plt.show()
 
     times += [time.time()]
     print "Image done reading, {0} seconds".format(times[-1] - times[-2])
@@ -101,15 +114,23 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     print "Center found, {0} seconds".format(times[-1] - times[-2])
 
     binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=binsize, quadrants=False)
+    print binarr.shape
     new_binarr = np.concatenate(([0.0], binarr))
     n = len(new_binarr)
 
     rarr = binarr
-
-
+    np.save("rbins.npy", rarr)
+    #fig, ax = plt.subplots()
+    #ax.plot(binarr, sigarr)
+    #ptools.add_thick_box(ax)
+    #ptools.add_labels(ax,"R (px)", "Counts")
+    #ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+    #plt.tight_layout()
+    #plt.savefig("th_lamp_quick_ringsum.pdf")
+    #plt.show()
 
     if L is None or d is None:
-        peaks = fitting.peak_and_fit2(rarr, sigarr, thres=0.3, plotit=False, smooth_points=10)
+        peaks = fitting.peak_and_fit2(rarr, sigarr, thres=0.2, plotit=False, smooth_points=10)
         th_peaks = peaks[0::2]
         ar_peaks = peaks[1::2]
 
@@ -117,7 +138,7 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
         print "Th Peak locations: ", th_peaks
 
         analysis = mns.solve_L_d(save_dir, th_peaks, ar_peaks, L_lim=(149.0/.004, 151.0/.004) )
-        L, d, Lsd, dsd = mns.L_d_results(analysis, th_peaks, ar_peaks, plotit=False)
+        L, d, Lsd, dsd = mns.L_d_results(analysis, th_peaks, ar_peaks, plotit=True, savedir=save_dir)
 
         # Temporary checking V on Ar plasma
         #newf = "Images/0015676_000.nef"
@@ -403,14 +424,19 @@ if __name__ == "__main__":
     folder = "Images"
     fname = join(folder, "thorium_ar_5_min_1.nef")
     bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
-    save_dir = "June_09_2016_Calibration_test1"
+    save_dir = "June_09_2016_Calibration_test2"
+    center_guess = (3068.56, 2033.17)
 
+    #folder ="ForwardModelData"
+    #fname = join(folder, "th_lamp_FM_14987_8824.npy")
+    #bg_fname = None
+    #save_dir = "FW_test_14987_8824_0"
+    #center_guess = (3018, 2010)
     # Old calibration used to flow
     #fname = join(folder, "Th_lamp_488_calib_5m.nef")
     #bg_fname = join(folder, "Th_lamp_488_calib_5m_background.nef")
     #save_dir = "old_flow_shots"
 
-    center_guess = (3068.56, 2033.17)
     #L, d, hwhm, x0, y0 = run_calibration(fname, bg_fname, center_guess, save_dir, gas='Ar')
     run_calibration(fname, bg_fname, center_guess, save_dir, gas='Ar')
 

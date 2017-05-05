@@ -19,13 +19,13 @@ def gaussian(x, amp, shift, width):
     Returns:
         np.array or float (depends on x)
     """
-    return amp * np.exp(-(x - shift) ** 2 / (2. * width) ** 2)
+    return amp * np.exp(-(x - shift) ** 2 / 2. / width ** 2)
 
 def peak_and_fit2(x, data, thres=0.55, plotit=False, **kwargs):
     smooth_points = kwargs.get("smooth_points", 5)
     thres_val = thres * np.max(data)
-    up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points, plotit=False)
-
+    up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points, plotit=True)
+   
     peaks2fit = kwargs.get('npeaks', 10)
 
     npeaks = min(len(up), len(down))
@@ -33,6 +33,8 @@ def peak_and_fit2(x, data, thres=0.55, plotit=False, **kwargs):
         return []
     else:
         npeaks = min(npeaks, peaks2fit)
+    for i in range(npeaks):
+        print up[i], down[i]
     if plotit:
         fig, ax = plt.subplots()
         ax.plot(x**2, data)
@@ -40,7 +42,6 @@ def peak_and_fit2(x, data, thres=0.55, plotit=False, **kwargs):
     peaks = []
     for i in range(npeaks):
         vals = data[up[i]:down[i]].copy()
-        #new_thres = 0.8 * np.max(vals)
         xx = x[up[i]:down[i]].copy()
 
         pk =  np.sqrt(np.trapz(xx**2 * vals, x=xx**2) / np.trapz(vals, x=xx**2))
@@ -115,7 +116,7 @@ def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
             fit[0] *= val_max
             fits += [fit]
             peaks += [np.sqrt(fit[1])]
-
+            print i, fit[2] * 2.0 * np.sqrt( 2.0 * np.log(2.0))            
 
             # print "\n",L, up[i]
             # print R, down[i]
@@ -124,7 +125,8 @@ def peak_and_fit(x, data, thres=0.55, plotit=False, **kwargs):
     # print "Peak locations: ", peaks
     if plotit:
         fig, ax = plt.subplots()
-        ax.plot([x[0]**2, x[-1]**2], [thres_val] * 2, '--k')
+        #ax.plot([x[0]**2, x[-1]**2], [thres_val] * 2, '--k')
+        ax.axhline(thres_val, color='k')
         ax.plot(x**2, data, lw=1)
         ax.plot(x[up]**2, data[up], 'or', ms=4)
         ax.plot(x[down]**2, data[down], 'oc', ms=4)
@@ -184,6 +186,45 @@ def find_peaks(x, data, maxval, smooth_points=5, plotit=False):
         plt.show()
     return up, down
 
+
+def get_peaks(x, data, thres1=0.5, thres2=.4, smooth_points=5, plotit=True, npks=4):
+
+    thres_val = thres1 * np.max(data)
+    up, down = find_peaks(x, data, thres_val, smooth_points=smooth_points, plotit=False)
+    print "data min",np.min(data) 
+    minval = np.min(data)
+
+    npeaks = min(len(up), len(down))
+    if npeaks==0:
+        return []
+    else:
+        npeaks = min(npeaks, npks)
+
+    #plt.plot(x, data)
+    L = []
+    R = []
+    for pk in range(npeaks):
+        ind = range(up[pk], down[pk]+1)
+        maxval = data[ind].max()
+
+        v = thres2 * (maxval - minval) + minval
+        if pk == 0:
+            i = np.max(np.where(data[0:up[pk]] < v))
+        else:
+            i = np.max(np.where(data[up[pk-1]:up[pk]] < v)) + up[pk-1]
+        if pk == npeaks-1:
+            j = np.min(np.where(data[down[pk]::] < v)) + down[pk]
+        else:
+            j = np.min(np.where(data[down[pk]:down[pk+1]] < v)) + down[pk]
+        #print down[pk], j
+        print "pk ",pk, x[i], x[up[pk]], x[down[pk]], x[j]
+        L.append(i)
+        R.append(j)
+        #plt.axvline(x=x[i], color='r')
+        #plt.axvline(x=x[j], color='g')
+        #plt.axhline(y=v, color='k')
+    #plt.show()
+    return L, R
 def norm_gaussian(x, a, shift, gamma):
     """
     Returns a normalized gaussian at shift with amplitude a and width gamma.  The area is a.

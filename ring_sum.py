@@ -325,7 +325,7 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         if UBfit[0] < 0.0:
             # concave down
             # print "UB concave down"
-            UBcent = -2 * np.max(sarr) * np.sign(UBfit[1])
+            UBcent = -1 * np.max(sarr) * np.sign(UBfit[1])
         else:
             # concave up
             UBcent = -UBfit[1] / (2*UBfit[0])
