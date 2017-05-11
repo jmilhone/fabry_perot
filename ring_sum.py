@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from image_helpers import get_image_data, quick_plot
+#from image_helpers import get_image_data, quick_plot
 from os.path import join
 import fitting
 import time

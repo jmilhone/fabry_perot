@@ -2,7 +2,7 @@ from __future__ import division
 from matplotlib import rcParams
 import numpy as np
 import matplotlib.pyplot as plt
-import image_helpers as im
+#import image_helpers as im
 import ring_sum as rs
 from os.path import join
 import fitting
@@ -78,11 +78,13 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     times += [time.time()]
     print "Center found, {0} seconds".format(times[-1] - times[-2])
 
-    binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=0.4, quadrants=False)
+    binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=1.0, quadrants=False)
+    print "Subtracting min value from ring sum"
+    sigarr -= sigarr.min()
     print len(binarr)
     np.save("rbins2.npy",binarr)
     new_binarr = np.concatenate(([0.0], binarr))
-    L, R = fitting.get_peaks(binarr, sigarr, thres1=0.3, npks=8)
+    LL, RR = fitting.get_peaks(binarr, sigarr, thres1=0.3, npks=8)
     z = fitting.peak_and_fit(binarr, sigarr, thres=0.3, plotit=True)
     print z
 
@@ -90,16 +92,18 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     #for i in range(8):
     #    print L[i], R[i]
     inds = [] 
-    for i in range(8):
-        inds += range(L[i], R[i])
+    print "Changed peaks from 8 to 6"
+    print "Using all indexes between argon and th peaks"
+    for i in range(3):
+        inds += range(LL[2*i], RR[2*i+1])
        
-    amp0 = np.max(sigarr[L[0]:R[0]])
-    amp1 = np.max(sigarr[L[1]:R[1]])
+    amp0 = np.max(sigarr[LL[0]:RR[0]])
+    amp1 = np.max(sigarr[LL[1]:RR[1]])
 
-    i = range(L[0], R[0])
+    i = range(LL[0], RR[0])
     pk0 = np.trapz(binarr[i] * sigarr[i], x=binarr[i]) / np.trapz(sigarr[i], x=binarr[i])
 
-    i = range(L[1],R[1])
+    i = range(LL[1],RR[1])
     pk1 = np.trapz(binarr[i] * sigarr[i], x=binarr[i]) / np.trapz(sigarr[i], x=binarr[i])
     print pk0, pk1
     r = binarr[inds]
@@ -137,20 +141,23 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     #ax1.plot(r, fall_off * (linear_out0 + linear_out1), 'r')
     #ax.plot(r, fall_off * (linear_out0 + linear_out1), 'r')
     ax.plot(r, fall_off * linear_out, 'r')
+    for i in range(3):
+        plt.axvline(x=binarr[LL[2*i]], color='g')
+        plt.axvline(x=binarr[RR[2*i+1]], color='r')
     plt.show()
 
 
-    finesse_range = [10, 50]
+    finesse_range = [10, 30]
     Ti_Ar_range = [300.0, 11000]
     Ti_Th_range = [300.0, 3000]
     d_range = [.87, .89]
-    L_range = [148.0, 151.0]
+    L_range = [148.0, 152.0]
     a0 = amp0 / np.exp(-(pk0/rscale)**2)
     a1 = amp1 / np.exp(-(pk1/rscale)**2)
-    Th_amp_range = [.5*a0, 5.0*a0]
-    Ar_amp_range = [.5*a1, 5.0*a1]
-    rscale_range = [1000.0, 10000.0]
-    
+    Th_amp_range = [.5*a0, 2.0*a0]
+    Ar_amp_range = [.5*a1, 2.0*a1]
+    rscale_range = [1000.0, 5000.0]
+    print a0, a1 
     params = {"finesse_range": finesse_range,
               "Ti_Ar_range": Ti_Ar_range,
               "Ti_Th_range": Ti_Th_range,
@@ -174,9 +181,16 @@ if __name__ == "__main__":
     folder = "Images"
     fname = join(folder, "thorium_ar_5_min_1.nef")
     bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
-    save_dir = "full_solver_run5"
+
+
+    fname = "thorium_lamp_data.npy"
+
+    #fname = "FM_150_88_195_4000_0.3eV.npy"
+    bg_fname = None
+    save_dir = "full_solver_run17"
     #center_guess = (3068.56, 2033.17)
     center_guess = (3068.57005213, 2032.17646934)
+    #center_guess = (3018.0, 2010.0)
     #folder ="ForwardModelData"
     #fname = join(folder, "th_lamp_FM_14987_8824.npy")
     #bg_fname = None

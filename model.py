@@ -16,12 +16,14 @@ def eval_airy(wavelength, cos_theta, d, F):
     airy = 1.0 / (1.0 + Q * np.sin(np.pi * 2.e6 * d * cos_theta / wavelength)**2)
     return airy
 
-def eval_spec(wavelength, amp, w0, sigma):
+def eval_spec(wavelength, amp, w0, sigma, V=0):
+    # V is in km/s, c=2.998e8 m/s = 2.998e5 km/s
     norm = 1.0 / sigma / np.sqrt(2.0 * np.pi)
-    exp = np.exp(-0.5*(wavelength-w0)**2 / sigma**2)
+    w = w0 * (1.0 - V / 2.998e5)
+    exp = np.exp(-0.5*(wavelength-w)**2 / sigma**2)
     return amp * norm * exp
 
-def forward(r, L, d, F, Ti, mu, w0, nlambda=512):
+def forward(r, L, d, F, Ti, mu, w0, nlambda=512, V=0):
     sigma = 3.276569e-5 * np.sqrt(Ti/mu) * w0
     w_arr = np.linspace(w0 - 5*sigma, w0 + 5*sigma, nlambda)
     nr = len(r)
@@ -32,7 +34,7 @@ def forward(r, L, d, F, Ti, mu, w0, nlambda=512):
     cth = np.tile(cos_th, (len(w_arr), 1))
 
 
-    spec = eval_spec(w_arr, 1.0, w0, sigma) 
+    spec = eval_spec(w_arr, 1.0, w0, sigma, V=V) 
     spec = np.tile(spec, (nr, 1)).T
 
     linear_out = np.trapz(spec*eval_airy(ll, cth, d, F), w_arr, axis=0)

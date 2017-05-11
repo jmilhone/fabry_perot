@@ -6,11 +6,12 @@ import multinest_plotting
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import matplotlib.ticker as mticker
-import seaborn.apionly as sns
+#import seaborn.apionly as sns
 import cPickle as pickle
 import model
 import plottingtools.core as ptools
 import time
+import json
 
 rcParams['xtick.direction'] = 'in'
 rcParams['ytick.direction'] = 'in'
@@ -20,6 +21,7 @@ err = 0.25
 params = ['L', 'd', 'finesse', 'Ti_Th', 'Ti_Ar', 'Amp_Th', 'Amp_Ar', 'r0']
 nparams = len(params)
 
+Arparams = ['Ti', 'V', 'r0', 'Amp']
 def fix_save_directory(save_directory):
     save_dir = os.path.join("saves/", save_directory, "")
     if not os.path.isdir('saves'):
@@ -34,6 +36,56 @@ def fix_save_directory(save_directory):
         except OSError, e:
             print "Error making directory, other process probably already maded it.  Moving on gracefully"
     return save_dir
+
+def solve_Ar(savedir, param_fname):
+
+    def log_prior(cube, ndim, nparams):
+        cube[0] = cube[0]*(Ti_lim[1] - Ti_lim[0]) + Ti_lim[0]
+        cube[1] = cube[1]*(V_lim[1] - V_lim[0]) + V_lim[0]
+        cube[2] = cube[2]*(r0_lim[1] - r0_lim[0]) + r0_lim[0]
+        cube[3] = cube[3]*(A_lim[1] - A_lim[0]) + A_lim[0]
+
+    def log_likelihood(cube, ndim, nparams):
+
+        linear_out = model.forward(r, L, d, F, cube[0], muAr, wAr, nlambda=512, V=cube[1]) 
+        linear_out *= cube[3]*np.exp(-(r / cube[2])**2)
+
+        chisq = np.sum( (linear_out - s)**2 / s_sd**2 )
+        return -chisq/2.0
+
+    with open("0015676_data.json", 'r') as infile:
+        data = json.load(infile, parse_float=np.float64)
+
+    L = data["L"]
+    d = data["d"]
+    F = data["F"]
+    rarr = np.array(data["r"])
+    sig = np.array(data["sig"])
+    idx = np.array(data['idx'])
+    r = rarr[idx]
+    s = sig[idx]
+
+    # run 0, 2
+    #s_sd = .01 * s + 100.0  # 1% error, avoid division by zero
+    # run 1, 3
+    #s_sd = np.sqrt(np.abs(s))
+    # run 4
+    s_sd = np.sqrt(3.5*np.abs(s))
+    # define limits for log_prior 
+    A_lim = [0.5 * data['A'], 5.*data['A']] # Counts
+    Ti_lim = [0.025, 4.0]  # eV
+    V_lim = [-10.0, 10.0]  # km/s
+    r0_lim = [2000.0, 6000.0] # px
+    nparams = 4
+
+
+    wAr = 487.98634
+    muAr = 40.0
+
+
+    pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
+            resume=True, verbose=True, sampling_efficiency='model', n_live_points=2000,
+            outputfiles_basename=savedir+"fp_full_", max_modes=500)
 
 def full_solver(savedir, param_fname):
 
@@ -95,7 +147,8 @@ def full_solver(savedir, param_fname):
     L_range = [x / 0.004 for x in L_range]
 
     data = ringsum[ind]
-    data_sd = ringsum[ind]
+    #data_sd = ringsum_sd[ind]
+    data_sd = 0.01 * data +100.0 #np.sqrt(3.5*np.abs(data))
     rr = r[ind]
 
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
@@ -279,16 +332,37 @@ def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, ploti
     return L, d, Lsd, dsd
 
 if __name__ == "__main__":
-    savedir = fix_save_directory("full_solver_run5")
+    #savedir = fix_save_directory("Ar_solver_run4")
+    #solve_Ar(savedir, None)
+    savedir = fix_save_directory("full_solver_run17")
     t00 = time.ctime(time.time())
     full_solver(savedir, "fp_ringsum_params.p")
 
-    print "Time started: ", t00
-    print "Time finished: ",time.ctime(time.time())
+    #print "Time started: ", t00
+    #print "Time finished: ",time.ctime(time.time())
     # run 0 forgot to convert L to pixels
     # run 1 has the L fix, mixed up the wavelengths, mu's were right, should be fixed now
     # run 2
     # run 3 changed fall off from exp(-r/r0) to exp(-(r/r0)**2)  gaussian fall off
     # run 4 changed bin size from .2 pixels to .4
     # run 5 switched to model.forward2 where only one integral is done
+    # run 6 changed bin size to 1.0 pixels
+    # run 7 subtracted min value from ring sum
+    # run 8 increased posterior of L to 152 mm, only did the first 3 orders
+    # run 9, 3 orders, 1.0 pixels, no offset subtraction
+    # run 10, synthetic data
+    # run 11, same synthetic keeping all data points inbeween argon and th peaks
+    # run 12, trying run 11 on real thorium lamp image
+    # run 13, 12 was really messed up.  I changed the prior for the amplitudes from .5 to 5 to .5 to 2 times the amplituded guess
+    # run 14, running 13 with an offset subtracted
+    # run 15, same as run 14 except limiting F from 10 to 30, and r0 up to 5000
+    # I found an type in the sd calculation
+    # run 16 running with the suggested noise factor 
+    # run17 was having trouble getting 16 to converge, trying 1% this time (unlike earlier runs)
 
+    # Ar solving
+    # run 0: used 1% error with an offset of 100 counts
+    # run 1: going to use the sqrt(counts) as the error
+    # run 2: going back to 1% error, going to increase the prior for the amplitude
+    # run 3: going back to sqrt(counts) with the increase in amplitude prior in run 2
+    # run 4: going to use a noise factor of 3.5 aka error = sqrt(3.5 * counts)
