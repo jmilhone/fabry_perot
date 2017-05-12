@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
     #fname = "FM_150_88_195_4000_0.3eV.npy"
     bg_fname = None
-    save_dir = "full_solver_run17"
+    save_dir = "full_solver_run18"
     #center_guess = (3068.56, 2033.17)
     center_guess = (3068.57005213, 2032.17646934)
     #center_guess = (3018.0, 2010.0)

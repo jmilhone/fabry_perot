@@ -72,11 +72,12 @@ if __name__ == "__main__":
     #L = 150.535647184 / 0.004
     #Q = 20.0
 
-    analyzer = pymultinest.Analyzer(n_params=8, outputfiles_basename="saves/full_solver_run4/fp_full_")
+    analyzer = pymultinest.Analyzer(n_params=8, outputfiles_basename="saves/full_solver_run18/fp_full_")
     stats = analyzer.get_mode_stats()
     mode = stats['modes'][0]
     
     mode_vals = mode['maximum a posterior']
+    print mode_vals
     L = mode_vals[0]
     d = mode_vals[1]
     F = mode_vals[2]
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     #lambda1_arr = np.linspace(lambda_1 - 5*sigma1, lambda_1 + 5*sigma1, 1000)
 
     r_arr = np.load("rbins2.npy")
-    print r_arr
+   # print r_arr
     print len(r_arr)
     print Amp_Ar / Amp_Th
     linear_out = forward2(r_arr, L, d, F, [Ti0, Ti1], [mu0, mu1], [Amp_Th , Amp_Ar], [lambda_0, lambda_1], nlambda=512)
@@ -167,7 +168,7 @@ if __name__ == "__main__":
     vals = fall_off*linear_out
     #t1 = time.time()
     #print t1-t0, "seconds"
-    with open("saves/full_solver_run4/fp_ringsum_params.p") as infile:
+    with open("saves/full_solver_run18/fp_ringsum_params.p") as infile:
         data = pickle.load(infile)
     #print data.keys()
     fig, ax = plt.subplots()

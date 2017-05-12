@@ -70,7 +70,12 @@ def solve_Ar(savedir, param_fname):
     # run 1, 3
     #s_sd = np.sqrt(np.abs(s))
     # run 4
-    s_sd = np.sqrt(3.5*np.abs(s))
+    #s_sd = np.sqrt(3.5*np.abs(s))
+    # run 5
+    #s_sd = .03 * s + 100.0
+    # run 6
+    s_sd = .01 * s + 100.0
+
     # define limits for log_prior 
     A_lim = [0.5 * data['A'], 5.*data['A']] # Counts
     Ti_lim = [0.025, 4.0]  # eV
@@ -148,7 +153,7 @@ def full_solver(savedir, param_fname):
 
     data = ringsum[ind]
     #data_sd = ringsum_sd[ind]
-    data_sd = 0.01 * data +100.0 #np.sqrt(3.5*np.abs(data))
+    data_sd = 0.03 * data +100.0 #np.sqrt(3.5*np.abs(data))
     rr = r[ind]
 
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
@@ -332,11 +337,11 @@ def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, ploti
     return L, d, Lsd, dsd
 
 if __name__ == "__main__":
-    #savedir = fix_save_directory("Ar_solver_run4")
-    #solve_Ar(savedir, None)
-    savedir = fix_save_directory("full_solver_run17")
-    t00 = time.ctime(time.time())
-    full_solver(savedir, "fp_ringsum_params.p")
+    savedir = fix_save_directory("Ar_solver_run8")
+    solve_Ar(savedir, None)
+    #savedir = fix_save_directory("full_solver_run18")
+    #t00 = time.ctime(time.time())
+    #full_solver(savedir, "fp_ringsum_params.p")
 
     #print "Time started: ", t00
     #print "Time finished: ",time.ctime(time.time())
@@ -359,6 +364,7 @@ if __name__ == "__main__":
     # I found an type in the sd calculation
     # run 16 running with the suggested noise factor 
     # run17 was having trouble getting 16 to converge, trying 1% this time (unlike earlier runs)
+    # run18, 17 is still going.  going to run it with 3% error
 
     # Ar solving
     # run 0: used 1% error with an offset of 100 counts
@@ -366,3 +372,7 @@ if __name__ == "__main__":
     # run 2: going back to 1% error, going to increase the prior for the amplitude
     # run 3: going back to sqrt(counts) with the increase in amplitude prior in run 2
     # run 4: going to use a noise factor of 3.5 aka error = sqrt(3.5 * counts)
+    # run 5: going to use 1% error with full solver run17 solution
+    # run 6: using 3% error to redo run 5
+    # run 7: made a modification to the limits for the Amplitude
+    # run 8: changed bottom finder from 2.5% to 10% in hopes to get the peaks fit better
