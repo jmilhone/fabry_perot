@@ -85,8 +85,42 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     np.save("rbins2.npy",binarr)
     new_binarr = np.concatenate(([0.0], binarr))
     LL, RR = fitting.get_peaks(binarr, sigarr, thres1=0.3, npks=8)
-    z = fitting.peak_and_fit(binarr, sigarr, thres=0.3, plotit=True)
+    z = fitting.peak_and_fit2(binarr, sigarr, thres=0.3, plotit=False)
+    ampsAr = []
+    ampsTh = []
+    locAr = []
+    locTh = []
+    for i in range(4):
+        temp1 = np.max(sigarr[LL[2*i]:RR[2*i]])
+        temp2 = np.max(sigarr[LL[2*i+1]:RR[2*i+1]])
+        ampsAr.append(temp2)
+        ampsTh.append(temp1)
+        locAr.append(z[2*i+1])
+        locTh.append(z[2*i])
+
+    ampsAr = np.array(ampsAr)
+    ampsTh = np.array(ampsTh)
+    locAr = np.array(locAr)
+    locTh = np.array(locTh)
+
+    print ampsAr
+    print ampsTh
+    relamps = [ampsAr[i]/ampsTh[i] for i in range(4)]
+    relA = np.mean(relamps)
+    print relamps, relA
     print z
+   
+    amps = np.hstack((ampsAr, relA*ampsTh))
+    locs = np.hstack((locAr, locTh))
+    pfit = np.polyfit(locs**2, np.log(amps),1)
+    print "r0 fit: ",1.0 / np.sqrt(np.abs(pfit[0]))
+    r0_fit =  1.0 / np.sqrt(np.abs(pfit[0]))
+    plt.plot(locTh**2, ampsTh, 'o')
+    plt.plot(locTh**2, relA*ampsTh, 'o')
+    plt.plot(locAr**2, ampsAr, 'o')
+    plt.plot(binarr**2, sigarr)
+    plt.plot(binarr**2, np.exp(np.polyval(pfit,binarr**2)))
+    plt.show()
 
 
     #for i in range(8):
@@ -158,18 +192,32 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     Ar_amp_range = [.5*a1, 2.0*a1]
     rscale_range = [1000.0, 5000.0]
     print a0, a1 
+    #params = {"finesse_range": finesse_range,
+    #          "Ti_Ar_range": Ti_Ar_range,
+    #          "Ti_Th_range": Ti_Th_range,
+    #          "d_range": d_range,
+    #          "L_range": L_range,
+    #          "Th_amp_range": Th_amp_range,
+    #          "Ar_amp_range": Ar_amp_range,
+    #          "rscale_range": rscale_range,
+    #          "binarr": binarr,
+    #          "ringsum": sigarr,
+    #          "ringsum_sd": 100.0 + 0.01 * sigarr,
+    #          "ind": inds}
+
     params = {"finesse_range": finesse_range,
               "Ti_Ar_range": Ti_Ar_range,
-              "Ti_Th_range": Ti_Th_range,
+              "Ti_Th": 1000.0 * .025 / 300.0,
               "d_range": d_range,
               "L_range": L_range,
-              "Th_amp_range": Th_amp_range,
+              "rel_amp": relA,
               "Ar_amp_range": Ar_amp_range,
-              "rscale_range": rscale_range,
+              "rscale": r0_fit,
               "binarr": binarr,
               "ringsum": sigarr,
-              "ringsum_sd": 100.0 + 0.01 * sigarr,
+              "ringsum_sd": 100.0 + 0.03 * sigarr,
               "ind": inds}
+
 
     folder = mns.fix_save_directory(save_dir)
     with open(folder + "fp_ringsum_params.p", 'wb') as outfile:
@@ -187,7 +235,9 @@ if __name__ == "__main__":
 
     #fname = "FM_150_88_195_4000_0.3eV.npy"
     bg_fname = None
-    save_dir = "full_solver_run18"
+    #save_dir = "full_solver_run17"
+    save_dir = "new_full_solver_run0"
+
     #center_guess = (3068.56, 2033.17)
     center_guess = (3068.57005213, 2032.17646934)
     #center_guess = (3018.0, 2010.0)

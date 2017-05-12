@@ -4,18 +4,35 @@ import numpy as np
 import plottingtools.core as ptools
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 from os.path import join
+import json
 
-params = ['L', 'd', 'Finesse', 'Ti_Th', 'Ti_Ar', 'Amp_Th', 'Amp_Ar', 'r0']
-labels = ["L (mm)", "d (mm)", "Finesse", r"$T_{i, Th}$ (K)", r"$T_{i, Ar}$ (eV)", r"$A_{Th}$ (Counts)", r"$A_{Ar}$ (Counts)", r"$r_0$ (px)"]
-prob_labels = ["P(L)", "P(d)", "P(Finesse)", r"P($T_{i,Th}$)", r"P($T_{i,Ar}$)", r"P($A_{Th}$)", r"P($A_{Ar}$)", r"P($r_0$)"]
+#params = ['L', 'd', 'Finesse', 'Ti_Th', 'Ti_Ar', 'Amp_Th', 'Amp_Ar', 'r0']
+#labels = ["L (mm)", "d (mm)", "Finesse", r"$T_{i, Th}$ (K)", r"$T_{i, Ar}$ (eV)", r"$A_{Th}$ (Counts)", r"$A_{Ar}$ (Counts)", r"$r_0$ (px)"]
+#prob_labels = ["P(L)", "P(d)", "P(Finesse)", r"P($T_{i,Th}$)", r"P($T_{i,Ar}$)", r"P($A_{Th}$)", r"P($A_{Ar}$)", r"P($r_0$)"]
 
 #params = ["Ti", "V", "r0", "A"]
 #labels = ["Ti (eV)", "V (km/s)", "r0 (px)", "A (Counts)"]
 #prob_labels = ["P(Ti)", "P(V)", "P(r0)", "P(A)"]
 
+#params = ['L', 'd', 'Finesse', 'Ti_Ar', 'Amp_Ar',]
+#labels = ["L (mm)", "d (mm)", "Finesse",  r"$T_{i, Ar}$ (eV)",  r"$A_{Ar}$ (Counts)"]
+#prob_labels = ["P(L)", "P(d)", "P(Finesse)", r"P($T_{i,Ar}$)", r"P($A_{Ar}$)"]
+
+#savedir = "saves/full_solver_run17/"
+savedir = "saves/new_full_solver_run0/"
+with open(savedir+"param_file.json") as paramfile:
+    param_info = json.load(paramfile)
+
+params = param_info['params']
+labels = param_info['labels']
+prob_labels = param_info['prob labels']
+
 nparams = len(params)
 #fname = "saves/Ar_solver_run4/fp_full_post_equal_weights.dat"
-fname = "saves/full_solver_run16/fp_full_post_equal_weights.dat"
+#fname = "saves/full_solver_run17/fp_full_post_equal_weights.dat"
+#fname = savedir + "fp_full_post_equal_weights.dat"
+fname = savedir + "fp_newfull_post_equal_weights.dat"
+#fname = "saves/new_full_solver_run0/fp_newfull_post_equal_weights.dat"
 post = np.loadtxt(fname, ndmin=2)
 #post[:, 0] *= 0.004  # convert px to mm
 #post[:, 3] *= 300.0 / .025 # convert to K from eV
@@ -24,7 +41,12 @@ post = np.loadtxt(fname, ndmin=2)
 save = False
 for idx, param in enumerate(params):
     fig, ax = plt.subplots()
-    hist, bins = np.histogram(post[:, idx], density=True, bins=40)
+    if idx == 1:
+        val = .883670
+        
+        hist, bins = np.histogram(post[100:, idx], density=True, bins=50)
+    else:
+        hist, bins = np.histogram(post[:, idx], density=True, bins=40)
     bw = bins[1]-bins[0]
     ax.bar(bins[0:-1], hist*bw, width=bw)
     print np.sum(hist*bw), bw, np.sum(hist)
@@ -45,7 +67,8 @@ for idx, param in enumerate(params):
 Lval = np.mean(post[:,0])
 i = np.argmin(np.abs(Lval - post[:,0]))
 print post[i, :]
-
+plt.plot(post[:, 1], 'o')
+plt.show()
 for i, param1 in enumerate(params):
     for j, param2 in enumerate(params[0:i]):
         fig, ax = plt.subplots()

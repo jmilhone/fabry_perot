@@ -90,7 +90,68 @@ def solve_Ar(savedir, param_fname):
 
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
             resume=True, verbose=True, sampling_efficiency='model', n_live_points=2000,
-            outputfiles_basename=savedir+"fp_full_", max_modes=500)
+            outputfiles_basename=savedir+"fp_full_", max_modes=500)    
+def full_solver2(savedir, param_fname):
+
+    def log_prior(cube, ndim, nparams):
+        cube[0] = cube[0]*(L_range[1] - L_range[0]) + L_range[0]
+        cube[1] = 10.0**(cube[1]*(np.log10(d_range[1]) - np.log10(d_range[0])) + np.log10(d_range[0]))
+        cube[2] = cube[2]*(finesse_range[1] - finesse_range[0]) + finesse_range[0]
+        cube[3] = cube[3]*(Ti_Ar_range[1] - Ti_Ar_range[0]) + Ti_Ar_range[0]
+        cube[4] = cube[4]*(Ar_amp_range[1] - Ar_amp_range[0]) + Ar_amp_range[0]
+
+
+    def log_likelihood(cube, ndim, nparams):
+        linear_out = model.forward2(rr, cube[0], cube[1], cube[2],
+                [Ti_Th, cube[3]], [muTh, muAr], [cube[4]/rel_amp, cube[4]], [wTh, wAr]) 
+        linear_out *= np.exp(-(rr / rscale)**2)
+        chisq = np.sum( (linear_out - data)**2 / data_sd**2 )
+
+        return -chisq/2.0
+
+    params = ['L', 'd', 'Finesse', 'Ti_Ar', 'Amp_Ar',]
+    labels = ["L (mm)", "d (mm)", "Finesse",  r"$T_{i, Ar}$ (eV)",  r"$A_{Ar}$ (Counts)"]
+    prob_labels = ["P(L)", "P(d)", "P(Finesse)", r"P($T_{i,Ar}$)", r"P($A_{Ar}$)"]
+
+    param_info = {'params':params, 'labels': labels, 'prob labels': prob_labels}
+    with open(savedir+"param_file.json", 'w') as param_config:
+        json.dump(param_info, param_config, indent=4)
+
+
+    with open(savedir+param_fname) as paramfile:
+        param_dict = pickle.load(paramfile)
+
+    nparams = len(params)
+
+    finesse_range = param_dict["finesse_range"]
+    Ti_Ar_range= param_dict["Ti_Ar_range"] # in Kelvin
+    Ti_Th= param_dict["Ti_Th"] # in eV, normally 1000 K * .025 eV / 300.0 K
+    d_range= param_dict["d_range"]
+    L_range = param_dict["L_range"]  # in mm 
+    rel_amp = param_dict["rel_amp"]  # Th Amplitude = Ar amplitude / rel_amp
+    Ar_amp_range= param_dict["Ar_amp_range"]
+    rscale = param_dict["rscale"]
+    r = param_dict["binarr"]
+    ringsum = param_dict["ringsum"]
+    ind = param_dict["ind"]
+    
+    rr = r[ind]
+    data = ringsum[ind]
+    data_sd = .03 * ringsum[ind] + 100.0
+
+
+    Ti_Ar_range = [x*.025 / 300.0 for x in Ti_Ar_range] # to eV
+    L_range = [x / 0.004 for x in L_range] # to px
+
+    wTh = 487.873302
+    wAr = 487.98634
+
+    muAr = 40.0
+    muTh = 232.0
+
+    pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
+            resume=True, verbose=True, sampling_efficiency='model', n_live_points=2000,
+            outputfiles_basename=savedir+"fp_newfull_", max_modes=500)
 
 def full_solver(savedir, param_fname):
 
@@ -123,6 +184,16 @@ def full_solver(savedir, param_fname):
         chisq = np.sum( (linear_out - data)**2 / data_sd**2 )
 
         return -chisq/2.0
+
+    params = ['L', 'd', 'Finesse', 'Ti_Th', 'Ti_Ar', 'Amp_Th', 'Amp_Ar', 'r0']
+    labels = ["L (mm)", "d (mm)", "Finesse", r"$T_{i, Th}$ (K)", 
+            r"$T_{i, Ar}$ (eV)", r"$A_{Th}$ (Counts)", r"$A_{Ar}$ (Counts)", r"$r_0$ (px)"]
+    prob_labels = ["P(L)", "P(d)", "P(Finesse)", r"P($T_{i,Th}$)", r"P($T_{i,Ar}$)", 
+            r"P($A_{Th}$)", r"P($A_{Ar}$)", r"P($r_0$)"]
+
+    param_info = {'params':params, 'labels': labels, 'prob labels': prob_labels}
+    with open(savedir+"param_file.json", 'w') as param_config:
+        json.dump(param_info, param_config, indent=4)
 
     wTh = 487.873302
     wAr = 487.98634
@@ -337,14 +408,18 @@ def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, ploti
     return L, d, Lsd, dsd
 
 if __name__ == "__main__":
-    savedir = fix_save_directory("Ar_solver_run8")
-    solve_Ar(savedir, None)
     #savedir = fix_save_directory("full_solver_run18")
     #t00 = time.ctime(time.time())
+    #savedir = fix_save_directory("Ar_solver_run4")
+    #solve_Ar(savedir, None)
+    t00 = time.ctime(time.time())
+    #savedir = fix_save_directory("full_solver_run17")
     #full_solver(savedir, "fp_ringsum_params.p")
 
-    #print "Time started: ", t00
-    #print "Time finished: ",time.ctime(time.time())
+    savedir = fix_save_directory("new_full_solver_run0")
+    full_solver2(savedir, "fp_ringsum_params.p")
+    print "Time started: ", t00
+    print "Time finished: ",time.ctime(time.time())
     # run 0 forgot to convert L to pixels
     # run 1 has the L fix, mixed up the wavelengths, mu's were right, should be fixed now
     # run 2
@@ -376,3 +451,6 @@ if __name__ == "__main__":
     # run 6: using 3% error to redo run 5
     # run 7: made a modification to the limits for the Amplitude
     # run 8: changed bottom finder from 2.5% to 10% in hopes to get the peaks fit better
+
+    # 5 param solver
+    # run 0: initial run with 3% error
