@@ -6,7 +6,7 @@ import time
 import plottingtools.core as ptools
 import cPickle as pickle
 import pymultinest
-
+import json
 
 rcParams['xtick.direction'] = 'in'
 rcParams['ytick.direction'] = 'in'
@@ -72,19 +72,34 @@ if __name__ == "__main__":
     #L = 150.535647184 / 0.004
     #Q = 20.0
 
-    analyzer = pymultinest.Analyzer(n_params=8, outputfiles_basename="saves/full_solver_run4/fp_full_")
+    #with open("saves/full_solver_run17/fp_ringsum_params.p") as infile:
+    with open("saves/new_full_solver_run0/fp_ringsum_params.p") as infile:
+        data = pickle.load(infile)
+
+    #analyzer = pymultinest.Analyzer(n_params=8, outputfiles_basename="saves/full_solver_run17/fp_full_")
+    analyzer = pymultinest.Analyzer(n_params=8, outputfiles_basename="saves/new_full_solver_run0/fp_newfull_")
     stats = analyzer.get_mode_stats()
     mode = stats['modes'][0]
     
     mode_vals = mode['maximum a posterior']
+    
+
     L = mode_vals[0]
     d = mode_vals[1]
     F = mode_vals[2]
-    Ti0 = mode_vals[3]
-    Ti1 = mode_vals[4]
-    Amp_Th = mode_vals[5]
-    Amp_Ar = mode_vals[6]
-    rscale = mode_vals[7]
+
+    Ti0 = 1000.0 * .025 / 300.0
+    Ti1 = mode_vals[3]
+    rscale = data['rscale']
+    rel_amp = data['rel_amp']
+    Amp_Ar = mode_vals[4]
+    Amp_Th = Amp_Ar / rel_amp
+
+    #Ti0 = mode_vals[3]
+    #Ti1 = mode_vals[4]
+    #Amp_Th = mode_vals[5]
+    #Amp_Ar = mode_vals[6]
+    #rscale = mode_vals[7]
     #d = 8.82693201e-01
     #L = 1.50481176e+02/ .004
     #F = 1.92960567e+01 
@@ -108,8 +123,8 @@ if __name__ == "__main__":
     #lambda1_arr = np.linspace(lambda_1 - 5*sigma1, lambda_1 + 5*sigma1, 1000)
 
     r_arr = np.load("rbins2.npy")
-    print r_arr
-    print len(r_arr)
+    #print r_arr
+    #print len(r_arr)
     print Amp_Ar / Amp_Th
     linear_out = forward2(r_arr, L, d, F, [Ti0, Ti1], [mu0, mu1], [Amp_Th , Amp_Ar], [lambda_0, lambda_1], nlambda=512)
 
@@ -167,8 +182,6 @@ if __name__ == "__main__":
     vals = fall_off*linear_out
     #t1 = time.time()
     #print t1-t0, "seconds"
-    with open("saves/full_solver_run4/fp_ringsum_params.p") as infile:
-        data = pickle.load(infile)
     #print data.keys()
     fig, ax = plt.subplots()
     ax.plot(data['binarr']**2, data['ringsum'], 'r')
