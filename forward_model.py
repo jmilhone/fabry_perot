@@ -5,6 +5,7 @@ import h5py
 import cPickle as pickle
 import time
 import argparse
+from scipy.special import erf
 
 class Source(object):
     def __init__(self, temp=1., vel=0., lam0=488., mu=40., amp=None, name='Source generic'):
@@ -39,18 +40,21 @@ class Source(object):
         self.wavelength = self.lam0 * (1. - 3.336e-6 * self.vel)  # nm, +vel=blueshift and -vel=redshift
         self.sig = 3.276569e-5 * np.sqrt((self.temp * self.lam0**2)/self.mu)    #nm
         self.FWHM = 2. * np.sqrt(2. * np.log(2.)) * self.sig    #nm
-        if self.amp is None:
-            self.amp = (2. * np.pi) ** (-0.5) * (self.sig) ** (-1)
-            self.A = None
-        else:
-            self.A = self.amp
-        if type(self.wavelength) is float:
+        if type(self.wavelength) in [float, np.float64]:
             self.bounds = (self.wavelength - 5.*self.FWHM, self.wavelength + 5.*self.FWHM)
+            amp0 = 0.398942 / self.sig
         else:
             ix = np.argsort(self.wavelength)
             wv = self.wavelength[ix]
             fwhm = self.FWHM[ix]
             self.bounds = (wv[0] - 5.*fwhm[0], wv[-1] + 5.*fwhm[-1])
+            amp0 = (0.398942 / self.sig) / self.wavelength.size
+        if self.amp is None:
+            self.amp = amp0#(2. * np.pi) ** (-0.5) * (self.sig) ** (-1)
+            self.A = None
+        else:
+            self.A = self.amp
+            self.amp *= amp0#(2. * np.pi) ** (-0.5) * (self.sig) ** (-1)
 
     def plot(self):
         lam = np.linspace(self.bounds[0], self.bounds[1], 1000)
@@ -59,10 +63,11 @@ class Source(object):
         ax.plot(lam, spec, lw=2)
         if type(self.lam0) is float:
             ax.plot([self.lam0]*2, [0, spec.max()], 'k--')
+        print 'Integral over lambda={0}'.format(np.trapz(spec, lam))
         plt.show()
 
     def eval_spec(self, lam):
-        if type(self.lam0) is float:
+        if type(self.lam0) in [float, np.float64]:
             return self.amp * np.exp(-0.5 * ((lam - self.wavelength) / self.sig) ** 2)
         else:
             out = np.zeros_like(np.array(lam))
@@ -159,24 +164,6 @@ class Etalon(object):
     def params(self):
         return {"d": self.d, "F": self.F, "Q": self.Q}
 
-# def eval_lin_fabry(source, ccd, etalon):
-#     lam_arr = np.linspace(source.bounds[0], source.bounds[1], 1000, endpoint=True)
-#     if ccd.cos_th.size < 1.e5:
-#         ll, cth = np.meshgrid(lam_arr, ccd.cos_th, indexing='ij')
-#         evald_spec = np.tile(source.eval_spec(lam_arr), ccd.cos_th.size).reshape(ll.T.shape).T
-#         lin_out = np.trapz(evald_spec * etalon.eval_airy(ll, cth), lam_arr, axis=0)
-#     else:
-#         lin_out = np.zeros_like(ccd.cos_th)
-#         spec = source.eval_spec(lam_arr)
-#         #per_print = (100./ccd.cos_th.size)
-#         for i, cth in enumerate(ccd.cos_th):
-#             lin_out[i] = np.trapz(spec * etalon.eval_airy(lam_arr, cth), lam_arr)
-#             #print "{0:.2f}% done...".format(i * per_print)
-#     return lin_out/lin_out.max()
-#
-# def interpolate_fabry_to_ccd(lin_arr, lin_data, ccd_grid):
-#     return griddata(lin_arr, lin_data, ccd_grid, fill_value=0.0)
-
 def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True):
     '''
     Main FP evaluation function. Takes information from input Source class, CCD class, and Etalon class
@@ -194,13 +181,19 @@ def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True
     '''
     lam_arr = np.linspace(source.bounds[0], source.bounds[1], 1000, endpoint=True)
     tic = time.time()
-    if ccd.cos_th.size < 1.e5:
+    if ccd.cos_th.size <= 1.e5:
         if verbose:
             print 'Evaluating convolution meshgrid...'
         ll, cth = np.meshgrid(lam_arr, ccd.cos_th, indexing='ij')
         if verbose:
             print 'Evaluating source spectrum on meshgrid...'
         evald_spec = np.tile(source.eval_spec(lam_arr), ccd.cos_th.size).reshape(ll.T.shape).T
+
+        #f, ax = plt.subplots(1, 1, figsize=(16, 9))
+        #cf1 = ax.contourf(ll, cth, evald_spec*etalon.eval_airy(ll, cth), 20, cmap='rainbow')
+        #f.colorbar(cf1)
+        #plt.show()
+
         if verbose:
             print 'Evaluating convolution integral...'
         lin_out = np.trapz(evald_spec * etalon.eval_airy(ll, cth), lam_arr, axis=0)
@@ -270,6 +263,7 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
     else:
         raise Exception('not a valid source name, try again')
 
+
     if camera.lower() in ['nikond5200', 'nikon', 'd5200']:
         ccd = NikonD5200(lens=lens, lin_pts=lin_pts)
     elif camera.lower() in ['andor', 'istar', 'istar334t', 'andoristar334t']:
@@ -278,7 +272,6 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
         raise Exception('not a valid camera name, try again')
 
     etalon = Etalon(d=d, F=F)
-
     pixel_arr = ccd.lin_arr
     costh_arr = ccd.cos_th
     if type(source.wavelength) is float:
