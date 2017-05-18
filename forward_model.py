@@ -225,10 +225,10 @@ def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True
         else:
             return ccd_data
 
-def peak_calc(source, ccd):
+def peak_calc(source, ccd, etalon):
     wav = source.wavelength
     if type(wav) is float:
-        m_max = 2.e6 * ccd.lens / wav
+        m_max = 2.e6 * etalon.d / wav
         num_pks = int(np.floor(np.floor(m_max) - m_max*ccd.cos_th.min() + 1))
         pk_locations = ccd.f * np.sqrt((m_max / (np.floor(m_max) - np.arange(num_pks)))**2 - 1.)
         pk_m = m_max * ccd.f/np.sqrt(ccd.f**2 + pk_locations**2)
@@ -237,9 +237,12 @@ def peak_calc(source, ccd):
         pk_locations = []
         pk_m = []
         for i, w in enumerate(wav):
-            mmax = 2.e6 * ccd.lens / w
+            mmax = 2.e6 * etalon.d / w
+            print mmax
             numpks = int(np.floor(np.floor(mmax) - mmax*ccd.cos_th.min() + 1))
+            print numpks
             pkloc = ccd.f * np.sqrt((mmax / (np.floor(mmax) - np.arange(numpks)))**2 - 1.)
+            print pkloc
             pkm = mmax * ccd.f/np.sqrt(ccd.f**2 + pkloc**2)
             m_max[i] = mmax
             pk_locations.append(pkloc)
@@ -279,7 +282,7 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
     else:
         instrument_func = etalon.eval_airy(source.wavelength[0], costh_arr)
 
-    pks = peak_calc(source, ccd)
+    pks = peak_calc(source, ccd, etalon)
 
     lin_data, ccd_data = eval_fabry(source, ccd, etalon, verbose=plotit, grid_out=True)
 
