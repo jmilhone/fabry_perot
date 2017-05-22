@@ -135,29 +135,64 @@ A Fabry-P\'{e}rot interferometer consists of a set of highly-reflective, partial
 \caption{An \'{e}talon showing incident, reflected and transmitted light.
 \label{fig:etalon}}
 \end{figure}
-Fig.~\ref{fig:etalon} shows a simple schematic of an \'{e}talon. Light incident at some angle, $\theta$, reflects back and forth in the cavity and then exits at the same angle, $\theta$. On each pass through the cavity, the light picks up a phase shift of
+Fig.~\ref{fig:etalon} shows a simple schematic of an \'{e}talon. Light incident at some angle, $\theta$, reflects back and forth in the cavity and then exits at the same angle, $\theta$. The optical path difference between two beams exiting the \'{e}talon is
 \begin{equation}
-\phi = 
+l_{opt} = 2nd\cos{\theta}
 \end{equation}
-Lot's of filler here... lala, the transmission function:
+where $n$ is the index of refraction in the \'{e}talon gap and $d$ is the width of the gap. We can calculate the phase shift between consective passes in the \'{e}talon by multiplying the wavenumber, $2\pi/\lambda$, by this optical path difference. 
 \begin{equation}
-\frac{I_{t}}{I_{i}} = \left[1+Q\sin{\pi m}^{2}\right]^{-1}
+\delta = \frac{2\pi}{\lambda}l_{opt}=2\pi \frac{2nd}{\lambda}\cos{\theta}=2\pi m
+\label{eq:ph}
+\end{equation}
+where we have defined $m$ as the interference order number. When the phase difference is integer multiples of $2\pi$, we expect constructive interference to occur, thus the interference condition for a Fabry-P\'{e}rot \'{e}talon is
+\begin{equation}
+m=\frac{2nd}{\lambda}\cos{\theta}
+\label{eq:int_con}
+\end{equation}
+Now we can work out the interference pattern by calculating the transmitted amplitude, $a_{tr}$ of incident light, $a_{in}$. Because we are working in amplitude, we will use amplitude reflectivities and transmissivities for the plates: $r$, $r'$ and $t$, $t'$, repectively. The square modulus of these reflectivities and transmissivities are the reflection and transmission coefficients of the \'{e}talon plates: $R$, $R'$ and $T$, $T'$, respectively. Summing up every beam in the \'{e}talon, we get a transmission amplitude of
+\begin{align*}
+a_{tr}&=tt'a_{in}+tt'a_{in}rr'e^{i\delta}+tt'a_{in}(rr')^{2}e^{2i\delta}+tt'a_{in}(rr')^{3}e^{3i\delta}+...\\
+&=tt'a_{in}\sum_{p=0}^{\infty}(rr'e^{i\delta})^{p}\\
+&=a_{in}\frac{tt'}{1-rr'e^{i\delta}}
+\end{align*}
+Now we need to take the square modulus of this ampltiude in order to get the transmitted intensity. This gives us
+\begin{equation}
+\frac{I_{tr}}{I_{in}}=\left|\frac{a_{tr}}{a_{in}}\right|^{2}=\frac{TT'}{\big|1-\sqrt{RR'}e^{i\delta}\big|^{2}}
+\end{equation}
+In order to clean up this expression some, we can introduce the coefficient
+\begin{equation}
+Q=\frac{4\sqrt{RR'}}{(1-\sqrt{RR'})^{2}}
+\end{equation}
+which leads us to
+\begin{equation}
+\frac{I_{tr}}{I_{in}}=\frac{TT'}{(1-\sqrt{RR'})^{2}}\left[1+Q\sin^{2}{\left(\frac{\delta}{2}\right)}\right]^{-1}
+\end{equation}
+which is recognizable as the Airy function. If the \'{e}talon plates have identical reflection and transmission coefficients, then the prefactor becomes unity. Also, we can replace the phase shift, $\delta$, with $2\pi m$ from eq.~\ref{eq:ph}. This gives us a transmission function of
+\begin{equation}
+\frac{I_{tr}}{I_{in}}=[1+Q\sin^{2}{(\pi m)}]^{-1}
 \label{eq:airy}
 \end{equation}
-Where
+At interger $m$, this function has a maximum value of 1, showing us the interference condition that we found before in eq.~\ref{eq:int_con}. As seen if fig.~\ref{fig:airy} the FWHM of the transmission is dependent on $Q$. A higher $Q$ leads to narrower peaks, which means a higher resolving power of the \'{e}talon. Following convention, this $Q$ is sometimes replaced with a figure of merit of the \'{e}talon plates known as the finesse, $\mathcal{F}$, which is 
 \begin{equation}
-Q = \frac{4R}{(1-R)^{2}} = \frac{2}{\pi}\mathcal{F}^{2}
+\mathcal{F}=\frac{\pi}{2}\sqrt{Q}
 \end{equation}
-Then this happens a bunch, blah blah then you get the glorious interference condition:
+The distance between successive peaks (which is one order number) is known as the free spectral range, FSR. Using the finesse, the FWHM of the Airy function is simply $FSR/\mathcal{F}$. 
+\subsection*{Imaging Fabry-P\'{e}rot Rings}
+If we plug in the expression for $m$ (eq.~\ref{eq:int_con}) into eq.~\ref{eq:airy} we get
 \begin{equation}
-m\lambda = 2nd\cos{\theta}
+\frac{I_{tr}}{I_{in}}=\left[1+Q\sin^{2}{\left(\frac{2nd}{\lambda}\cos{\theta}\right)}\right]^{-1}
 \end{equation}
-If we use a lens of focal length, $f$, the $\cos{\theta}$ term can be rewritten in terms of $f$ and the radius across the imaging plane, $r$. This gives us
+If $n$, $d$, and $\lambda$ are fixed, then the interference pattern will be peaks at ever increasing $\cos{\theta}$. This leads to the familiar ring pattern of the Fabry-P\'{e}rot. Now if we place a lens with focal length, $f$,  behind the \'{e}talon, we can focus this pattern on a plane. Defining $r$ as the radius on this plane (with the optical axis being the origin), 
 \begin{equation}
-m\lambda = 2d \frac{f}{\sqrt{f^{2}+r^{2}}}
-\label{eq:inf_con}
+\cos{\theta}=\frac{f}{\sqrt{f^{2}+r^{2}}}
 \end{equation}
-where we have absorbed $n$ into $d$, giving us an effective \'{e}talon spacing.
+Now we see that the Airy function can be written as a function in $r$ with $f$, $n$, $d$ and $\lambda$ fixed. 
+\begin{equation}
+\frac{I_{tr}}{I_{in}}=\left[1+Q\sin^{2}{\left(\frac{A}{\sqrt{1+(r/f)^{2}}}\right)}\right]^{-1}
+\end{equation}
+with $A=2\pi n d / \lambda$.  With this function the distance between interference peaks drops as we move out in $r$
+
+
 
 %----------------------------------------------------------------------------------------
 %	SECTION 4
