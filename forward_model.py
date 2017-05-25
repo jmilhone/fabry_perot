@@ -182,7 +182,7 @@ class Etalon(object):
 # def interpolate_fabry_to_ccd(lin_arr, lin_data, ccd_grid):
 #     return griddata(lin_arr, lin_data, ccd_grid, fill_value=0.0)
 
-def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True):
+def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True, r0=None, He_filter=False):
     '''
     Main FP evaluation function. Takes information from input Source class, CCD class, and Etalon class
     to convolve the source function with the Etalon transmission function and then cast it onto the CCD.
@@ -206,6 +206,12 @@ def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True
         if verbose:
             print 'Evaluating source spectrum on meshgrid...'
         evald_spec = np.tile(source.eval_spec(lam_arr), ccd.cos_th.size).reshape(ll.T.shape).T
+        if He_filter and source.name.lower() == 'helium':
+            print "Using He filter"
+            filt = model.eval_spec(lam_arr, 1.0, 468.67, .46 / 2.0 / np.sqrt(2.0 * np.log(2.0)))
+            filt *= .3423 / filt.max()
+            evald_spec *= filt
+
         if verbose:
             print 'Evaluating convolution integral...'
         lin_out = np.trapz(evald_spec * etalon.eval_airy(ll, cth), lam_arr, axis=0)
@@ -214,21 +220,22 @@ def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True
             print 'CCD linear array has more than 100K points. Using for loop method...'
         lin_out = np.zeros_like(ccd.cos_th)
         spec = source.eval_spec(lam_arr)
-        filt = model.eval_spec(lam_arr, 1.0, 468.67, .46 / 2.0 / np.sqrt(2.0 * np.log(2.0)))
-        filt *= .3423 / filt.max()
-        if True:
+
+        if He_filter and source.name.lower() == 'helium':
             print "Using He filter"
+            filt = model.eval_spec(lam_arr, 1.0, 468.67, .46 / 2.0 / np.sqrt(2.0 * np.log(2.0)))
+            filt *= .3423 / filt.max() 
             spec *= filt
-        
-        #per_print = (100./ccd.cos_th.size)
+
         for i, cth in enumerate(ccd.cos_th):
             lin_out[i] = np.trapz(spec * etalon.eval_airy(lam_arr, cth), lam_arr)
-            #print "{0:.2f}% done...".format(i * per_print)
     lin_data = lin_out / lin_out.max()
     convo_time = time.time() - tic
-    if True:
+
+    if r0:
         print "Added gaussian fall off"
-        lin_data *= np.exp(-(ccd.lin_arr/3500.0)**2)
+        lin_data *= np.exp(-(ccd.lin_arr/r0)**2)
+
     if verbose:
         print 'Convolution complete! It took {0:.2f} seconds.'.format(convo_time)
     if not grid_out:
@@ -271,7 +278,7 @@ def peak_calc(source, ccd, etalon):
     return {'wavelength': wav, 'm_max': m_max, 'pk_loc': pk_locations, 'pk_m': pk_m}
 
 def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150., d=0.88, F=20., lin_pts=5e4,
-         plotit=True, savedic=None, saveccd=None, saveparams=None):
+         plotit=True, savedic=None, saveccd=None, saveparams=None, r0=None, He_filter=False):
 
     if light.lower() in ['argon', 'ar']:
         source = Argon(temp=temp, vel=vel)
@@ -307,7 +314,7 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
 
     pks = peak_calc(source, ccd, etalon)
 
-    lin_data, ccd_data = eval_fabry(source, ccd, etalon, verbose=plotit, grid_out=True)
+    lin_data, ccd_data = eval_fabry(source, ccd, etalon, verbose=plotit, grid_out=True, r0=r0, He_filter=He_filter)
 
     param_dict = {"source": source.name, "ccd": ccd.name, "T": temp, "V": vel, "f": (lens, ccd.f), "d": d,
                   "F": F, "Q": etalon.Q, "lam0": source.lam0, "mu": source.mu, "FWHM": source.FWHM,
