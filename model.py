@@ -7,6 +7,7 @@ import plottingtools.core as ptools
 import cPickle as pickle
 import pymultinest
 import json
+from scipy.integrate import trapz
 
 rcParams['xtick.direction'] = 'in'
 rcParams['ytick.direction'] = 'in'
@@ -41,17 +42,48 @@ def forward(r, L, d, F, Ti, mu, w0, nlambda=512, V=0):
     nr = len(r)
 
     ll = np.tile(w_arr, (nr, 1)).T
-
+    #print ll[0:2, 0:2]
     cos_th = L / np.sqrt(L**2 + r**2)
     cth = np.tile(cos_th, (len(w_arr), 1))
 
 
     spec = eval_spec(w_arr, 1.0, w0, sigma, V=V) 
     spec = np.tile(spec, (nr, 1)).T
-
-    linear_out = np.trapz(spec*eval_airy(ll, cth, d, F), w_arr, axis=0)
+    linear_out = trapz(spec*eval_airy(ll, cth, d, F), w_arr, axis=0)
     linear_out /= linear_out.max()
     return linear_out
+
+def forward3(r, L, d, F, Ti, mu, w0, nlambda=512, V=0):
+    # This is slightly faster!
+    sigma = 3.276569e-5 * np.sqrt(Ti/mu) * w0
+    w_arr = np.linspace(w0 - 5*sigma, w0 + 5*sigma, nlambda)[:, np.newaxis]
+    nr = len(r)
+
+    cos_th = L / np.sqrt(L**2 + r**2).reshape((1,nr))
+    spec = eval_spec(w_arr, 1.0, w0, sigma, V=V)
+
+    lin_out = trapz(spec*eval_airy(w_arr, cos_th, d, F), w_arr, axis=0)
+    lin_out /= lin_out.max()
+    return lin_out
+
+def forward4(r, L, d, F, Ti, mu, amp, w0, nlambda=512):
+
+    sigma = [3.276569e-5 * np.sqrt(Ti[idx]/mu[idx]) * w for idx, w in enumerate(w0)]
+    minW = min(w0)
+    maxW = max(w0)
+    max_sigma = max(sigma)
+    w_arr = np.linspace( minW- 5.0*max_sigma, maxW+5.0*max_sigma, nlambda)[:, np.newaxis]
+
+    spec = 0.0
+    for idx, w in enumerate(w0):
+        spec += eval_spec(w_arr, amp[idx], w, sigma[idx])
+    nr = len(r)
+
+    cos_th = L / np.sqrt(L**2 + r**2).reshape((1,nr))
+
+    lin_out = trapz(spec*eval_airy(w_arr, cos_th, d, F), w_arr, axis=0)
+    lin_out /= lin_out.max()
+    return lin_out
 
 def forward2(r, L, d, F, Ti, mu, amp, w0, nlambda=512):
     sigma = [3.276569e-5 * np.sqrt(Ti[idx]/mu[idx]) * w for idx, w in enumerate(w0)]
@@ -74,8 +106,6 @@ def forward2(r, L, d, F, Ti, mu, amp, w0, nlambda=512):
     spec = np.tile(spec, (nr, 1)).T
     linear_out = np.trapz(spec*eval_airy(ll, cth, d, F), w_arr, axis=0)
 
-    #plt.plot(r**2, linear_out)
-    #plt.show()
 
     return linear_out
 

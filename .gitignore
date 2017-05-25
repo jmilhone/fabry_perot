@@ -20,3 +20,6 @@
 
 # Multinest save files
 saves/*
+
+# json
+*.json
