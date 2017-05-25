@@ -18,8 +18,8 @@ import json
 #labels = ["L (mm)", "d (mm)", "Finesse",  r"$T_{i, Ar}$ (eV)",  r"$A_{Ar}$ (Counts)"]
 #prob_labels = ["P(L)", "P(d)", "P(Finesse)", r"P($T_{i,Ar}$)", r"P($A_{Ar}$)"]
 
-#savedir = "saves/full_solver_run17/"
-savedir = "saves/new_full_solver_run0/"
+savedir = "saves/full_solver_run17/"
+#savedir = "saves/new_full_solver_run0/"
 with open(savedir+"param_file.json") as paramfile:
     param_info = json.load(paramfile)
 
@@ -30,8 +30,8 @@ prob_labels = param_info['prob labels']
 nparams = len(params)
 #fname = "saves/Ar_solver_run4/fp_full_post_equal_weights.dat"
 #fname = "saves/full_solver_run17/fp_full_post_equal_weights.dat"
-#fname = savedir + "fp_full_post_equal_weights.dat"
-fname = savedir + "fp_newfull_post_equal_weights.dat"
+fname = savedir + "fp_full_post_equal_weights.dat"
+#fname = savedir + "fp_newfull_post_equal_weights.dat"
 #fname = "saves/new_full_solver_run0/fp_newfull_post_equal_weights.dat"
 post = np.loadtxt(fname, ndmin=2)
 #post[:, 0] *= 0.004  # convert px to mm
@@ -41,7 +41,7 @@ post = np.loadtxt(fname, ndmin=2)
 save = False
 for idx, param in enumerate(params):
     fig, ax = plt.subplots()
-    if idx == 1:
+    if False:#idx == 1:
         val = .883670
         
         hist, bins = np.histogram(post[100:, idx], density=True, bins=50)

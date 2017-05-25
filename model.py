@@ -12,6 +12,18 @@ rcParams['xtick.direction'] = 'in'
 rcParams['ytick.direction'] = 'in'
 
 def eval_airy(wavelength, cos_theta, d, F):
+    """
+    Compute Airy Function as function of wavelength and cos(theta) (i.e. location on ccd) with 
+    parameters d and F
+
+    Args:
+        wavelength (np.ndarray): wavelength array
+        cos_theta (np.ndarray): cos(theta) array
+        d (float): etalon spacing
+        F (float): Finesse
+    Returns:
+        np.ndarray
+    """
     Q = 2. * F**2 / np.pi
     airy = 1.0 / (1.0 + Q * np.sin(np.pi * 2.e6 * d * cos_theta / wavelength)**2)
     return airy
@@ -75,7 +87,7 @@ if __name__ == "__main__":
     #with open("saves/full_solver_run17/fp_ringsum_params.p") as infile:
     with open("saves/new_full_solver_run0/fp_ringsum_params.p") as infile:
         data = pickle.load(infile)
-
+    print data.keys()
     #analyzer = pymultinest.Analyzer(n_params=8, outputfiles_basename="saves/full_solver_run17/fp_full_")
     analyzer = pymultinest.Analyzer(n_params=8, outputfiles_basename="saves/new_full_solver_run0/fp_newfull_")
     stats = analyzer.get_mode_stats()
@@ -123,6 +135,10 @@ if __name__ == "__main__":
 
     r_arr = np.load("rbins2.npy")
     print Amp_Ar / Amp_Th
+    rind = data['binarr'][data['ind']]
+    t0 = time.time()
+    linear_out = forward2(rind, L, d, F, [Ti0, Ti1], [mu0, mu1], [Amp_Th , Amp_Ar], [lambda_0, lambda_1], nlambda=512)
+    print time.time()-t0, "seconds"
     linear_out = forward2(r_arr, L, d, F, [Ti0, Ti1], [mu0, mu1], [Amp_Th , Amp_Ar], [lambda_0, lambda_1], nlambda=512)
 
     #up = [1012, 1287, 2981, 3260, 4957, 5238, 6935, 7218, 8921, 9202]

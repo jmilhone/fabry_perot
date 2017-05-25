@@ -91,6 +91,87 @@ def solve_Ar(savedir, param_fname):
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
             resume=True, verbose=True, sampling_efficiency='model', n_live_points=2000,
             outputfiles_basename=savedir+"fp_full_", max_modes=500)    
+
+def full_solver3(savedir, param_fname):
+
+
+    def log_prior(cube, ndim, nparams):
+        cube[0] = cube[0]*(L_range[1] - L_range[0]) + L_range[0]
+        cube[1] = 10.0**(cube[1]*(np.log10(d_range[1]) - np.log10(d_range[0])) + np.log10(d_range[0]))
+        cube[2] = cube[2]*(finesse_range[1] - finesse_range[0]) + finesse_range[0]
+        cube[3] = cube[3]*(Ti_Ar_range[1] - Ti_Ar_range[0]) + Ti_Ar_range[0]
+        cube[4] = cube[4]*(Th_amp_range[1] - Th_amp_range[0]) + Th_amp_range[0]
+        cube[5] = cube[5]*(Ar_amp_range[1] - Ar_amp_range[0]) + Ar_amp_range[0]
+        cube[6] = cube[6]*(rscale_range[1] - rscale_range[0]) + rscale_range[0]
+
+    def log_likelihood(cube, ndim, nparams):
+        # two integral approach
+        #linear_out_Ar = model.forward(rr, cube[0], cube[1], cube[2], cube[4], muAr, wAr)
+        #linear_out_Th = model.forward(rr, cube[0], cube[1], cube[2], cube[3], muTh, wTh)
+
+        #linear_out_Ar *= cube[6] 
+        #linear_out_Th *= cube[5]
+        #linear_out = np.exp(-(rr / cube[7])**2 ) * (linear_out_Ar + linear_out_Th) 
+
+        #chisq = np.sum( (linear_out - data)**2 / data_sd**2 )
+
+        # single integral approach
+        linear_out = model.forward2(rr, cube[0], cube[1], cube[2],
+                [Ti_Th, cube[3]], [muTh, muAr], [cube[4], cube[5]], [wTh, wAr]) 
+        linear_out *= np.exp(-(rr / cube[6])**2)
+        chisq = np.sum( (linear_out - data)**2 / data_sd**2 )
+
+        return -chisq/2.0
+
+    params = ['L', 'd', 'Finesse', 'Ti_Ar', 'Amp_Th', 'Amp_Ar', 'r0']
+    labels = ["L (mm)", "d (mm)", "Finesse", 
+            r"$T_{i, Ar}$ (eV)", r"$A_{Th}$ (Counts)", r"$A_{Ar}$ (Counts)", r"$r_0$ (px)"]
+    prob_labels = ["P(L)", "P(d)", "P(Finesse)", r"P($T_{i,Ar}$)", 
+            r"P($A_{Th}$)", r"P($A_{Ar}$)", r"P($r_0$)"]
+
+    param_info = {'params':params, 'labels': labels, 'prob labels': prob_labels}
+    with open(savedir+"param_file.json", 'w') as param_config:
+        json.dump(param_info, param_config, indent=4)
+
+    wTh = 487.873302
+    wAr = 487.98634
+    
+    #Changed for run3
+    #muAr = 40.0
+    #muTh = 232.0
+    muAr = 39.948
+    muTh = 232.03806
+
+    with open(savedir+param_fname) as paramfile:
+        param_dict = pickle.load(paramfile)
+
+    finesse_range = param_dict["finesse_range"]
+    Ti_Ar_range= param_dict["Ti_Ar_range"]
+    Ti_Th= 1000.0 * .025 /300.0
+    d_range= param_dict["d_range"]
+    L_range = param_dict["L_range"]
+    Th_amp_range= param_dict["Th_amp_range"]
+    Ar_amp_range= param_dict["Ar_amp_range"]
+    rscale_range= param_dict["rscale_range"]
+    r = param_dict["binarr"]
+    ringsum = param_dict["ringsum"]
+    ringsum_sd = param_dict["ringsum_sd"]
+    ind = param_dict["ind"]
+
+    # Convert from K to eV 
+    Ti_Ar_range = [x*.025 / 300.0 for x in Ti_Ar_range]
+    L_range = [x / 0.004 for x in L_range]
+
+    data = ringsum[ind]
+    #data_sd = ringsum_sd[ind]
+    data_sd = 0.01 * data +100.0 #np.sqrt(3.5*np.abs(data))
+    rr = r[ind]
+    nparams = len(params)
+    pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
+            resume=True, verbose=True, sampling_efficiency='model', n_live_points=2000,
+            outputfiles_basename=savedir+"fp_full_", max_modes=500)
+
+
 def full_solver2(savedir, param_fname):
 
     def log_prior(cube, ndim, nparams):
@@ -416,8 +497,10 @@ if __name__ == "__main__":
     #savedir = fix_save_directory("full_solver_run17")
     #full_solver(savedir, "fp_ringsum_params.p")
 
-    savedir = fix_save_directory("new_full_solver_run0")
-    full_solver2(savedir, "fp_ringsum_params.p")
+    #savedir = fix_save_directory("new_full_solver_run0")
+    #full_solver2(savedir, "fp_ringsum_params.p")
+    savedir = fix_save_directory("solver3_run4")
+    full_solver3(savedir, "fp_ringsum_params.p")
     print "Time started: ", t00
     print "Time finished: ",time.ctime(time.time())
     # run 0 forgot to convert L to pixels
@@ -454,3 +537,16 @@ if __name__ == "__main__":
 
     # 5 param solver
     # run 0: initial run with 3% error
+
+
+    # 7 param solver (no Ti_Th)
+    # run0: initial run with 1% error
+        # 16 cores on dave
+        #Time started:  Mon May 15 08:26:59 2017
+        #Time finished:  Mon May 15 22:22:40 2017
+    # runn1: running on old thorium calibration data
+        # 22 cores on dave
+    # run2: trying it against the forward model
+    # run3: reducing the prior size
+    # run4: rerunning 3 but without subtracting an offset
+

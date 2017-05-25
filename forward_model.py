@@ -5,7 +5,7 @@ import h5py
 import cPickle as pickle
 import time
 import argparse
-
+import model 
 class Source(object):
     def __init__(self, temp=1., vel=0., lam0=488., mu=40., amp=None, name='Source generic'):
         self.name = name
@@ -76,6 +76,11 @@ class Source(object):
 class Argon(Source):
     def __init__(self, temp=1., vel=0.):
         super(Argon, self).__init__(temp=temp, vel=vel, lam0=487.98634, mu=39.948, name='Argon')
+
+class Mercury(Source):
+    def __init__(self, temp=1., vel=0.):
+        #super(Mercury, self).__init__(temp=temp, vel=vel, lam0=546.07498, mu=200.59, name='Argon')
+        super(Mercury, self).__init__(temp=temp, vel=vel, lam0=576.96095, mu=200.59, name='Argon')
 
 class Thorium(Source):
     def __init__(self, argon_temp=None, argon_amp=None):
@@ -209,12 +214,21 @@ def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True
             print 'CCD linear array has more than 100K points. Using for loop method...'
         lin_out = np.zeros_like(ccd.cos_th)
         spec = source.eval_spec(lam_arr)
+        filt = model.eval_spec(lam_arr, 1.0, 468.67, .46 / 2.0 / np.sqrt(2.0 * np.log(2.0)))
+        filt *= .3423 / filt.max()
+        if True:
+            print "Using He filter"
+            spec *= filt
+        
         #per_print = (100./ccd.cos_th.size)
         for i, cth in enumerate(ccd.cos_th):
             lin_out[i] = np.trapz(spec * etalon.eval_airy(lam_arr, cth), lam_arr)
             #print "{0:.2f}% done...".format(i * per_print)
     lin_data = lin_out / lin_out.max()
     convo_time = time.time() - tic
+    if True:
+        print "Added gaussian fall off"
+        lin_data *= np.exp(-(ccd.lin_arr/3500.0)**2)
     if verbose:
         print 'Convolution complete! It took {0:.2f} seconds.'.format(convo_time)
     if not grid_out:
@@ -245,7 +259,7 @@ def peak_calc(source, ccd, etalon):
         pk_m = []
         for i, w in enumerate(wav):
             mmax = 2.e6 * etalon.d / w
-            print mmax
+            print w,mmax
             numpks = int(np.floor(np.floor(mmax) - mmax*ccd.cos_th.min() + 1))
             print numpks
             pkloc = ccd.f * np.sqrt((mmax / (np.floor(mmax) - np.arange(numpks)))**2 - 1.)
@@ -270,6 +284,8 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
             source = Thorium(argon_temp=temp, argon_amp=amp[0])
     elif light.lower() in ['helium', 'he']:
         source = Helium(vel=vel, temp=temp, rel_amps=amp)
+    elif light.lower() in ['mercury', 'hg']:
+        source = Mercury(temp=temp, vel=vel)
     else:
         raise Exception('not a valid source name, try again')
 
@@ -319,9 +335,11 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
         print 'Plotting...'
         f, ax = plt.subplots()
         ax.plot(pixel_arr, lin_data, label='data')
-        ax.plot(pixel_arr, instrument_func, label='instr. f')
+        #ax.plot(pixel_arr**2, lin_data, label='data')
+        #ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+        #ax.plot(pixel_arr, instrument_func, label='instr. f')
         ax.set_xlabel('pixels')
-        ax.set_xlim([0, min(ccd.npx) / 2.])
+        #ax.set_xlim([0, min(ccd.npx) / 2.])
         # last_pk_ix = np.where(pk_locations > min(ccd.npx) / 2.)[0][0]
         # ax2 = ax.twiny()
         # ax2.set_xlim(ax.get_xlim())

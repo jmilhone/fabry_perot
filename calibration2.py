@@ -74,18 +74,18 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
 
     times += [time.time()]
     print "Image done reading, {0} seconds".format(times[-1] - times[-2])
-    #x0, y0 = rs.locate_center(data, x0, y0, binsize=binsize, plotit=False)
+    x0, y0 = rs.locate_center(data, x0, y0, binsize=binsize, plotit=False)
     times += [time.time()]
     print "Center found, {0} seconds".format(times[-1] - times[-2])
 
     binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=1.0, quadrants=False)
-    print "Subtracting min value from ring sum"
-    sigarr -= sigarr.min()
+    #print "Subtracting min value from ring sum"
+    #sigarr -= sigarr.min()
     print len(binarr)
     np.save("rbins2.npy",binarr)
     new_binarr = np.concatenate(([0.0], binarr))
-    LL, RR = fitting.get_peaks(binarr, sigarr, thres1=0.3, npks=8)
-    z = fitting.peak_and_fit2(binarr, sigarr, thres=0.3, plotit=False)
+    LL, RR = fitting.get_peaks(binarr, sigarr, thres1=0.2, npks=8)
+    z = fitting.peak_and_fit2(binarr, sigarr, thres=0.2, plotit=False)
     ampsAr = []
     ampsTh = []
     locAr = []
@@ -181,42 +181,45 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     plt.show()
 
 
-    finesse_range = [10, 30]
-    Ti_Ar_range = [300.0, 11000]
+    finesse_range = [15, 20]
+    #Ti_Ar_range = [300.0, 11000]
+    Ti_Ar_range = [300.0, 11000/2.0]
     Ti_Th_range = [300.0, 3000]
     d_range = [.87, .89]
     L_range = [148.0, 152.0]
     a0 = amp0 / np.exp(-(pk0/rscale)**2)
     a1 = amp1 / np.exp(-(pk1/rscale)**2)
-    Th_amp_range = [.5*a0, 2.0*a0]
-    Ar_amp_range = [.5*a1, 2.0*a1]
-    rscale_range = [1000.0, 5000.0]
+    #Th_amp_range = [.5*a0, 2.0*a0]
+    #Ar_amp_range = [.5*a1, 2.0*a1]
+    Th_amp_range = [.75*a0, 1.5*a0]
+    Ar_amp_range = [.75*a1, 1.5*a1]
+    rscale_range = [3000.0, 4000.0]
     print a0, a1 
-    #params = {"finesse_range": finesse_range,
-    #          "Ti_Ar_range": Ti_Ar_range,
-    #          "Ti_Th_range": Ti_Th_range,
-    #          "d_range": d_range,
-    #          "L_range": L_range,
-    #          "Th_amp_range": Th_amp_range,
-    #          "Ar_amp_range": Ar_amp_range,
-    #          "rscale_range": rscale_range,
-    #          "binarr": binarr,
-    #          "ringsum": sigarr,
-    #          "ringsum_sd": 100.0 + 0.01 * sigarr,
-    #          "ind": inds}
-
     params = {"finesse_range": finesse_range,
               "Ti_Ar_range": Ti_Ar_range,
-              "Ti_Th": 1000.0 * .025 / 300.0,
+              "Ti_Th_range": Ti_Th_range,
               "d_range": d_range,
               "L_range": L_range,
-              "rel_amp": relA,
+              "Th_amp_range": Th_amp_range,
               "Ar_amp_range": Ar_amp_range,
-              "rscale": r0_fit,
+              "rscale_range": rscale_range,
               "binarr": binarr,
               "ringsum": sigarr,
-              "ringsum_sd": 100.0 + 0.03 * sigarr,
+              "ringsum_sd": 100.0 + 0.01 * sigarr,
               "ind": inds}
+
+    #params = {"finesse_range": finesse_range,
+    #          "Ti_Ar_range": Ti_Ar_range,
+    #          "Ti_Th": 1000.0 * .025 / 300.0,
+    #          "d_range": d_range,
+    #          "L_range": L_range,
+    #          "rel_amp": relA,
+    #          "Ar_amp_range": Ar_amp_range,
+    #          "rscale": r0_fit,
+    #          "binarr": binarr,
+    #          "ringsum": sigarr,
+    #          "ringsum_sd": 100.0 + 0.03 * sigarr,
+    #          "ind": inds}
 
 
     folder = mns.fix_save_directory(save_dir)
@@ -226,21 +229,27 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
 
 if __name__ == "__main__":
     binsize = 0.1
-    folder = "Images"
-    fname = join(folder, "thorium_ar_5_min_1.nef")
-    bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
+    #folder = "Images"
+    #fname = join(folder, "thorium_ar_5_min_1.nef")
+    #bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
 
-
-    fname = "thorium_lamp_data.npy"
+    folder = "FM_saves"
+    #fname = "model1.npy"
+    fname = "model1_0.02_noise.npy"
+    fname = join(folder,fname)
+    #fname = "thorium_lamp_data.npy"
+    #fname = "old_thorium_data.npy"
 
     #fname = "FM_150_88_195_4000_0.3eV.npy"
     bg_fname = None
     #save_dir = "full_solver_run17"
-    save_dir = "new_full_solver_run0"
+    #save_dir = "new_full_solver_run0"
 
+    save_dir = "solver3_run5"
     #center_guess = (3068.56, 2033.17)
-    center_guess = (3068.57005213, 2032.17646934)
-    #center_guess = (3018.0, 2010.0)
+    #center_guess = (3068.57005213, 2032.17646934)
+    #center_guess = (3040.78197222, 2003.29777455) # Old thorium calibration data center
+    center_guess = (3018.0, 2010.0)
     #folder ="ForwardModelData"
     #fname = join(folder, "th_lamp_FM_14987_8824.npy")
     #bg_fname = None
