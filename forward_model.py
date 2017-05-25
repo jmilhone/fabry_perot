@@ -5,7 +5,7 @@ import h5py
 import cPickle as pickle
 import time
 import argparse
-import model 
+#import model
 from scipy.special import erf
 
 class Source(object):
@@ -114,10 +114,15 @@ class Helium(Source):
                               468.575707958, 468.5757974, 468.58040922, 468.58308897, 468.588412282, 468.59055531,
                               468.591788438])
         if rel_amps is None:
+            rel_amps = np.ones(5)
             #From Evan's Thesis (see Cooper's he4686tivoigtfit.pro)
-            rel_amps = [11., 9., 13., 3., 6., 16., 1., 2., 9., 1.5, 1., 28., 1.]
-        rel_amps = np.array(rel_amps)
-        self.amp = rel_amps/rel_amps.max()
+            #rel_amps = [11., 9., 13., 3., 6., 16., 1., 2., 9., 1.5, 1., 28., 1.]
+        c1 = 24. / (5 + 9 + 1) * rel_amps[0]
+        c2 = 9. / (2 + 1) * rel_amps[1]
+        c3 = 30. / (2 + 1) * rel_amps[2]
+        c4 = 33. / (20 + 14 + 1) * rel_amps[3]
+        c5 = 4 / (5 + 9 + 1) * rel_amps[4]
+        self.amp = np.array([5*c1, 2*c2, 1*c3, 1*c2, 14*c4, 9*c1, 1*c5, 1*c1, 20*c4, 1*c4, 9*c5, 2*c3, 5*c5])
         super(Helium, self).__init__(temp=self.temp, vel=self.vel, lam0=self.lam0, mu=self.mu,
                                      amp=self.amp, name='Helium')
 
@@ -333,7 +338,7 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
         #ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
         #ax.plot(pixel_arr, instrument_func, label='instr. f')
         ax.set_xlabel('pixels')
-        #ax.set_xlim([0, min(ccd.npx) / 2.])
+        ax.set_xlim([0, min(ccd.npx) / 2.])
         # last_pk_ix = np.where(pk_locations > min(ccd.npx) / 2.)[0][0]
         # ax2 = ax.twiny()
         # ax2.set_xlim(ax.get_xlim())
