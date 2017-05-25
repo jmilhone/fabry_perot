@@ -2,7 +2,7 @@ from __future__ import division
 from matplotlib import rcParams
 import numpy as np
 import matplotlib.pyplot as plt
-#import image_helpers as im
+import image_helpers as im
 import ring_sum as rs
 from os.path import join
 import fitting
@@ -63,29 +63,39 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     # f_bg=None
     print f[-3:].lower()
     if f[-3:].lower() == "nef":
+        #print "changed it to green dumbass"
+        #data = im.get_image_data(f, bgname=f_bg, color='g')
         data = im.get_image_data(f, bgname=f_bg, color='b')
     elif f[-3:].lower() == "npy":
         data = np.load(f)
     else:
         print "need a valid file"
         return
-    #im.quick_plot(data)
-    # plt.show()
+    im.quick_plot(data)
+    plt.show()
 
     times += [time.time()]
+    print f
     print "Image done reading, {0} seconds".format(times[-1] - times[-2])
-    #x0, y0 = rs.locate_center(data, x0, y0, binsize=binsize, plotit=False)
+    x0, y0 = rs.locate_center(data, x0, y0, binsize=binsize, plotit=False)
     times += [time.time()]
     print "Center found, {0} seconds".format(times[-1] - times[-2])
 
     binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=1.0, quadrants=False)
     print "Subtracting min value from ring sum"
+    print "sig min",sigarr.min()
+    print "sig max",sigarr.max()
     sigarr -= sigarr.min()
+    print "sig max",sigarr.max()
     print len(binarr)
     np.save("rbins2.npy",binarr)
+    np.save("old_thorium_data.npy", data)
     new_binarr = np.concatenate(([0.0], binarr))
-    LL, RR = fitting.get_peaks(binarr, sigarr, thres1=0.3, npks=8)
-    z = fitting.peak_and_fit2(binarr, sigarr, thres=0.3, plotit=False)
+    print "sig max",sigarr.max()
+    LL, RR = fitting.get_peaks(binarr, sigarr, thres1=0.2,thres2=.4, npks=8)
+    print "sig max",sigarr.max()
+    z = fitting.peak_and_fit2(binarr, sigarr, thres=0.2, plotit=False)
+    print "sig max",sigarr.max()
     ampsAr = []
     ampsTh = []
     locAr = []
@@ -98,6 +108,7 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
         locAr.append(z[2*i+1])
         locTh.append(z[2*i])
 
+    print "sig max",sigarr.max()
     ampsAr = np.array(ampsAr)
     ampsTh = np.array(ampsTh)
     locAr = np.array(locAr)
@@ -115,6 +126,7 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     pfit = np.polyfit(locs**2, np.log(amps),1)
     print "r0 fit: ",1.0 / np.sqrt(np.abs(pfit[0]))
     r0_fit =  1.0 / np.sqrt(np.abs(pfit[0]))
+    print "sig max",sigarr.max()
     plt.plot(locTh**2, ampsTh, 'o')
     plt.plot(locTh**2, relA*ampsTh, 'o')
     plt.plot(locAr**2, ampsAr, 'o')
@@ -192,6 +204,33 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     Ar_amp_range = [.5*a1, 2.0*a1]
     rscale_range = [1000.0, 5000.0]
     print a0, a1 
+
+    print len(binarr)
+    plt.plot(binarr, sigarr, 'r')
+
+    theta_min = 0.0
+    L = 150.508755008
+    rmax = 1800.0
+    cos_theta_min = L / np.sqrt(L**2 + rmax**2)
+    cos_theta = np.linspace(cos_theta_min,1.0, 1000.0)
+    newr = L * np.sqrt( 1.0 /cos_theta**2 -1.0)
+    newr = newr[::-1]
+    ny, nx = data.shape
+    x = np.arange(0, nx, 1)
+    y = np.arange(0, ny, 1)
+    print x0, y0
+    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+    R = np.sqrt(xx**2 + yy**2)
+
+
+    newsig, _ = np.histogram(R.flatten(), bins=newr, weights=data.flatten())
+    #plt.plot(newr)
+    plt.plot(newr[1:], newsig,'b')
+    plt.show()
+    plt.plot(np.diff(newr),'.')
+    plt.show()
+    #plt.plot(R.flatten(), data.flatten(), '.')
+    #plt.show()
     #params = {"finesse_range": finesse_range,
     #          "Ti_Ar_range": Ti_Ar_range,
     #          "Ti_Th_range": Ti_Th_range,
@@ -220,26 +259,30 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
 
 
     folder = mns.fix_save_directory(save_dir)
-    with open(folder + "fp_ringsum_params.p", 'wb') as outfile:
-        pickle.dump(params, outfile)
+    #with open(folder + "fp_ringsum_params.p", 'wb') as outfile:
+    #    pickle.dump(params, outfile)
 
 
 if __name__ == "__main__":
     binsize = 0.1
     folder = "Images"
+    #fname = join(folder, "Th_lamp_488_calib_5m.nef")
+    #bg_fname = join(folder, "Th_lamp_488_calib_5m_background.nef")
     fname = join(folder, "thorium_ar_5_min_1.nef")
-    bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
+    #bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
+    #fname = join(folder, "DSC_0007.nef")
+    bg_fname = None
 
-
-    fname = "thorium_lamp_data.npy"
+    #fname = "thorium_lamp_data.npy"
 
     #fname = "FM_150_88_195_4000_0.3eV.npy"
-    bg_fname = None
+    #bg_fname = None
     #save_dir = "full_solver_run17"
     save_dir = "new_full_solver_run0"
 
-    #center_guess = (3068.56, 2033.17)
-    center_guess = (3068.57005213, 2032.17646934)
+    center_guess = (3068.56, 2033.17)
+    #center_guess = (3040.78197222, 2003.29777455) # old Th calib center guess
+    #center_guess = (3068.57005213, 2032.17646934)
     #center_guess = (3018.0, 2010.0)
     #folder ="ForwardModelData"
     #fname = join(folder, "th_lamp_FM_14987_8824.npy")

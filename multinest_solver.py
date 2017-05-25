@@ -18,8 +18,8 @@ rcParams['ytick.direction'] = 'in'
 #rcParams['xtick.major.pad'] = 12
 err = 0.25
 #          0    1     2           3       4         5        6        7
-params = ['L', 'd', 'finesse', 'Ti_Th', 'Ti_Ar', 'Amp_Th', 'Amp_Ar', 'r0']
-nparams = len(params)
+#params = ['L', 'd', 'finesse', 'Ti_Th', 'Ti_Ar', 'Amp_Th', 'Amp_Ar', 'r0']
+#nparams = len(params)
 
 Arparams = ['Ti', 'V', 'r0', 'Amp']
 def fix_save_directory(save_directory):
@@ -47,13 +47,22 @@ def solve_Ar(savedir, param_fname):
 
     def log_likelihood(cube, ndim, nparams):
 
-        linear_out = model.forward(r, L, d, F, cube[0], muAr, wAr, nlambda=512, V=cube[1]) 
+        linear_out = model.forward3(r, L, d, F, cube[0], muAr, wAr, nlambda=512, V=cube[1]) 
         linear_out *= cube[3]*np.exp(-(r / cube[2])**2)
 
         chisq = np.sum( (linear_out - s)**2 / s_sd**2 )
         return -chisq/2.0
 
-    with open("0015676_data.json", 'r') as infile:
+    params = ["Ti", "V", "r0", "Amp"]
+    labels = ["Ti (eV)", "V (km/s)", "r0 (px)", "Amp (Counts)"]
+    prob_labels = ["P(Ti)", "P(V)", "P(r0)", "P(Amp)"]
+    shotnum = 8#9756 #9215
+    param_info = {'params':params, 'labels': labels, 'prob labels': prob_labels}
+    with open(savedir+"param_file.json", 'w') as param_config:
+        json.dump(param_info, param_config, indent=4)
+
+    #with open("0015676_data.json", 'r') as infile:
+    with open("{0:07d}_data.json".format(shotnum), 'r') as infile:
         data = json.load(infile, parse_float=np.float64)
 
     L = data["L"]
@@ -73,7 +82,7 @@ def solve_Ar(savedir, param_fname):
     #s_sd = np.sqrt(3.5*np.abs(s))
     # run 5
     #s_sd = .03 * s + 100.0
-    # run 6
+    # run 6, 9
     s_sd = .01 * s + 100.0
 
     # define limits for log_prior 
@@ -81,7 +90,7 @@ def solve_Ar(savedir, param_fname):
     Ti_lim = [0.025, 4.0]  # eV
     V_lim = [-10.0, 10.0]  # km/s
     r0_lim = [2000.0, 6000.0] # px
-    nparams = 4
+    nparams = len(params) 
 
 
     wAr = 487.98634
@@ -409,15 +418,14 @@ def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, ploti
 
 if __name__ == "__main__":
     #savedir = fix_save_directory("full_solver_run18")
-    #t00 = time.ctime(time.time())
-    #savedir = fix_save_directory("Ar_solver_run4")
-    #solve_Ar(savedir, None)
     t00 = time.ctime(time.time())
+    savedir = fix_save_directory("Ar_solver_run23")
+    solve_Ar(savedir, None)
     #savedir = fix_save_directory("full_solver_run17")
     #full_solver(savedir, "fp_ringsum_params.p")
 
-    savedir = fix_save_directory("new_full_solver_run0")
-    full_solver2(savedir, "fp_ringsum_params.p")
+    #savedir = fix_save_directory("new_full_solver_run5")
+    #full_solver2(savedir, "fp_ringsum_params.p")
     print "Time started: ", t00
     print "Time finished: ",time.ctime(time.time())
     # run 0 forgot to convert L to pixels
@@ -451,6 +459,26 @@ if __name__ == "__main__":
     # run 6: using 3% error to redo run 5
     # run 7: made a modification to the limits for the Amplitude
     # run 8: changed bottom finder from 2.5% to 10% in hopes to get the peaks fit better
+    # run 9: running analysis on shotnum 9214
+    # run 10: running analysis on shotnum 9215
+    # run 11: running analysis on shotnum 9756
+    # run 12: using proper ringsum r bins for shotnum 9756
+    # run 13: changed the minimum subtraction to the last point in the array
+    # run 14: running against forward model with forward model calibration solve as well
+    # run 15: same Ti but with V=3.4 km/s
+    # run 16: trying it with a negative velocity and small Ti
+    # run 17: same as 16 but with perfect L and d input
+    # run 18: shot=4, didnt subtract offset, using full solver solution
+    # run 19: shot=5, went back to constant area ring sum
+    # run 20: shot=6, no offset subraction, using solver3_run4 with no offset subtraction
+    # run 21: shot=7, using solver3_run5
+        # Time started:  Thu May 25 09:39:36 2017
+        # Time finished:  Thu May 25 09:44:26 2017
+    # run 22, shot=7, using solver3_run5, checking speed against foward3 vs forward in model.py
+        # Time started:  Thu May 25 11:33:08 2017
+        # Time finished:  Thu May 25 11:37:27 2017
+        # 22 was 31 seconds faster
+    # run 23, shot=8, looking at using 5% for thres2 instead of 10%
 
     # 5 param solver
     # run 0: initial run with 3% error

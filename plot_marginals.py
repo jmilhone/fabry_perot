@@ -19,7 +19,8 @@ import json
 #prob_labels = ["P(L)", "P(d)", "P(Finesse)", r"P($T_{i,Ar}$)", r"P($A_{Ar}$)"]
 
 #savedir = "saves/full_solver_run17/"
-savedir = "saves/new_full_solver_run0/"
+#savedir = "saves/new_full_solver_run0/"
+savedir = "saves/Ar_solver_run17/"
 with open(savedir+"param_file.json") as paramfile:
     param_info = json.load(paramfile)
 
@@ -31,7 +32,8 @@ nparams = len(params)
 #fname = "saves/Ar_solver_run4/fp_full_post_equal_weights.dat"
 #fname = "saves/full_solver_run17/fp_full_post_equal_weights.dat"
 #fname = savedir + "fp_full_post_equal_weights.dat"
-fname = savedir + "fp_newfull_post_equal_weights.dat"
+#fname = savedir + "fp_newfull_post_equal_weights.dat"
+fname = savedir + "fp_full_post_equal_weights.dat"
 #fname = "saves/new_full_solver_run0/fp_newfull_post_equal_weights.dat"
 post = np.loadtxt(fname, ndmin=2)
 #post[:, 0] *= 0.004  # convert px to mm
@@ -40,21 +42,23 @@ post = np.loadtxt(fname, ndmin=2)
 #folder = "Plots/run15/"
 save = False
 for idx, param in enumerate(params):
+    print param
     fig, ax = plt.subplots()
-    if idx == 1:
+    if False:#idx == 1:
         val = .883670
-        
         hist, bins = np.histogram(post[100:, idx], density=True, bins=50)
     else:
         hist, bins = np.histogram(post[:, idx], density=True, bins=40)
     bw = bins[1]-bins[0]
     ax.bar(bins[0:-1], hist*bw, width=bw)
-    print np.sum(hist*bw), bw, np.sum(hist)
+    if 'amp' in param.lower():
+        ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+    #print np.sum(hist*bw), bw, np.sum(hist)
     #ax.plot(bins[:-1], hist)
     #ax.hist(post[:, idx], bins=bins, normed=True)
     ptools.add_labels(ax, labels[idx], prob_labels[idx])
     ptools.add_thick_box(ax, minor=False)
-    print param,np.mean(post[:, idx]), np.std(post[:, idx])
+    #print param,np.mean(post[:, idx]), np.std(post[:, idx])
 
     plt.tight_layout()
     if save:
@@ -64,11 +68,11 @@ for idx, param in enumerate(params):
     else:
         plt.show()
 
-Lval = np.mean(post[:,0])
-i = np.argmin(np.abs(Lval - post[:,0]))
-print post[i, :]
-plt.plot(post[:, 1], 'o')
-plt.show()
+#jLval = np.mean(post[:,0])
+#i = np.argmin(np.abs(Lval - post[:,0]))
+#print post[i, :]
+#plt.plot(post[:, 1], 'o')
+#plt.show()
 for i, param1 in enumerate(params):
     for j, param2 in enumerate(params[0:i]):
         fig, ax = plt.subplots()
