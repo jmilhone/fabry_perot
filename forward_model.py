@@ -5,6 +5,7 @@ import h5py
 import cPickle as pickle
 import time
 import argparse
+import model 
 from scipy.special import erf
 
 class Source(object):
@@ -81,6 +82,11 @@ class Source(object):
 class Argon(Source):
     def __init__(self, temp=1., vel=0.):
         super(Argon, self).__init__(temp=temp, vel=vel, lam0=487.98634, mu=39.948, name='Argon')
+
+class Mercury(Source):
+    def __init__(self, temp=1., vel=0.):
+        #super(Mercury, self).__init__(temp=temp, vel=vel, lam0=546.07498, mu=200.59, name='Argon')
+        super(Mercury, self).__init__(temp=temp, vel=vel, lam0=576.96095, mu=200.59, name='Argon')
 
 class Thorium(Source):
     def __init__(self, argon_temp=None, argon_amp=None):
@@ -164,7 +170,7 @@ class Etalon(object):
     def params(self):
         return {"d": self.d, "F": self.F, "Q": self.Q}
 
-def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True):
+def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True, r0=None, He_filter=False):
     '''
     Main FP evaluation function. Takes information from input Source class, CCD class, and Etalon class
     to convolve the source function with the Etalon transmission function and then cast it onto the CCD.
@@ -188,12 +194,11 @@ def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True
         if verbose:
             print 'Evaluating source spectrum on meshgrid...'
         evald_spec = np.tile(source.eval_spec(lam_arr), ccd.cos_th.size).reshape(ll.T.shape).T
-
-        #f, ax = plt.subplots(1, 1, figsize=(16, 9))
-        #cf1 = ax.contourf(ll, cth, evald_spec*etalon.eval_airy(ll, cth), 20, cmap='rainbow')
-        #f.colorbar(cf1)
-        #plt.show()
-
+        if He_filter and source.name.lower() == 'helium':
+            print "Using He filter"
+            filt = model.eval_spec(lam_arr, 1.0, 468.67, .46 / 2.0 / np.sqrt(2.0 * np.log(2.0)))
+            filt *= .3423 / filt.max()
+            evald_spec *= filt
         if verbose:
             print 'Evaluating convolution integral...'
         lin_out = np.trapz(evald_spec * etalon.eval_airy(ll, cth), lam_arr, axis=0)
@@ -202,12 +207,22 @@ def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True
             print 'CCD linear array has more than 100K points. Using for loop method...'
         lin_out = np.zeros_like(ccd.cos_th)
         spec = source.eval_spec(lam_arr)
-        #per_print = (100./ccd.cos_th.size)
+
+        if He_filter and source.name.lower() == 'helium':
+            print "Using He filter"
+            filt = model.eval_spec(lam_arr, 1.0, 468.67, .46 / 2.0 / np.sqrt(2.0 * np.log(2.0)))
+            filt *= .3423 / filt.max() 
+            spec *= filt
+
         for i, cth in enumerate(ccd.cos_th):
             lin_out[i] = np.trapz(spec * etalon.eval_airy(lam_arr, cth), lam_arr)
-            #print "{0:.2f}% done...".format(i * per_print)
     lin_data = lin_out / lin_out.max()
     convo_time = time.time() - tic
+
+    if r0:
+        print "Added gaussian fall off"
+        lin_data *= np.exp(-(ccd.lin_arr/r0)**2)
+
     if verbose:
         print 'Convolution complete! It took {0:.2f} seconds.'.format(convo_time)
     if not grid_out:
@@ -238,7 +253,7 @@ def peak_calc(source, ccd, etalon):
         pk_m = []
         for i, w in enumerate(wav):
             mmax = 2.e6 * etalon.d / w
-            print mmax
+            print w,mmax
             numpks = int(np.floor(np.floor(mmax) - mmax*ccd.cos_th.min() + 1))
             print numpks
             pkloc = ccd.f * np.sqrt((mmax / (np.floor(mmax) - np.arange(numpks)))**2 - 1.)
@@ -250,7 +265,7 @@ def peak_calc(source, ccd, etalon):
     return {'wavelength': wav, 'm_max': m_max, 'pk_loc': pk_locations, 'pk_m': pk_m}
 
 def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150., d=0.88, F=20., lin_pts=5e4,
-         plotit=True, savedic=None, saveccd=None, saveparams=None):
+         plotit=True, savedic=None, saveccd=None, saveparams=None, r0=None, He_filter=False):
 
     if light.lower() in ['argon', 'ar']:
         source = Argon(temp=temp, vel=vel)
@@ -263,6 +278,8 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
             source = Thorium(argon_temp=temp, argon_amp=amp[0])
     elif light.lower() in ['helium', 'he']:
         source = Helium(vel=vel, temp=temp, rel_amps=amp)
+    elif light.lower() in ['mercury', 'hg']:
+        source = Mercury(temp=temp, vel=vel)
     else:
         raise Exception('not a valid source name, try again')
 
@@ -284,7 +301,7 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
 
     pks = peak_calc(source, ccd, etalon)
 
-    lin_data, ccd_data = eval_fabry(source, ccd, etalon, verbose=plotit, grid_out=True)
+    lin_data, ccd_data = eval_fabry(source, ccd, etalon, verbose=plotit, grid_out=True, r0=r0, He_filter=He_filter)
 
     param_dict = {"source": source.name, "ccd": ccd.name, "T": temp, "V": vel, "f": (lens, ccd.f), "d": d,
                   "F": F, "Q": etalon.Q, "lam0": source.lam0, "mu": source.mu, "FWHM": source.FWHM,
@@ -312,9 +329,11 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
         print 'Plotting...'
         f, ax = plt.subplots()
         ax.plot(pixel_arr, lin_data, label='data')
-        ax.plot(pixel_arr, instrument_func, label='instr. f')
+        #ax.plot(pixel_arr**2, lin_data, label='data')
+        #ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+        #ax.plot(pixel_arr, instrument_func, label='instr. f')
         ax.set_xlabel('pixels')
-        ax.set_xlim([0, min(ccd.npx) / 2.])
+        #ax.set_xlim([0, min(ccd.npx) / 2.])
         # last_pk_ix = np.where(pk_locations > min(ccd.npx) / 2.)[0][0]
         # ax2 = ax.twiny()
         # ax2.set_xlim(ax.get_xlim())

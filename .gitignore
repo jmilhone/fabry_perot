@@ -17,3 +17,9 @@
 *.synctex.gz
 *-converted-to.pdf
 *.pdf
+
+# Multinest save files
+saves/*
+
+# json
+*.json

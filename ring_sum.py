@@ -1,10 +1,95 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from image_helpers import get_image_data, quick_plot
+#from image_helpers import get_image_data, quick_plot
 from os.path import join
 import fitting
 import time
 import multiprocessing as mp
+
+
+def ringsum2(R, weights, m0, L, d, peaks, dlambda_arr, out=None, index=None):
+
+    ringsums = np.zeros( (len(peaks), len(dlambda_arr)-1) )
+    #print ringsums.shape
+    #ringsums = np.zeros( (1, len(dlambda_arr)-1) )
+    for j, peak in enumerate(peaks):
+        sq = np.sqrt(1.0 + (peak/L)**2)
+        num = 2.e6 * d * sq
+        denom = 2.e6 * d + dlambda_arr * (m0 - j) * sq
+        temp = num / denom
+        rarr = L * np.sqrt(temp**2 - 1.0)
+
+        # rarr is the right direction, but the histogram requires the bins increase
+        rmin = np.nanmin(rarr)
+        rmax = np.nanmax(rarr)
+        #t0 = time.time()
+        inds = np.where(np.logical_and(R >= rmin, R< rmax))
+        #print time.time()-t0
+        #sig, _ = np.histogram(R[inds], bins=rarr[::-1], weights=weights[inds])
+        sig, _ = np.histogram(R[inds], bins=rarr, weights=weights[inds])
+        sig = sig[::-1]  # correct the order again
+        ringsums[j, :] = sig
+
+    if out:
+        #print "exiting..."
+        out.put((index, ringsums))
+    else:
+        return ringsums
+
+def ringsum(R, weights, m0, L, d, peaks, delta_lambda, ndl=512):
+    # L = np.float64(L)
+    # d = np.float64(d)
+    # peaks = np.array(peaks, dtype=np.float64)
+    # delta_lambda = np.float64(delta_lambda)
+    d_lam_arr = np.arange(-ndl/2, ndl/2+1, 1) * delta_lambda
+    # print d_lam_arr
+    ringsums = []
+    for j, peak in enumerate(peaks):
+
+
+        sq = np.sqrt(1.0 + (peak/L)**2)
+        num = 2 * d * 1.e6 * sq
+        denom = 2*d*1.e6 + d_lam_arr[::-1] * (m0-j) * sq * -1.0  # added -1 to fix signs
+        temp = num / denom
+        # print temp
+        rarr = L * np.sqrt(temp**2 - 1.0)
+        # print m0, rarr.min(), rarr.max(), d_lam_arr.max() - d_lam_arr.min()
+        # rarr = rarr[::-1]
+        rmin = np.nanmin(rarr)
+        rmax = np.nanmax(rarr)
+        # inds = np.where( np.logical_and(R >= rmin, R < rmax))
+
+        # rmin = 600.0
+        # rmax = 750.0
+        # rarr = np.linspace(rmin, rmax, 100)
+        inds = np.where( np.logical_and(R >= rmin, R < rmax))
+        # print rmin, rmax, peak
+        # print inds
+        # print rmin, rmax
+        # print len(inds)
+        sig, _ = np.histogram(R[inds], bins=rarr[::-1], weights=weights[inds])
+        # print len(sig), len(rarr), len(d_lam_arr)
+        # plt.plot(rarr[0:-1], sig)
+        # plt.plot(d_lam_arr[0:-1], sig[::-1], '.')
+        # plt.plot(d_lam_arr, rarr)
+        # plt.show()
+        # ringsums += [y(sig[::-1])]
+
+        ringsums.append(sig[::-1])
+        # plt.plot(R[inds], weights[inds])
+        # print rarr
+        # plt.plot(np.diff(rarr))
+
+
+        # fig, ax = plt.subplots()
+        # ax.imshow(weights)
+        # ax.set_aspect(1.0)
+        # theta = np.linspace(0, 2*np.pi, 1000)
+        # plt.plot(rmin*np.cos(theta)+3018.5, rmin*np.sin(theta)+2010.5, 'r')
+        # plt.plot(rmax*np.cos(theta)+3018.5, rmax*np.sin(theta)+2010.5, 'g')
+        # plt.show()
+        # print rarr
+    return ringsums, d_lam_arr[0:-1]
 
 def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda, ndl=512):
     """
@@ -26,7 +111,10 @@ def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lam
     """
     ringsum = []
     for idx, peak in enumerate(peaks):
-        mm = m - idx
+        if isinstance(m, list):
+            mm = m[idx]
+        else:
+            mm = m - idx
         rmin = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_max)) ** 2 - L ** 2)
         rmax = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_min)) ** 2 - L ** 2)
         inds = np.where(np.logical_and(R > rmin, R < rmax))[0]
@@ -99,8 +187,8 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
          UL UR BL Br for the order)
     """
     ny, nx = dat.shape
-    x = np.arange(1, nx+1, 1)
-    y = np.arange(1, ny+1, 1)
+    x = np.arange(0, nx, 1)
+    y = np.arange(0, ny, 1)
 
     xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
     R = np.sqrt(xx**2 + yy**2)
@@ -113,18 +201,27 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
     ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
     imax = int((ri ** 2. - 2. * ri - 1.) / (1. + 2. * ri) / binsize)
 
-    """Ken's way of building the bins"""
-    binarr = np.fromfunction(lambda i: np.sqrt(2. * (i + 1.) * ri * binsize + (i + 1.) * binsize ** 2.), (imax,),
-                             dtype='float64')
+    # """Ken's way of building the bins"""
+    # binarr = np.fromfunction(lambda i: np.sqrt(2. * (i + 1.) * ri * binsize + (i + 1.) * binsize ** 2.), (imax,),
+    #                          dtype='float64')
+    norm_radius = np.sqrt(2*binsize*ri + binsize**2)
+    binarr = np.sqrt(range(1, imax))*norm_radius
 
+    # xi0 = int(round(x0))
+    # yi0 = int(round(y0))
 
-    xi0 = int(round(x0))
-    yi0 = int(round(y0))
+    xi0 = int(x0)
+    yi0 = int(y0)
 
-    i1 = [0, 0, yi0, yi0]
-    i2 = [yi0+1, yi0+1, ny, ny]
-    j1 = [0, xi0, 0, xi0]
-    j2 = [xi0+1, nx, xi0+1, nx]
+    # i1 = [0, 0, yi0, yi0]
+    # i2 = [yi0+1, yi0+1, ny, ny]
+    # j1 = [0, xi0, 0, xi0]
+    # j2 = [xi0+1, nx, xi0+1, nx]
+
+    i1 = [yi0-ri, yi0-ri, yi0, yi0]
+    i2 = [yi0+1, yi0+1, yi0+ri+1, yi0+ri+1]
+    j1 = [xi0-ri, xi0, xi0-ri, xi0]
+    j2 = [xi0+1, xi0+ri+1, xi0+1, xi0+ri+1]
 
     procs = []
     nprocs = 4
@@ -132,7 +229,9 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
     out = mp.Queue()
     labels = ['UL', 'UR', 'BL', 'BR']
     for k in range(nprocs):
-        p = mp.Process(target=_histogram, args=(binarr, R[i1[k]:i2[k], j1[k]:j2[k]], dat[i1[k]:i2[k], j1[k]:j2[k]]), kwargs={'out':out, 'label': labels[k]})
+        # print R[i1[k]:i2[k], j1[k]:j2[k]].shape
+        p = mp.Process(target=_histogram, args=(binarr, R[i1[k]:i2[k], j1[k]:j2[k]], dat[i1[k]:i2[k], j1[k]:j2[k]]),
+                       kwargs={'out': out, 'label': labels[k]})
         procs.append(p)
         p.start()
 
@@ -171,31 +270,37 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         fig, ax = plt.subplots()
         line1 = None
         line2 = None
+        line3 = None
+        line4 = None
 
     print "Center finding:"
+    print "start x0: {0} y0: {1}".format(xguess, yguess)
     for ii in range(maxiter):
 
         # t0 = time.time()
         binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = quick_ringsum(data, xguess, yguess, binsize=binsize)
         # print time.time()-t0
 
-        thres = 0.35 * np.max(ULsigarr + URsigarr)
+        thres = 0.3* np.max(ULsigarr + URsigarr)
         i = np.where(ULsigarr + URsigarr > thres)[0]
 
         # A cheat if the i goes to the edge of the array.  Makes sliding them past each other hard
-        if len(ULsigarr) - i.max() < 50:
+        if len(ULsigarr) - i.max() < 60:
             i = i[0:-50]
         ni = len(i)
-        ns = 25
+        #ns = 25
+        ns = 11
         sarr = 2 * np.arange(-ns, ns+1, 1)
-        sarr_max = 2 * ns
+        sarr_max = np.max(sarr)
         UB = np.zeros(len(sarr))
         RL = np.zeros(len(sarr))
 
+        # sarr = np.arange(-2*ns, 2*ns + 1, 1)
         for idx, ix in enumerate(sarr):
-            UB[idx] = np.sum((ULsigarr[i-ix]+URsigarr[i-ix] - BLsigarr[i+ix]-BRsigarr[i+ix])**2) / (1.*ni-np.abs(ix))
-            RL[idx] = np.sum((URsigarr[i-ix]+BRsigarr[i-ix] - ULsigarr[i+ix]-BLsigarr[i+ix])**2) / (1.*ni-np.abs(ix))
-
+            # print i-ix, i
+            UB[idx] = np.sum((ULsigarr[i-ix]+URsigarr[i-ix] - BLsigarr[i]-BRsigarr[i])**2) / (1.0*ni - np.abs(ix))
+            RL[idx] = np.sum((URsigarr[i-ix]+BRsigarr[i-ix] - ULsigarr[i]-BLsigarr[i])**2) / (1.0*ni - np.abs(ix))
+            #UB[idx] = np.sum((ULsigarr[i-ix]+URsigarr[i-ix] - BLsigarr[i+ix]-BRsigarr[i+ix])**2) / (1.*ni-np.abs(ix))
         RLfit = np.polyfit(sarr, RL, 2)
         UBfit = np.polyfit(sarr, UB, 2)
 
@@ -220,7 +325,7 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         if UBfit[0] < 0.0:
             # concave down
             # print "UB concave down"
-            UBcent = -2 * np.max(sarr) * np.sign(UBfit[1])
+            UBcent = -1 * np.max(sarr) * np.sign(UBfit[1])
         else:
             # concave up
             UBcent = -UBfit[1] / (2*UBfit[0])
@@ -234,8 +339,11 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         yguess += UBcent * binsize
         xguess -= RLcent * binsize
 
-        print "{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii)
+        # yguess -= 1
+        # print "subtracting 1 from yguess for no reason other than trying to match Cooper"
 
+        print "{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii)
+        #print "{0}, {1}".format(UBcent, RLcent)
         if plotit:
             # fig, ax = plt.subplots()
             if line1 is not None:
@@ -247,14 +355,130 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
                 line2.set_data(sarr, RL)
             else:
                 line2, = ax.plot(sarr, RL, 'b', lw=1, label='RL')
+
+            # if line3 is not None:
+            #     line3.set_data(sarr, np.polyval(UBfit, sarr))
+            # else:
+            #     line3, = ax.plot(sarr, np.polyval(UBfit, sarr), '--r', lw=1, label='fit UD')
+            #
+            # if line4 is not None:
+            #     line4.set_data(sarr, np.polyval(RLfit, sarr))
+            # else:
+            #     line4, = ax.plot(sarr, np.polyval(RLfit, sarr), '--b', lw=1, label='fit RL')
             if ii == 0:
                 leg = ax.legend()
+
             fig.canvas.draw()
             plt.pause(0.0001)
             # plt.show()
 
         if np.sqrt((UBcent*binsize)**2 + (RLcent*binsize)**2) / binsize < 0.1:
             break
+        # U = ULsigarr + URsigarr
+        # B = BLsigarr + BRsigarr
+        # R = URsigarr + BRsigarr
+        # L = ULsigarr + BLsigarr
+        # plt.plot(binarr, U)
+        # plt.show()
+        # Upeaks = fitting.peak_and_fit(binarr, U, thres=.6, npeaks=1)
+        # Bpeaks = fitting.peak_and_fit(binarr, B, thres=.6, npeaks=1)
+        # Rpeaks = fitting.peak_and_fit(binarr, R, thres=.6, npeaks=1)
+        # Lpeaks = fitting.peak_and_fit(binarr, L, thres=.6, npeaks=1)
+        #
+        # UDloc = 0.5 * (Upeaks[0] + Bpeaks[0])
+        # RLloc = 0.5 * (Rpeaks[0] + Lpeaks[0])
+        #
+        # print xguess, RLloc, 0.5*(RLloc - Rpeaks[0])
+        # print yguess, UDloc, 0.5*(UDloc - Upeaks[0])
+        #
+        # xguess -= 0.5*(RLloc - Upeaks[0])
+        # yguess += 0.5*(UDloc - Rpeaks[0])
+        #
+        # fig, ax = plt.subplots(2)
+        # ax[0].plot(binarr, U)
+        # ax[0].plot(binarr, B)
+        # ax[1].plot(binarr, R)
+        # ax[1].plot(binarr, L)
+        # plt.show()
+
+
+        # for idx, ix in enumerate(sarr):
+        #     UB[idx] = np.sum((ULsigarr[i-ix]+URsigarr[i-ix] - BLsigarr[i+ix]-BRsigarr[i+ix])**2) / (1.*ni-np.abs(ix))
+        #     RL[idx] = np.sum((URsigarr[i-ix]+BRsigarr[i-ix] - ULsigarr[i+ix]-BLsigarr[i+ix])**2) / (1.*ni-np.abs(ix))
+
+        # RLfit = np.polyfit(sarr, RL, 2)
+        # UBfit = np.polyfit(sarr, UB, 2)
+
+
+        # """
+        # The logic for the center jump is matching A(x-x0)^2 = C0 x^2 + C1 x + C2
+        # x0 = - C1 / (2 C0)
+        # """
+        # if RLfit[0] < 0.0:
+        #     # print "RL concave down"
+        #     # Concave down fit
+        #     RLcent = -2 * np.max(sarr) * np.sign(RLfit[1])
+        # else:
+        #     # concave up
+        #     RLcent = -RLfit[1] / (2*RLfit[0])
+
+        # # Dont jump fartther than max(sarr)
+        # if RLcent > sarr_max:
+        #     RLcent = np.sign(RLcent) * np.max(sarr)
+
+
+        # if UBfit[0] < 0.0:
+        #     # concave down
+        #     # print "UB concave down"
+        #     UBcent = -2 * np.max(sarr) * np.sign(UBfit[1])
+        # else:
+        #     # concave up
+        #     UBcent = -UBfit[1] / (2*UBfit[0])
+
+        # # Dont jump fartther than max(sarr)
+        # if RLcent > sarr_max:
+        #     UBcent = np.sign(UBcent) * np.max(sarr)
+
+        # # Rough conversion to pixels
+        # # yguess -= UBcent * binsize
+        # yguess += UBcent * binsize
+        # xguess -= RLcent * binsize
+
+#         # yguess -= 1
+#         # print "subtracting 1 from yguess for no reason other than trying to match Cooper"
+
+        # print "{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii)
+
+        # if plotit:
+        #     # fig, ax = plt.subplots()
+        #     if line1 is not None:
+        #         line1.set_data(sarr, UB)
+        #     else:
+        #         line1, = ax.plot(sarr, UB, 'r', lw=1, label='UD')
+
+            # if line2 is not None:
+            #     line2.set_data(sarr, RL)
+            # else:
+            #     line2, = ax.plot(sarr, RL, 'b', lw=1, label='RL')
+
+            # # if line3 is not None:
+            # #     line3.set_data(sarr, np.polyval(UBfit, sarr))
+            # # else:
+            # #     line3, = ax.plot(sarr, np.polyval(UBfit, sarr), '--r', lw=1, label='fit UD')
+            # #
+            # # if line4 is not None:
+            # #     line4.set_data(sarr, np.polyval(RLfit, sarr))
+            # # else:
+            # #     line4, = ax.plot(sarr, np.polyval(RLfit, sarr), '--b', lw=1, label='fit RL')
+            # if ii == 0:
+            #     leg = ax.legend()
+
+            # fig.canvas.draw()
+            # plt.pause(0.0001)
+            # # plt.show()
+
+        # if np.sqrt((UBcent*binsize)**2 + (RLcent*binsize)**2) / binsize < 0.1:
+        #     break
     if plotit:
         plt.close(fig)
         plt.ioff()
