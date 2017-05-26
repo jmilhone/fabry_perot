@@ -48,9 +48,10 @@
 \usepackage{amsmath}
 \usepackage{setspace}
 \usepackage{amssymb}
+\usepackage{rotating}
 \renewcommand{\labelenumi}{(\alph{enumi})}
 
-\setlength\parindent{0pt} % Removes all indentation from paragraphs
+%\setlength\parindent{0pt} % Removes all indentation from paragraphs
 
 \renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
 
@@ -60,7 +61,7 @@
 %	DOCUMENT INFORMATION
 %----------------------------------------------------------------------------------------
 
-\title{WiPAL Fabry-Perot\\ Spectrometer} % Title
+\title{WiPAL Fabry-P\'{e}rot\\ Spectrometer} % Title
 
 \author{Ken \textsc{Flanagan} and Jason \textsc{Milhone}} % Author name
 
@@ -80,54 +81,122 @@
 %	SECTION 1
 %----------------------------------------------------------------------------------------
 
-\section{Introduction}
-Need to add a nice little introduction here about what we're doing etc...
+\section*{Introduction}
+
+The Fabry-P\'{e}rot system on WiPAL is essentailly a very high-resolution spectrometer that can image the light emitted by ions in the plasma. This light will be doppler shifted by random movements of the ions (temperature) and by bulk ion flow. As a result, the spectrum captured represents the entire ion velocity distribution function (IVDF) . A reliable measurement of ion temperature and flow is essential for many WiPAL experiements,  such as dynamo stirring and MRI flow drive.
+
+This brief write-up should serve as a good primer for anyone interested in using the WiPAL system as well as a good resource for those who may be building off of the work done to date.  In the first section, the optical layout of the system is described as it is currently used on WiPAL. Next, an overview of Fabry-P\'{e}rot theory is given to layout basic concepts. Next, using the basic Fabry-P\'{e}rot theory, a more detailed description within the context of spectrometry. Finally, the processes used in the analysis of Fabry-P\'{e}rot output are outlined along with a overview of the code used at WiPAL.
 
 %----------------------------------------------------------------------------------------
 %	SECTION 2
 %----------------------------------------------------------------------------------------
 
-\section{Optical Layout}
+\section{Basic Fabry-P\'{e}rot Theory}
+A Fabry-P\'{e}rot interferometer consists of a set of highly-reflective, partially transmitting parallel plates, called an \'{e}talon. Light enters the \'{e}talon and is reflected many times back and forth creating an interference pattern. This pattern can be used to determine the wavelength of the incident light. 
 \begin{figure}
-\includegraphics[width=\textwidth]{Images/FP_Optical_Schematic.eps}
-\caption{Optical schematic of Fabry-P\'{e}rot spectrometer used on WiPAL. All lengths are in units of millimeters. \label{fig:opticalsetup}}
+\begin{center}
+\includegraphics[scale=1]{Images/etalon.png}
+\caption{An \'{e}talon showing incident, reflected and transmitted light.
+\label{fig:etalon}}
+\end{center}
 \end{figure}
-The optical layout for the WiPAL Fabry-P\'{e}rot spectrometer is shown above in Fig.~\ref{fig:opticalsetup}. The main components of this setup are a pair of lenses ($f_{t1}$ and $f_{t2}$) that form a telescope to bring light from the center of plasma to the \'{e}talon, another telescope formed by lenses $f_{3}$ and $f_{4}$ that focuses light through the \'{e}talon, and the camera sensor. 
+Fig.~\ref{fig:etalon} shows a simple schematic of an \'{e}talon. Light incident at some angle, $\theta$, reflects back and forth in the cavity and then exits at the same angle, $\theta$. The optical path difference between two beams exiting the \'{e}talon is
+\begin{equation}
+l_{opt} = 2nd\cos{\theta}
+\end{equation}
+where $n$ is the index of refraction in the \'{e}talon gap and $d$ is the width of the gap. We can calculate the phase shift between consective passes in the \'{e}talon by multiplying the wavenumber, $2\pi/\lambda$, by this optical path difference. 
+\begin{equation}
+\delta = \frac{2\pi}{\lambda}l_{opt}=2\pi \frac{2nd}{\lambda}\cos{\theta}=2\pi m
+\label{eq:ph}
+\end{equation}
+where we have defined $m$ as the interference order number. When the phase difference is integer multiples of $2\pi$, we expect constructive interference to occur, thus the interference condition for a Fabry-P\'{e}rot \'{e}talon is
+\begin{equation}
+m=\frac{2nd}{\lambda}\cos{\theta}
+\label{eq:int_con}
+\end{equation}
+Now we can work out the interference pattern by calculating the transmitted amplitude, $a_{tr}$ of incident light, $a_{in}$. Because we are working in amplitude, we will use amplitude reflectivities and transmissivities for the plates: $r$, $r'$ and $t$, $t'$, repectively. The square modulus of these reflectivities and transmissivities are the reflection and transmission coefficients of the \'{e}talon plates: $R$, $R'$ and $T$, $T'$, respectively. Summing up every beam in the \'{e}talon, we get a transmission amplitude of
+\begin{align*}
+a_{tr}&=tt'a_{in}+tt'a_{in}rr'e^{i\delta}+tt'a_{in}(rr')^{2}e^{2i\delta}+tt'a_{in}(rr')^{3}e^{3i\delta}+...\\
+&=tt'a_{in}\sum_{p=0}^{\infty}(rr'e^{i\delta})^{p}=a_{in}\frac{tt'}{1-rr'e^{i\delta}}
+\end{align*}
+Now we need to take the square modulus of this ampltiude in order to get the transmitted intensity. This gives us
+\begin{equation}
+\frac{I_{tr}}{I_{in}}=\left|\frac{a_{tr}}{a_{in}}\right|^{2}=\frac{TT'}{\big|1-\sqrt{RR'}e^{i\delta}\big|^{2}}
+\end{equation}
+In order to clean up this expression some, we can introduce the coefficient
+\begin{equation}
+Q=\frac{4\sqrt{RR'}}{(1-\sqrt{RR'})^{2}}
+\end{equation}
+which leads us to
+\begin{equation}
+\frac{I_{tr}}{I_{in}}=\frac{TT'}{(1-\sqrt{RR'})^{2}}\left[1+Q\sin^{2}{\left(\frac{\delta}{2}\right)}\right]^{-1}
+\end{equation}
+which is recognizable as the Airy function. If the \'{e}talon plates have identical reflection and transmission coefficients, then the prefactor becomes unity. Also, we can replace the phase shift, $\delta$, with $2\pi m$ from eq.~\ref{eq:ph}. This gives us a transmission function of
+\begin{equation}
+\frac{I_{tr}}{I_{in}}=[1+Q\sin^{2}{(\pi m)}]^{-1}
+\label{eq:airy}
+\end{equation}
+At interger $m$, this function has a maximum value of 1, showing us the interference condition that we found before in eq.~\ref{eq:int_con}. As seen if fig.~\ref{fig:airy} the FWHM of the transmission is dependent on $Q$. A higher $Q$ leads to narrower peaks, which means a higher resolving power of the \'{e}talon. Following convention, this $Q$ is sometimes replaced with a figure of merit of the \'{e}talon plates known as the finesse, $\mathcal{F}$, which is 
+\begin{equation}
+\mathcal{F}=\frac{\pi}{2}\sqrt{Q}
+\end{equation}
+The distance between successive peaks (which is one order number) is known as the free spectral range, FSR. Using the finesse, the FWHM of the Airy function is simply $FSR/\mathcal{F}$. 
+\begin{figure}
+\begin{center}
+\includegraphics[width=\textwidth]{Images/ring_pattern.png}
+\caption{A) diagram showning the focusing of the \'{e}talon ring pattern onto an imaging plane. B) Actually ring pattern recorded with the WiPAL Fabry-P\'{e}rot system.
+\label{fig:real_rings}}
+\end{center}
+\end{figure}
+\subsection*{Imaging Fabry-P\'{e}rot Rings}
+If we plug in the expression for $m$ (eq.~\ref{eq:int_con}) into eq.~\ref{eq:airy} we get
+\begin{equation}
+\frac{I_{tr}}{I_{in}}=\left[1+Q\sin^{2}{\left(\frac{2nd}{\lambda}\cos{\theta}\right)}\right]^{-1}
+\end{equation}
+If $n$, $d$, and $\lambda$ are fixed, then the interference pattern will be peaks at ever increasing $\cos{\theta}$. This leads to the familiar ring pattern of the Fabry-P\'{e}rot. Now if we place a lens with focal length, $f$,  behind the \'{e}talon, we can focus this pattern on a plane. Defining $r$ as the radius on this plane (with the optical axis being the origin), 
+\begin{equation}
+\cos{\theta}=\frac{f}{\sqrt{f^{2}+r^{2}}}=\left[1+\left(\frac{r}{f}\right)^{2}\right]^{-1/2}
+\end{equation}
+Now we see that the Airy function can be written as a function in $r$ with $f$, $n$, $d$ and $\lambda$ fixed. 
+\begin{equation}
+\frac{I_{tr}}{I_{in}}=\left[1+Q\sin^{2}{\left(\frac{A}{\sqrt{1+(r/f)^{2}}}\right)}\right]^{-1}
+\end{equation}
+with $A=2\pi n d / \lambda$.  With this function the distance between interference peaks drops as we move out in $r$. This function is imaged in fig.~\ref{fig:real_rings}.
 
 %----------------------------------------------------------------------------------------
 %	SECTION 3
 %----------------------------------------------------------------------------------------
 
-\section{Basic Fabry-P\'{e}rot Theory}
-A Fabry-P\'{e}rot interferometer consists of a set of highly-reflective, partially transmitting parallel plates, called an \'{e}talon. Light enters the \'{e}talon and is reflected many times back and forth creating an interference pattern. This pattern can be used to determine the wavelength of the incident light. 
+\section{Optical Layout}
 \begin{figure}
-\includegraphics[width=\textwidth]{Images/etalon.png}
-\caption{An \'{e}talon showing incident, reflected and transmitted light.
-\label{fig:etalon}}
+\includegraphics[width=\textwidth]{Images/OpticalLayout.png}
+\caption{Optical schematic of Fabry-P\'{e}rot spectrometer used on WiPAL. All lengths are in units of millimeters. \label{fig:opticalsetup}}
 \end{figure}
-Fig.~\ref{fig:etalon} shows a simple schematic of an \'{e}talon. Light incident at some angle, $\theta$, reflects back and forth in the cavity and then exits at the same angle, $\theta$. On each pass through the cavity, the light picks up a phase shift of
-\begin{equation}
-\phi = 
-\end{equation}
-Lot's of filler here... lala, the transmission function:
-\begin{equation}
-\frac{I_{t}}{I_{i}} = \left[1+Q\sin{\pi m}^{2}\right]^{-1}
-\label{eq:airy}
-\end{equation}
-Where
-\begin{equation}
-Q = \frac{4R}{(1-R)^{2}} = \frac{2}{\pi}\mathcal{F}^{2}
-\end{equation}
-Then this happens a bunch, blah blah then you get the glorious interference condition:
-\begin{equation}
-m\lambda = 2nd\cos{\theta}
-\end{equation}
-If we use a lens of focal length, $f$, the $\cos{\theta}$ term can be rewritten in terms of $f$ and the radius across the imaging plane, $r$. This gives us
-\begin{equation}
-m\lambda = 2d \frac{f}{\sqrt{f^{2}+r^{2}}}
-\label{eq:inf_con}
-\end{equation}
-where we have absorbed $n$ into $d$, giving us an effective \'{e}talon spacing.
+The optical layout for the WiPAL Fabry-P\'{e}rot spectrometer is shown above in Fig.~\ref{fig:opticalsetup}. The main components of this setup are a pair of lenses of focal length, $f_{1}$, that form a telescope to bring light from the center of plasma to the \'{e}talon, another telescope formed by lenses $f_{2}$ and $f_{3}$ that focuses light through the \'{e}talon, and the camera sensor.
+
+The telescope formed by the $f_{1}$ lenses acts to extend the image plane of the sensor a distance $2f_{1}$ past the first lens. For WiPAL, we have chosen $f_{1}=1000$ mm, so the ccd image plane is 2m past the first lens of the system, which is roughly the center of the plasma. The lenses with focal length $f_{2}$ and $f_{3}$ function to magnify the ccd image by a factor of $f_{2}/f_{3}$. So for a sensor that is $\sim15$ mm and lenses $f_{2}=350$ mm and $f_{3}=150$ mm, the image of the ccd in the plasma is roughly 35 mm. This area of the image in the focus plane is essentially the beam diameter of the chord of light sampled by the spectrometer.
+
+An aperature is placed at the first lens of the system in order to control the illuminated spot size on the etalon. Imaging this aperature through the system places it's image $f_{2}-f_{2}^{2}/2f_{1}$  past the $f_{2}$ lens with a magnification of $f_{2}/2f_{1}$. If $f_{2}<f_{1}$, which is the case for the WiPAL system, the aperature image will be smaller than the actual aperature. It is important to use a small spot size on the \'{e}talon in order to minimize the effect of plate defects over the surface.
+
+For the WiPAL system, table~\ref{tab:system} lists the values of optical components used. These values have been chosen to optimize the imaging of the interference pattern of the \'{e}talon and to maximize the amount of light collected from the plasma. 
+\begin{table}
+\begin{center}
+\begin{tabular}{l | l }
+parameter & value \\\hline
+$f_{1}$ & 1000 mm\\
+$f_{2}$ & 350 mm\\
+$f_{3}$ & 150 mm\\
+$M_{ccd}$ & 7/3 \\
+$M_{aperature}$ & 0.175\\
+ccd & 15.6 mm\\
+beam size & 36.4 mm\\
+aperature & 40 mm\\
+spot size & 7 mm
+\end{tabular}
+\caption{A table of chosen values for optical components of the WiPAL Fabry-P\'{e}rot system.}
+\label{tab:system}
+\end{center}
+\end{table}
 
 %----------------------------------------------------------------------------------------
 %	SECTION 4
