@@ -9,11 +9,11 @@ import pymultinest
 import model
 import json
 
-shotnum = 8#9756
+shotnum = 9215
 rcParams['xtick.direction'] = 'in'
 rcParams['ytick.direction'] = 'in'
 
-analyzer = pymultinest.Analyzer(n_params=4, outputfiles_basename="saves/Ar_solver_run23/fp_full_")
+analyzer = pymultinest.Analyzer(n_params=4, outputfiles_basename="saves/solver_Ar0/fp_full_")
 stats = analyzer.get_mode_stats()
 
 local_log_ev = [x['local log-evidence'] for x in stats['modes']]
