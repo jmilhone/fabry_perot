@@ -31,7 +31,7 @@ def read_image(filename, color=None):
                             have to upgrade libgcc as well, "conda install libgcc".)
     """
     #### Just checking the filetype and appending .nef if left off
-    if filename[-4::] != '.nef':
+    if filename[-4::].lower() != '.nef':
         if '.' in filename:
             raise Exception('Invalid file format. {0} is not a .nef file!'.format(filename))
         else:
@@ -196,7 +196,7 @@ def quick_plot(image, color=None, block=False):
         f.colorbar(im, extend='both', cax=cax)
         ax.set_aspect('equal')
         plt.tight_layout()
-        plt.show(block=block)
+        #plt.show(block=block)
 
 if __name__ == "__main__":
     folder = "Images"

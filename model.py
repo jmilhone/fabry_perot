@@ -25,11 +25,12 @@ def eval_airy(wavelength, cos_theta, d, F):
     Returns:
         np.ndarray
     """
-    Q = 2. * F**2 / np.pi
+    Q = (2. * F / np.pi)**2
     airy = 1.0 / (1.0 + Q * np.sin(np.pi * 2.e6 * d * cos_theta / wavelength)**2)
     return airy
 
 def eval_spec(wavelength, amp, w0, sigma, V=0):
+    #print V
     # V is in km/s, c=2.998e8 m/s = 2.998e5 km/s
     norm = 1.0 / sigma / np.sqrt(2.0 * np.pi)
     w = w0 * (1.0 - V / 2.998e5)
@@ -56,33 +57,54 @@ def forward(r, L, d, F, Ti, mu, w0, nlambda=512, V=0):
 def forward3(r, L, d, F, Ti, mu, w0, nlambda=512, V=0):
     # This is slightly faster!
     sigma = 3.276569e-5 * np.sqrt(Ti/mu) * w0
-    w_arr = np.linspace(w0 - 5*sigma, w0 + 5*sigma, nlambda)[:, np.newaxis]
+    ww = w0 * (1.0 - V / 2.998e5)
+    #w_arr = np.linspace(w0 - 5*sigma, w0 + 5*sigma, nlambda)[:, np.newaxis]
+    w_arr = np.linspace(ww - 10.*sigma, ww + 10.*sigma, nlambda)[:, np.newaxis]
+    #print w_arr.max() - w_arr.min()
     nr = len(r)
 
-    cos_th = L / np.sqrt(L**2 + r**2).reshape((1,nr))
+    #cos_th = L / np.sqrt(L**2 + r**2).reshape((1,nr))
+    cos_th = 1.0 - 0.5 * (r / L)**2
     spec = eval_spec(w_arr, 1.0, w0, sigma, V=V)
 
     lin_out = trapz(spec*eval_airy(w_arr, cos_th, d, F), w_arr, axis=0)
-    lin_out /= lin_out.max()
+    #lin_out /= lin_out.max()
     return lin_out
 
-def forward4(r, L, d, F, Ti, mu, amp, w0, nlambda=512):
+def forward4(r, L, d, F, Ti, mu, amp, w0, nlambda=512, V=0):
 
     sigma = [3.276569e-5 * np.sqrt(Ti[idx]/mu[idx]) * w for idx, w in enumerate(w0)]
     minW = min(w0)
     maxW = max(w0)
     max_sigma = max(sigma)
-    w_arr = np.linspace( minW- 5.0*max_sigma, maxW+5.0*max_sigma, nlambda)[:, np.newaxis]
-
+    ww_min = minW * (1.0 - V / 2.998e5)
+    ww_max = maxW * (1.0 - V / 2.998e5)
+    #w_arr = np.linspace( minW- 5.0*max_sigma, maxW+5.0*max_sigma, nlambda)[:, np.newaxis]
+    w_arr = np.linspace(ww_min - 10.*max_sigma, ww_max + 10.*max_sigma, nlambda)[:, np.newaxis]
+    #print len(sigma)
+    #print len(Ti)
+    #print len(mu)
+    #print len(amp)
+    #print len(w0)
     spec = 0.0
+    #fig, ax = plt.subplots()
     for idx, w in enumerate(w0):
-        spec += eval_spec(w_arr, amp[idx], w, sigma[idx])
+        #print idx
+        #temp = eval_spec(w_arr, amp[idx], w, sigma[idx], V=V)
+        #ax.plot(w_arr, temp)
+        spec += eval_spec(w_arr, amp[idx], w, sigma[idx], V=V)
+        #ax.axvline(w*(1.0 - V/2.998e5), color='k')
+
+    #plt.plot(w_arr, spec)
+    #plt.show(block=False)
     nr = len(r)
 
-    cos_th = L / np.sqrt(L**2 + r**2).reshape((1,nr))
+    #cos_th = L / np.sqrt(L**2 + r**2).reshape((1,nr))
+    cos_th = 1.0 - 0.5 * (r / L)**2
+    cos_th = cos_th.reshape((1,nr))
 
     lin_out = trapz(spec*eval_airy(w_arr, cos_th, d, F), w_arr, axis=0)
-    lin_out /= lin_out.max()
+    #lin_out /= lin_out.max()
     return lin_out
 
 def forward2(r, L, d, F, Ti, mu, amp, w0, nlambda=512):

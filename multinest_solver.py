@@ -12,6 +12,8 @@ import model
 import plottingtools.core as ptools
 import time
 import json
+from check_caliibration_solution import plot_marginals
+from scipy.stats import norm
 
 rcParams['xtick.direction'] = 'in'
 rcParams['ytick.direction'] = 'in'
@@ -56,7 +58,7 @@ def solve_Ar(savedir, param_fname):
     params = ["Ti", "V", "r0", "Amp"]
     labels = ["Ti (eV)", "V (km/s)", "r0 (px)", "Amp (Counts)"]
     prob_labels = ["P(Ti)", "P(V)", "P(r0)", "P(Amp)"]
-    shotnum = 8#9756 #9215
+    shotnum = 9215
     param_info = {'params':params, 'labels': labels, 'prob labels': prob_labels}
     with open(savedir+"param_file.json", 'w') as param_config:
         json.dump(param_info, param_config, indent=4)
@@ -125,7 +127,11 @@ def full_solver3(savedir, param_fname):
         #chisq = np.sum( (linear_out - data)**2 / data_sd**2 )
 
         # single integral approach
-        linear_out = model.forward2(rr, cube[0], cube[1], cube[2],
+        rrr = np.zeros_like(rr)
+        for i in xrange(nr):
+            rrr[i] = pdfs[i].rvs(1)[0]
+
+        linear_out = model.forward4(rr, cube[0], cube[1], cube[2],
                 [Ti_Th, cube[3]], [muTh, muAr], [cube[4], cube[5]], [wTh, wAr]) 
         linear_out *= np.exp(-(rr / cube[6])**2)
         chisq = np.sum( (linear_out - data)**2 / data_sd**2 )
@@ -163,10 +169,10 @@ def full_solver3(savedir, param_fname):
     Ar_amp_range= param_dict["Ar_amp_range"]
     rscale_range= param_dict["rscale_range"]
     r = param_dict["binarr"]
+    binsize = param_dict['binsize']
     ringsum = param_dict["ringsum"]
     ringsum_sd = param_dict["ringsum_sd"]
     ind = param_dict["ind"]
-
     # Convert from K to eV 
     Ti_Ar_range = [x*.025 / 300.0 for x in Ti_Ar_range]
     L_range = [x / 0.004 for x in L_range]
@@ -175,9 +181,15 @@ def full_solver3(savedir, param_fname):
     #data_sd = ringsum_sd[ind]
     data_sd = 0.01 * data +100.0 #np.sqrt(3.5*np.abs(data))
     rr = r[ind]
+    bin_sigma = binsize[ind] / 6.0
+    nr = len(rr)
+    pdfs = []
+    for i in xrange(nr):
+        pdfs.append(norm(scale=bin_sigma[i], loc=rr[i]))
+
     nparams = len(params)
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=True, verbose=True, sampling_efficiency='model', n_live_points=2000,
+            resume=True, verbose=True, sampling_efficiency='model', n_live_points=100,
             outputfiles_basename=savedir+"fp_full_", max_modes=500)
 
 
@@ -340,14 +352,37 @@ def solve_L_d(savedir, peaksTh, peaksAr, d_lim=(0.88-0.01, 0.88+0.01),
 
         m = 2.e6 * cube[1] / wAr
         n = 2.e6 * cube[1] / wTh
-    
+        k0 = 2.e6 * cube[1] / wUk0 
+        k1 = 2.e6 * cube[1] / wUk1 
+
         rAr = [cube[0] * np.sqrt( m**2 / (np.floor(m) - 1.*j)**2 - 1.0) for j in range(npeaks)]
         rTh = [cube[0] * np.sqrt( n**2 / (np.floor(n) - 1.*j)**2 - 1.0) for j in range(npeaks)]
+        rUk0 = [cube[0] * np.sqrt( k0**2 / (np.floor(k0) - 1.*j)**2 - 1.0) for j in range(npeaks)]
+        rUk1 = [cube[0] * np.sqrt( k1**2 / (np.floor(k1) - 1.*j)**2 - 1.0) for j in range(npeaks)]
+
         chisq = sum( (rAr[j] - peaksAr[j])**2 / err**2 for j in range(npeaks) )
         chisq += sum( (rTh[j] - peaksTh[j])**2 / err**2 for j in range(npeaks) )
+        chisq += sum( (rUk0[j] - peaksUk0[j])**2 / err**2 for j in range(npeaks) )
+        chisq += sum( (rUk1[j] - peaksUk1[j])**2 / err**2 for j in range(npeaks) )
 
         return -chisq / 2.0
-    savedir = fix_save_directory(savedir)
+
+    params = ['L', 'd']
+    labels = ["L (mm)", "d (mm)"]
+    prob_labels = ["P(L)", "P(d)"]
+
+    param_info = {'params':params, 'labels': labels, 'prob labels': prob_labels}
+    with open(savedir+"param_file.json", 'w') as param_config:
+        json.dump(param_info, param_config, indent=4)
+
+    #savedir = fix_save_directory(savedir)
+    wUk0 = 487.800942
+    wUk1 = 467.3660927
+
+    #peaksUk0 = np.sqrt(np.array([60022.8, 828886., 1.6008e6, 2.37548e6]))
+    #peaksUk1 = np.sqrt(np.array([322803., 1.06251e6, 1.8048e6, 2.54998e6]))
+    peaksUk0 = [244.52057396118195, 911.07036218754683, 1266.0274806441739, 1541.5990554793589] 
+    peaksUk1 = [568.77586620923012, 1031.354410078168, 1343.9804619294503, 1597.2710700051123] 
 
     log_d_lim = [np.log10(x) for x in d_lim]
     npeaks = min(len(peaksTh), len(peaksAr))
@@ -367,15 +402,20 @@ def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, ploti
     nparams = 2 
     stats = analysis.get_stats()
     marginals = stats['marginals']
+    modes = stats['modes']
+    print len(modes)
+    local_log_ev = [x['local log-evidence'] for x in stats['modes']]
+    ix = np.argmax(local_log_ev)
 
-    L = marginals[0]['median']
+    #L = marginals[ix]['median']
     Lsd = marginals[0]['sigma']
-
+    L = modes[ix]['maximum a posterior'][0]
     #d = None
     #dsd = None
 
-    d = marginals[1]['median']
+    #d = marginals[1]['median']
     dsd = marginals[1]['sigma']
+    d = modes[ix]['maximum a posterior'][1]
     #for x in marginals[1]:
     #    print x, marginals[1][x]
     print "L = {0} +/- {1}".format(L, Lsd) 
@@ -429,6 +469,9 @@ def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, ploti
         post = analysis.get_equal_weighted_posterior()
         Lpost = post[:, 0]
         dpost = post[:, 1]
+        plt.plot(dpost)
+        plt.show()
+
         print post.shape
         #p.plot_marginal(0, with_ellipses=True, with_points=False, grid_points=100)
         #plt.show()
@@ -500,14 +543,23 @@ def L_d_results(analysis, peaksTh, peaksAr, wTh=487.873302, wAr=487.98634, ploti
 if __name__ == "__main__":
     #savedir = fix_save_directory("full_solver_run18")
     t00 = time.ctime(time.time())
-    #savedir = fix_save_directory("Ar_solver_run23")
+    #peaksTh = np.array([644.383, 1089.1, 1399.2, 1653. ]) 
+    #peaksAr = np.array([733.8, 1144.7, 1443.5, 1691. ]) 
+    #peaksTh = [644.45936512469882, 1089.370588979835, 1399.4961244393533, 1653.9688234764596]
+    #peaksAr = [734.15309407063455, 1145.004498782735, 1443.8927124858421, 1691.3157088640837] 
+    #savedir = fix_save_directory("Ld_test4")
+    #analysis = solve_L_d(savedir, peaksTh, peaksAr)
+    #L_d_results(analysis, peaksTh, peaksAr)
+    #plot_marginals(savedir, basename="fp_Ld_", param_fname="param_file.json", save=False)
+    #savedir = fix_save_directory("solveAr_0")
     #solve_Ar(savedir, None)
     #savedir = fix_save_directory("full_solver_run17")
     #full_solver(savedir, "fp_ringsum_params.p")
 
     #savedir = fix_save_directory("new_full_solver_run0")
     #full_solver2(savedir, "fp_ringsum_params.p")
-    savedir = fix_save_directory("solver3_run4")
+    #savedir = fix_save_directory("solver3_run16")
+    savedir = fix_save_directory("NewCalibration_Ar_run0")
     full_solver3(savedir, "fp_ringsum_params.p")
     #savedir = fix_save_directory("new_full_solver_run5")
     #full_solver2(savedir, "fp_ringsum_params.p")
@@ -579,4 +631,7 @@ if __name__ == "__main__":
     # run2: trying it against the forward model
     # run3: reducing the prior size
     # run4: rerunning 3 but without subtracting an offset
+    # run14: running on calibration from 9114
+    # run15: Trying the small angle approx in forward4
+    # run16: Added a 4th order
 

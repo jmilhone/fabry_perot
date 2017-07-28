@@ -206,7 +206,7 @@ def quick_ringsum(dat, x0, y0, binsize=0.1, quadrants=True):
     #                          dtype='float64')
     norm_radius = np.sqrt(2*binsize*ri + binsize**2)
     binarr = np.sqrt(range(1, imax))*norm_radius
-
+    
     # xi0 = int(round(x0))
     # yi0 = int(round(y0))
 
@@ -288,8 +288,8 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         if len(ULsigarr) - i.max() < 60:
             i = i[0:-50]
         ni = len(i)
-        #ns = 25
-        ns = 11
+        ns = 25
+        #ns = 11
         sarr = 2 * np.arange(-ns, ns+1, 1)
         sarr_max = np.max(sarr)
         UB = np.zeros(len(sarr))
@@ -318,7 +318,7 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
             RLcent = -RLfit[1] / (2*RLfit[0])
 
         # Dont jump fartther than max(sarr)
-        if RLcent > sarr_max:
+        if np.abs(RLcent) > sarr_max:
             RLcent = np.sign(RLcent) * np.max(sarr)
 
 
@@ -331,11 +331,13 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
             UBcent = -UBfit[1] / (2*UBfit[0])
 
         # Dont jump fartther than max(sarr)
-        if RLcent > sarr_max:
+        if np.abs(UBcent) > sarr_max:
             UBcent = np.sign(UBcent) * np.max(sarr)
 
         # Rough conversion to pixels
         # yguess -= UBcent * binsize
+        #print UBcent, UBcent * binsize
+        #print RLcent, RLcent * binsize
         yguess += UBcent * binsize
         xguess -= RLcent * binsize
 

@@ -7,6 +7,8 @@ import time
 import argparse
 import model 
 from scipy.special import erf
+from scipy.stats import norm
+
 
 class Source(object):
     def __init__(self, temp=1., vel=0., lam0=488., mu=40., amp=None, name='Source generic'):
@@ -81,6 +83,7 @@ class Source(object):
 
 class Argon(Source):
     def __init__(self, temp=1., vel=0.):
+        print temp
         super(Argon, self).__init__(temp=temp, vel=vel, lam0=487.98634, mu=39.948, name='Argon')
 
 class Mercury(Source):
@@ -93,6 +96,8 @@ class Thorium(Source):
         if argon_temp is None and argon_amp is None:
             #temp=1000K -> 0.0861733eV
             super(Thorium, self).__init__(temp=0.0861733, vel=0.0, lam0=487.8733020, mu=232.03806, name='Thorium')
+            #super(Thorium, self).__init__(temp=0.0861733, vel=0.0, lam0=468.6194581, mu=232.03806, name='Thorium')
+            #print "Changed wavelength to 468.615"
         else:
             if argon_temp is None:
                 ar_t = 1.
@@ -162,7 +167,9 @@ class Etalon(object):
     def __init__(self, d=0.88, F=20.):
         self.d = d  #mm
         self.F = F  #finesse
-        self.Q = (2. / np.pi) * self.F ** 2  # quality factor
+        #self.Q = (2. / np.pi) * self.F ** 2  # quality factor
+        # fixing this
+        self.Q = (2. / np.pi * self.F )** 2  # quality factor
 
     def eval_airy(self, lam, cos_th):
         return (1. + self.Q * np.sin(np.pi * 2.e6 * self.d * (1./lam) * cos_th)**2)**(-1)
@@ -232,6 +239,12 @@ def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True
             print 'Interpolating linear output to ccd grid...'
         tic = time.time()
         ccd_data = griddata(ccd.lin_arr, lin_data, ccd.pix_arr, fill_value=0.0)
+        print "Adding noise to ccd_data"
+        scale = 0.05
+        print "Noise Scale: {}".format(scale)
+        n, m = ccd_data.shape
+        ccd_data += np.abs(norm(scale=scale).rvs((n,m)))
+
         interp_time = time.time() - tic
         if verbose:
             print 'Interpolation complete! It took {0:.2f} seconds.'.format(interp_time)
@@ -330,10 +343,11 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
         f, ax = plt.subplots()
         ax.plot(pixel_arr, lin_data, label='data')
         #ax.plot(pixel_arr**2, lin_data, label='data')
-        #ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
-        #ax.plot(pixel_arr, instrument_func, label='instr. f')
+        ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+        #ax.plot(pixel_arr**2, instrument_func, label='instr. f')
         ax.set_xlabel('pixels')
-        #ax.set_xlim([0, min(ccd.npx) / 2.])
+        ax.set_xlim([0, min(ccd.npx) / 2.])
+       # ax.set_xlim(0.0, 1700.0**2)
         # last_pk_ix = np.where(pk_locations > min(ccd.npx) / 2.)[0][0]
         # ax2 = ax.twiny()
         # ax2.set_xlim(ax.get_xlim())
@@ -430,4 +444,4 @@ if __name__ == "__main__":
 
     _, _ = main(light=args.light_source, camera=args.camera, amp=args.rel_amp, temp=args.temp, vel=args.vel,
                 lens=args.lens, d=args.d, F=args.finesse, lin_pts=args.pts, plotit=args.quiet, savedic=savedic,
-                saveccd=saveccd, saveparams=saveparams)
+                saveccd=saveccd, saveparams=saveparams, r0=3500.0)
