@@ -13,6 +13,7 @@ from analysis.datahelpers import smooth
 import multinest_solver as mns
 import multiprocessing as mp
 import model
+from scipy.stats import norm
 
 #np.seterr(invalid='ignore')  # I got sick of invalid values that happening during minimization
 rcParams['xtick.direction'] = 'in'
@@ -77,25 +78,88 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     times += [time.time()]
     print f
     print "Image done reading, {0} seconds".format(times[-1] - times[-2])
-    x0, y0 = rs.locate_center(data, x0, y0, binsize=binsize, plotit=False)
+    x0, y0 = rs.locate_center(data, x0, y0, binsize=0.1, plotit=False)
+    fig, ax = plt.subplots(2)
+    ax[0].plot(data[int(np.ceil(y0)), :])
+    ax[1].plot(data[int(np.floor(y0)), :])
+    plt.show()
     times += [time.time()]
     print "Center found, {0} seconds".format(times[-1] - times[-2])
+    
+    binarr, UL, UR, BL, BR = rs.quick_ringsum(data, x0, y0, binsize=1.0)
+
+
+    r = np.concatenate(([0.0], binarr))
+    rr = 0.5 * (r[0:-1] + r[1:])
+    rdiff = np.diff(r)
+    fig, ax = plt.subplots()
+    plt.plot(binarr**2, UL, label='UL')
+    plt.plot(binarr**2, UR, label='UR')
+    plt.plot(binarr**2, BL, label='BL')
+    plt.plot(binarr**2, BR, label='BR')
+    #plt.plot(binarr**2, UL/UL.max(), label='UL')
+    #plt.plot(binarr**2, UR/UR.max(), label='UR')
+    #plt.plot(binarr**2, BL/BL.max(), label='BL')
+    #plt.plot(binarr**2, BR/BR.max(), label='BR')
+    ax.ticklabel_format(style='sci', axis='both', scilimits=(0,0))
+    ax.legend(loc='upper right')
+    plt.show()
+    
 
     binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=1.0, quadrants=False)
+    bg_Th = np.abs(norm(scale=0.2).rvs(data.shape))
+    _, bg_sig_Th = rs.quick_ringsum(bg_Th, x0, y0, binsize=1.0, quadrants=False)
+
+    sigarr -= bg_sig_Th
+
+    _, err_sqd = rs.quick_ringsum(100.0**2 * np.ones_like(data), x0, y0, binsize=1.0, quadrants=False)
+    err = np.sqrt(err_sqd)
+    fig, ax = plt.subplots()
+    ax.errorbar(rr, sigarr, xerr=rdiff/2.0, yerr=err)
+    rrr = np.zeros_like(rr)
+    for idx, rval in enumerate(rr):
+        rrr[idx] = norm(scale=rdiff[idx]/6.0, loc=rval).rvs(1)[0]
+    ax.ticklabel_format(style='sci', axis='both', scilimits=(0,0))
+    ax.plot(rrr, sigarr,'g')
+    plt.show()
+
+    binarr = np.concatenate(([0.0], binarr))
+    binarr = 0.5*(binarr[0:-1] + binarr[1:])
+    #ny, nx = data.shape
+    #x = np.arange(0, nx, 1)
+    #y = np.arange(0, ny, 1)
+    #xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+    #RR = np.sqrt(xx**2 + yy**2)
+
+    #rr = np.linspace(0, 2000.0, 2000)
+    #tot_areas = np.pi * rr**2
+    #areas = np.diff(tot_areas)
+
+    #ss, _ = np.histogram(RR, bins=rr, weights=data)
+    #print rr.shape
+    #print ss.shape
+    #rr = rr[1:]
+    #ss = ss / areas
+    #fig, ax = plt.subplots()
+    #ax.plot(binarr, sigarr, 'g')
+    #ax1 = ax.twinx()
+    #ax1.plot(rr, ss, 'b')
+    #plt.show()
+
     #print "Subtracting min value from ring sum"
     #sigarr -= sigarr.min()
 
     print len(binarr)
-    np.save("rbins2.npy",binarr)
-    np.save("old_thorium_data.npy", data)
+    #np.save("rbins2.npy",binarr)
+    #np.save("old_thorium_data.npy", data)
     new_binarr = np.concatenate(([0.0], binarr))
-    LL, RR = fitting.get_peaks(binarr, sigarr, thres1=0.2, npks=8)
+    LL, RR = fitting.get_peaks(binarr, sigarr, thres1=0.2,thres2=0.3, npks=8)
     z = fitting.peak_and_fit2(binarr, sigarr, thres=0.2, plotit=False)
     ampsAr = []
     ampsTh = []
     locAr = []
     locTh = []
-    for i in range(4):
+    for i in range(3):
         temp1 = np.max(sigarr[LL[2*i]:RR[2*i]])
         temp2 = np.max(sigarr[LL[2*i+1]:RR[2*i+1]])
         ampsAr.append(temp2)
@@ -111,7 +175,7 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
 
     print ampsAr
     print ampsTh
-    relamps = [ampsAr[i]/ampsTh[i] for i in range(4)]
+    relamps = [ampsAr[i]/ampsTh[i] for i in range(3)]
     relA = np.mean(relamps)
     print relamps, relA
     print z
@@ -188,19 +252,19 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     plt.show()
 
 
-    finesse_range = [15, 20]
+    finesse_range = [15, 25]
     #Ti_Ar_range = [300.0, 11000]
     Ti_Ar_range = [300.0, 11000/2.0]
     Ti_Th_range = [300.0, 3000]
     d_range = [.87, .89]
-    L_range = [148.0, 152.0]
+    L_range = [145.0, 155.0]
     a0 = amp0 / np.exp(-(pk0/rscale)**2)
     a1 = amp1 / np.exp(-(pk1/rscale)**2)
     #Th_amp_range = [.5*a0, 2.0*a0]
     #Ar_amp_range = [.5*a1, 2.0*a1]
     Th_amp_range = [.75*a0, 1.5*a0]
     Ar_amp_range = [.75*a1, 1.5*a1]
-    rscale_range = [3000.0, 4000.0]
+    rscale_range = [500.0, 3500.0]
     print a0, a1 
 
     #print len(binarr)
@@ -250,7 +314,8 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
               "Th_amp_range": Th_amp_range,
               "Ar_amp_range": Ar_amp_range,
               "rscale_range": rscale_range,
-              "binarr": binarr,
+              "binarr": rr,
+              "binsize": rdiff,
               "ringsum": sigarr,
               "ringsum_sd": 100.0 + 0.01 * sigarr,
               "ind": inds}
@@ -270,47 +335,57 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
 
 
     folder = mns.fix_save_directory(save_dir)
-    #with open(folder + "fp_ringsum_params.p", 'wb') as outfile:
-    #    pickle.dump(params, outfile)
+    with open(folder + "fp_ringsum_params.p", 'wb') as outfile:
+        pickle.dump(params, outfile)
 
 
 if __name__ == "__main__":
     binsize = 0.1
-    #folder = "Images"
+    folder = "Images"
     #fname = join(folder, "thorium_ar_5_min_1.nef")
     #bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
 
-    folder = "FM_saves"
+    #folder = "FM_saves"
     #fname = "model1.npy"
-    fname = "model1_0.02_noise.npy"
-    fname = join(folder,fname)
+    #fname = "model1_0.02_noise.npy"
+    #fname = join(folder,fname)
     #fname = "thorium_lamp_data.npy"
     #fname = "old_thorium_data.npy"
     #folder = "Images"
     #fname = join(folder, "Th_lamp_488_calib_5m.nef")
+    #fname = join(folder, "0012443_000.nef")
     #bg_fname = join(folder, "Th_lamp_488_calib_5m_background.nef")
     #fname = join(folder, "thorium_ar_5_min_1.nef")
     #bg_fname = join(folder, "thorium_ar_5_min_1_bg.nef")
     #fname = join(folder, "DSC_0007.nef")
     bg_fname = None
-
+    #bg_fname = join(folder, "0012443_001.nef")
     #fname = "thorium_lamp_data.npy"
-
+    fname = join("synthetic_data/test1/","th_lamp_ar.npy") 
+    #fname = join(folder, "DSC_0098.NEF")
+    #fname = join(folder, "0025203_000.nef")
     #fname = "FM_150_88_195_4000_0.3eV.npy"
     #bg_fname = None
     #save_dir = "full_solver_run17"
     #save_dir = "new_full_solver_run0"
 
-    save_dir = "solver3_run5"
+    #save_dir = "solver3_run16"
+    #save_dir = "finesse_solver3"
     #center_guess = (3068.56, 2033.17)
     #center_guess = (3068.57005213, 2032.17646934)
     #center_guess = (3040.78197222, 2003.29777455) # Old thorium calibration data center
     center_guess = (3018.0, 2010.0)
+    #center_guess = (3041., 2028.)
     #center_guess = (3068.56, 2033.17)
     #center_guess = (3040.78197222, 2003.29777455) # old Th calib center guess
     #center_guess = (3068.57005213, 2032.17646934)
     #center_guess = (3018.0, 2010.0)
+    #center_guess = (3070.0, 2270.0)
+    #center_guess = (3046, 2207)
+    #center_guess = (3070.0, 2500.0)
     #folder ="ForwardModelData"
+    #save_dir = "NewCalibration_Ar_run0"
+    save_dir = "finesse_solver10"
     #fname = join(folder, "th_lamp_FM_14987_8824.npy")
     #bg_fname = None
     #save_dir = "FW_test_14987_8824_0"
