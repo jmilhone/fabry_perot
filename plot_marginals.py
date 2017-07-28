@@ -18,11 +18,17 @@ import json
 #labels = ["L (mm)", "d (mm)", "Finesse",  r"$T_{i, Ar}$ (eV)",  r"$A_{Ar}$ (Counts)"]
 #prob_labels = ["P(L)", "P(d)", "P(Finesse)", r"P($T_{i,Ar}$)", r"P($A_{Ar}$)"]
 
-savedir = "saves/full_solver_run17/"
+#savedir = "saves/full_solver_run17/"
 #savedir = "saves/new_full_solver_run0/"
 #savedir = "saves/full_solver_run17/"
 #savedir = "saves/new_full_solver_run0/"
 #savedir = "saves/Ar_solver_run17/"
+#savedir = "saves/Ar_solver_run25/"
+#savedir = "saves/solver_Ar4/"
+#savedir = "saves/ThAr_ThHe_testing_solver20/"
+#savedir = "saves/Ar_solver_syntest1_17/"
+savedir = "saves/He_solver_run9/"
+#savedir = "saves/Ld_test8/"
 with open(savedir+"param_file.json") as paramfile:
     param_info = json.load(paramfile)
 
@@ -35,9 +41,13 @@ nparams = len(params)
 #fname = "saves/full_solver_run17/fp_full_post_equal_weights.dat"
 #fname = savedir + "fp_full_post_equal_weights.dat"
 #fname = savedir + "fp_newfull_post_equal_weights.dat"
-fname = savedir + "fp_full_post_equal_weights.dat"
+#fname = savedir + "fp_full_post_equal_weights.dat"
+fname = savedir + "fp_post_equal_weights.dat"
+#fname = savedir + "fp_post_equal_weights.dat"
+#fname = savedir + "fp_Ld_post_equal_weights.dat"
 #fname = "saves/new_full_solver_run0/fp_newfull_post_equal_weights.dat"
 post = np.loadtxt(fname, ndmin=2)
+#print "Changing L to mm"
 #post[:, 0] *= 0.004  # convert px to mm
 #post[:, 3] *= 300.0 / .025 # convert to K from eV
 
