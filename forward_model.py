@@ -5,7 +5,7 @@ import h5py
 import cPickle as pickle
 import time
 import argparse
-import model 
+#import model
 from scipy.special import erf
 from scipy.stats import norm
 
@@ -119,21 +119,26 @@ class Helium(Source):
                               468.575707958, 468.5757974, 468.58040922, 468.58308897, 468.588412282, 468.59055531,
                               468.591788438])
         if rel_amps is None:
+            rel_amps = np.ones(5)
             #From Evan's Thesis (see Cooper's he4686tivoigtfit.pro)
-            rel_amps = [11., 9., 13., 3., 6., 16., 1., 2., 9., 1.5, 1., 28., 1.]
-        rel_amps = np.array(rel_amps)
-        self.amp = rel_amps/rel_amps.max()
+            #rel_amps = [11., 9., 13., 3., 6., 16., 1., 2., 9., 1.5, 1., 28., 1.]
+        c1 = 24. / (5 + 9 + 1) * rel_amps[0]
+        c2 = 9. / (2 + 1) * rel_amps[1]
+        c3 = 30. / (2 + 1) * rel_amps[2]
+        c4 = 33. / (20 + 14 + 1) * rel_amps[3]
+        c5 = 4 / (5 + 9 + 1) * rel_amps[4]
+        self.amp = np.array([5*c1, 2*c2, 1*c3, 1*c2, 14*c4, 9*c1, 1*c5, 1*c1, 20*c4, 1*c4, 9*c5, 2*c3, 5*c5])
         super(Helium, self).__init__(temp=self.temp, vel=self.vel, lam0=self.lam0, mu=self.mu,
                                      amp=self.amp, name='Helium')
 
 class CCD(object):
-    def __init__(self, lens=150., px_size=4., npx=(6036, 4020), lin_pts=5e4, name='CCD generic'):
+    def __init__(self, lens=150., px_size=4., npx=(6036, 4020), lin_pts=5e4, name='CCD generic', sm_ang=False):
         self.name = name
         self.npx = npx
         self.lens = lens
         self.px_size = px_size
         self.f =  lens / (px_size * 1.e-3)
-        self.calc_lin_arr(lin_pts)
+        self.calc_lin_arr(lin_pts, sm_ang)
         self.calc_pix_arr()
 
     def calc_pix_arr(self):
@@ -144,9 +149,13 @@ class CCD(object):
         self.pix_arr = np.sqrt(X**2 + Y**2)
         self.center = (self.center[1], self.center[0])
 
-    def calc_lin_arr(self, lin_pts):
+    def calc_lin_arr(self, lin_pts, sm_ang):
         self.lin_arr = np.linspace(0.0, max(self.npx)/2., lin_pts, endpoint=True)
-        self.cos_th = self.f / np.sqrt(self.f**2 + self.lin_arr**2)
+        if sm_ang:
+            print 'Using small angle approximation.'
+            self.cos_th = 1. - 0.5 * (self.lin_arr / self.f)**2
+        else:
+            self.cos_th = self.f / np.sqrt(self.f**2 + self.lin_arr**2)
 
     def params(self):
         return {"type": self.name, "f": (self.lens, self.f), "px_size": self.px_size,
@@ -156,12 +165,12 @@ class CCD(object):
         return {"r": self.lin_arr, "cos_th": self.cos_th, "grid": self.pix_arr}
 
 class NikonD5200(CCD):
-    def __init__(self, lens=150., lin_pts=5e4):
-        super(NikonD5200, self).__init__(lens=lens, px_size=4.0, npx=(6036, 4020), lin_pts=lin_pts, name='Nikon D5200')
+    def __init__(self, lens=150., lin_pts=5e4, sm_ang=False):
+        super(NikonD5200, self).__init__(lens=lens, px_size=4.0, npx=(6036, 4020), lin_pts=lin_pts, name='Nikon D5200', sm_ang=sm_ang)
 
 class Andor(CCD):
-    def __init__(self, lens=150., lin_pts=5e4):
-        super(Andor, self).__init__(lens=lens, px_size=13.0, npx=(1024, 1024), lin_pts=lin_pts, name='Andor iStar334T')
+    def __init__(self, lens=150., lin_pts=5e4, sm_ang=False):
+        super(Andor, self).__init__(lens=lens, px_size=13.0, npx=(1024, 1024), lin_pts=lin_pts, name='Andor iStar334T', sm_ang=sm_ang)
 
 class Etalon(object):
     def __init__(self, d=0.88, F=20.):
@@ -278,7 +287,7 @@ def peak_calc(source, ccd, etalon):
     return {'wavelength': wav, 'm_max': m_max, 'pk_loc': pk_locations, 'pk_m': pk_m}
 
 def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150., d=0.88, F=20., lin_pts=5e4,
-         plotit=True, savedic=None, saveccd=None, saveparams=None, r0=None, He_filter=False):
+         plotit=True, savedic=None, saveccd=None, saveparams=None, r0=None, He_filter=False, sm_ang=False):
 
     if light.lower() in ['argon', 'ar']:
         source = Argon(temp=temp, vel=vel)
@@ -298,9 +307,9 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
 
 
     if camera.lower() in ['nikond5200', 'nikon', 'd5200']:
-        ccd = NikonD5200(lens=lens, lin_pts=lin_pts)
+        ccd = NikonD5200(lens=lens, lin_pts=lin_pts, sm_ang=sm_ang)
     elif camera.lower() in ['andor', 'istar', 'istar334t', 'andoristar334t']:
-        ccd = Andor(lens=lens, lin_pts=lin_pts)
+        ccd = Andor(lens=lens, lin_pts=lin_pts, sm_ang=sm_ang)
     else:
         raise Exception('not a valid camera name, try again')
 
@@ -347,7 +356,6 @@ def main(light='Ar', camera='NikonD5200', amp=None, temp=1.0, vel=0.0, lens=150.
         #ax.plot(pixel_arr**2, instrument_func, label='instr. f')
         ax.set_xlabel('pixels')
         ax.set_xlim([0, min(ccd.npx) / 2.])
-       # ax.set_xlim(0.0, 1700.0**2)
         # last_pk_ix = np.where(pk_locations > min(ccd.npx) / 2.)[0][0]
         # ax2 = ax.twiny()
         # ax2.set_xlim(ax.get_xlim())
@@ -414,6 +422,7 @@ if __name__ == "__main__":
                                                                                          'calc (no arrays).')
     parser.add_argument('--fname', '-f', type=str, default=None, help='Filename for any saves. Default is'
                                                                       'SpecName_pts')
+    parser.add_argument('--sm_ang', '-sa', action='store_true', help='applies small angle approximation to show error')
     args = parser.parse_args()
     if args.fname is None:
         if args.save_h5:

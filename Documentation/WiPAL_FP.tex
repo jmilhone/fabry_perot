@@ -167,43 +167,13 @@ with $A=2\pi n d / \lambda$.  With this function the distance between interferen
 %	SECTION 3
 %----------------------------------------------------------------------------------------
 
-\section{Optical Layout}
-\begin{figure}
-\includegraphics[width=\textwidth]{Images/OpticalLayout.png}
-\caption{Optical schematic of Fabry-P\'{e}rot spectrometer used on WiPAL. All lengths are in units of millimeters. \label{fig:opticalsetup}}
-\end{figure}
-The optical layout for the WiPAL Fabry-P\'{e}rot spectrometer is shown above in Fig.~\ref{fig:opticalsetup}. The main components of this setup are a pair of lenses of focal length, $f_{1}$, that form a telescope to bring light from the center of plasma to the \'{e}talon, another telescope formed by lenses $f_{2}$ and $f_{3}$ that focuses light through the \'{e}talon, and the camera sensor.
-
-The telescope formed by the $f_{1}$ lenses acts to extend the image plane of the sensor a distance $2f_{1}$ past the first lens. For WiPAL, we have chosen $f_{1}=1000$ mm, so the ccd image plane is 2m past the first lens of the system, which is roughly the center of the plasma. The lenses with focal length $f_{2}$ and $f_{3}$ function to magnify the ccd image by a factor of $f_{2}/f_{3}$. So for a sensor that is $\sim15$ mm and lenses $f_{2}=350$ mm and $f_{3}=150$ mm, the image of the ccd in the plasma is roughly 35 mm. This area of the image in the focus plane is essentially the beam diameter of the chord of light sampled by the spectrometer.
-
-An aperature is placed at the first lens of the system in order to control the illuminated spot size on the etalon. Imaging this aperature through the system places it's image $f_{2}-f_{2}^{2}/2f_{1}$  past the $f_{2}$ lens with a magnification of $f_{2}/2f_{1}$. If $f_{2}<f_{1}$, which is the case for the WiPAL system, the aperature image will be smaller than the actual aperature. It is important to use a small spot size on the \'{e}talon in order to minimize the effect of plate defects over the surface.
-
-For the WiPAL system, table~\ref{tab:system} lists the values of optical components used. These values have been chosen to optimize the imaging of the interference pattern of the \'{e}talon and to maximize the amount of light collected from the plasma. 
-\begin{table}
-\begin{center}
-\begin{tabular}{l | l }
-parameter & value \\\hline
-$f_{1}$ & 1000 mm\\
-$f_{2}$ & 350 mm\\
-$f_{3}$ & 150 mm\\
-$M_{ccd}$ & 7/3 \\
-$M_{aperature}$ & 0.175\\
-ccd & 15.6 mm\\
-beam size & 36.4 mm\\
-aperature & 40 mm\\
-spot size & 7 mm
-\end{tabular}
-\caption{A table of chosen values for optical components of the WiPAL Fabry-P\'{e}rot system.}
-\label{tab:system}
-\end{center}
-\end{table}
-
-%----------------------------------------------------------------------------------------
-%	SECTION 4
-%----------------------------------------------------------------------------------------
-
 \section{Fabry-P\'{e}rot Spectroscopy}
-Given the interference condition (eq.~\ref{eq:inf_con}) and the Airy function output of the interferometer (eq.~\ref{eq:airy}), the output of the Fabry-P\'{e}rot for a given wavelength can be calculated. Looking at the interference condition, $m$ for a given $\lambda$ is given by 
+Fabry-P\'{e}rot spectroscopy maps the ring pattern output of the \'{e}talon to a source's spectrum by varying one or more of the variables in the interference condition (eq.~\ref{eq:int_con}). Traditionally, this is done by varying the index of refraction, $n$, by putting the \'{e}talon in a controllable pressure chamber. Alternatively, some \'{e}talons are outfized with a pizeoelectric driver that can very slight change the distance between the plates, $d$. 	At WiPAL, however, we do not have time during a plasma discharge to vary these parameters, so we rely on calibration to a known wavelength and compare ring locations and widths to map out the plasma spectrum.
+
+Calibration is performed using a hollow-cathode Thorium lamp. Thorium is a great calibration source because it is a very heavy atom that has no isotopes (therefore, the line broadening is extremely small). In order to get a $m$, $d$ and $f$, the peak locations of the thorium rings are found and successive orders are used to solve the interference condition based on these locations using the NIST database thorium wavelength. 
+
+\subsection*{Ring Locations}
+Given the interference condition (eq.~\ref{eq:int_con}) and the Airy function output of the interferometer (eq.~\ref{eq:airy}), the output of the Fabry-P\'{e}rot for a given wavelength can be calculated. Looking at the interference condition, $m$ for a given $\lambda$ is given by 
 \begin{equation}
 m = 0,\,1,\,2\,...\,m_{0}\leq\frac{2d}{\lambda}
 \end{equation}
@@ -221,13 +191,14 @@ where $r_{j}$ is the radial location of peaks for that given wavelength. Inverti
 r_{j} = f\sqrt{\left(\frac{2d/\lambda}{m_{0}-j}\right)^{2}-1}=f\sqrt{\left(\frac{2d/\lambda}{\text{Floor}[2d/\lambda]-j}\right)^{2}-1}
 \end{equation}
 
+
 All of the above calculation works for a given, single wavelength, but we are interested in what the Fabry-P\'{e}rot output for a given input spectrum, $B(\lambda)$, looks like. For this we need to integrate over all wavelengths. The output as a function of radius across the ccd will be:
 \begin{equation}
 I(r) = \int_{0}^{\infty} \frac{B(\lambda)\,d\lambda}{1+Q\sin^{2}{\left(\pi \frac{2d}{\lambda}\frac{f}{\sqrt{f^{2}+r^{2}}}\right)}}
 \label{eq:pattern}
 \end{equation}
 
-\subsection{Mapping $r$ to $\lambda$}
+\subsection*{Mapping $r$ to $\lambda$}
 In order to extract spectral information from the interference pattern given by eq.~\ref{eq:pattern}, a mapping must be made from $r$ to $\lambda$ space. This can be done by considering the change in $r$, $\Delta r$, for a given change in $\lambda$, $\Delta\lambda$. From eq.~\ref{eq:mj}, we see that if $\lambda\rightarrow\lambda+\Delta\lambda$, $r_{j}\rightarrow r_{j}+\Delta r$ in order to keep $m_{j}$ an integer. If we limit the change in $\lambda$ to less than a free spectral range, then
 \begin{equation}
 m_{0}=\text{Floor}\left[\frac{2d}{\lambda_{0}}\right]=\text{Floor}\left[\frac{2d}{\lambda_{0}+\Delta\lambda}\right]
@@ -326,6 +297,41 @@ This can be rewritten in terms of the complex Faddeeva function, $w(z)$.
 \begin{equation}
  V(x;\mu,\sigma,\gamma) = \frac{\rm{Re}[w(z)]}{\sigma \sqrt{2 \pi}} \quad z=\frac{x - \mu + i \gamma}{\sigma \sqrt{2}}
 \end{equation} 
+%----------------------------------------------------------------------------------------
+%	SECTION 4
+%----------------------------------------------------------------------------------------
+
+\section{Optical Layout}
+\begin{figure}
+\includegraphics[width=\textwidth]{Images/OpticalLayout.png}
+\caption{Optical schematic of Fabry-P\'{e}rot spectrometer used on WiPAL. All lengths are in units of millimeters. \label{fig:opticalsetup}}
+\end{figure}
+The optical layout for the WiPAL Fabry-P\'{e}rot spectrometer is shown above in Fig.~\ref{fig:opticalsetup}. The main components of this setup are a pair of lenses of focal length, $f_{1}$, that form a telescope to bring light from the center of plasma to the \'{e}talon, another telescope formed by lenses $f_{2}$ and $f_{3}$ that focuses light through the \'{e}talon, and the camera sensor.
+
+The telescope formed by the $f_{1}$ lenses acts to extend the image plane of the sensor a distance $2f_{1}$ past the first lens. For WiPAL, we have chosen $f_{1}=1000$ mm, so the ccd image plane is 2m past the first lens of the system, which is roughly the center of the plasma. The lenses with focal length $f_{2}$ and $f_{3}$ function to magnify the ccd image by a factor of $f_{2}/f_{3}$. So for a sensor that is $\sim15$ mm and lenses $f_{2}=350$ mm and $f_{3}=150$ mm, the image of the ccd in the plasma is roughly 35 mm. This area of the image in the focus plane is essentially the beam diameter of the chord of light sampled by the spectrometer.
+
+An aperature is placed at the first lens of the system in order to control the illuminated spot size on the etalon. Imaging this aperature through the system places it's image $f_{2}-f_{2}^{2}/2f_{1}$  past the $f_{2}$ lens with a magnification of $f_{2}/2f_{1}$. If $f_{2}<f_{1}$, which is the case for the WiPAL system, the aperature image will be smaller than the actual aperature. It is important to use a small spot size on the \'{e}talon in order to minimize the effect of plate defects over the surface.
+
+For the WiPAL system, table~\ref{tab:system} lists the values of optical components used. These values have been chosen to optimize the imaging of the interference pattern of the \'{e}talon and to maximize the amount of light collected from the plasma. 
+\begin{table}
+\begin{center}
+\begin{tabular}{l | l }
+parameter & value \\\hline
+$f_{1}$ & 1000 mm\\
+$f_{2}$ & 350 mm\\
+$f_{3}$ & 150 mm\\
+$M_{ccd}$ & 7/3 \\
+$M_{aperature}$ & 0.175\\
+ccd & 15.6 mm\\
+beam size & 36.4 mm\\
+aperature & 40 mm\\
+spot size & 7 mm
+\end{tabular}
+\caption{A table of chosen values for optical components of the WiPAL Fabry-P\'{e}rot system.}
+\label{tab:system}
+\end{center}
+\end{table}
+
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
