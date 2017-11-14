@@ -27,7 +27,8 @@ import json
 #savedir = "saves/solver_Ar4/"
 #savedir = "saves/ThAr_ThHe_testing_solver20/"
 #savedir = "saves/Ar_solver_syntest1_17/"
-savedir = "saves/He_solver_run9/"
+#savedir = "saves/He_solver_run9/"
+savedir = "saves/newcalib3/"
 #savedir = "saves/Ld_test8/"
 with open(savedir+"param_file.json") as paramfile:
     param_info = json.load(paramfile)

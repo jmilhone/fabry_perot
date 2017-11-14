@@ -239,11 +239,11 @@ def eval_fabry(source, ccd, etalon, verbose=False, grid_out=False, both_out=True
             print 'Interpolating linear output to ccd grid...'
         tic = time.time()
         ccd_data = griddata(ccd.lin_arr, lin_data, ccd.pix_arr, fill_value=0.0)
-        print "Adding noise to ccd_data"
-        scale = 0.05
-        print "Noise Scale: {}".format(scale)
-        n, m = ccd_data.shape
-        ccd_data += np.abs(norm(scale=scale).rvs((n,m)))
+        #print "Adding noise to ccd_data"
+        #scale = 0.05
+        #print "Noise Scale: {}".format(scale)
+        #n, m = ccd_data.shape
+        #ccd_data += np.abs(norm(scale=scale).rvs((n,m)))
 
         interp_time = time.time() - tic
         if verbose:

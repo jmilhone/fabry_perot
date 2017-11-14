@@ -25,7 +25,7 @@ print LL
 print RR
 
 
-with open("peak_locations.json", 'w') as outfile:
+with open("newcalib_peak_locations.json", 'w') as outfile:
     locations = {'left pos': LL, 'right pos': RR}
     json.dump(locations, outfile, indent=4, separators=(',', ': '))
 

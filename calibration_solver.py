@@ -35,12 +35,12 @@ def fix_save_directory(save_directory):
 def calculate_peaks(L, d, w, norders=4):
     m = 2.e6 * d / w
     m0 = np.floor(m)
-    #return [L * np.sqrt( m**2 / (m0 - j)**2 - 1.0) for j in range(norders)]
-    return [np.sqrt(2.0) * L * np.sqrt(1.0 - (m0-j) / m) for j in range(norders)]
+    return [L * np.sqrt( m**2 / (m0 - j)**2 - 1.0) for j in range(norders)]
+    #return [np.sqrt(2.0) * L * np.sqrt(1.0 - (m0-j) / m) for j in range(norders)]
 
 #def solve_L_d(savedir, peak_file, d_lim=(0.88-0.01, 0.88+0.01),
 def solve_L_d(savedir, peak_file, sigma_file, d_lim=(0.88-0.01, 0.88+0.01),
-        L_lim=(148.0/.004, 152.0/.004)):
+        L_lim=(145.0/.004, 155.0/.004)):
 
     def log_prior(cube, ndim, nparams):
 
@@ -74,7 +74,7 @@ def solve_L_d(savedir, peak_file, sigma_file, d_lim=(0.88-0.01, 0.88+0.01),
         peaks = json.load(infile, parse_float=np.float64)
     with open(sigma_file, 'r') as infile:
         sigma = json.load(infile, parse_float=np.float64)
-    npks = 4
+    npks = 3
     peak_labels = peaks.keys()
     wavelengths = [float(x) for x in peak_labels]
     n_params = 2
@@ -124,23 +124,23 @@ def finesse_solver(savedir, param_fname, etalon_dir):#, L, d):
         cube[1] = cube[1]*(Ti_Ar_range[1] - Ti_Ar_range[0]) + Ti_Ar_range[0]
         cube[2] = cube[2]*(Th_amp_range[1] - Th_amp_range[0]) + Th_amp_range[0]
         cube[3] = cube[3]*(Ar_amp_range[1] - Ar_amp_range[0]) + Ar_amp_range[0]
-        cube[4] = cube[4]*(rscale_range[1] - rscale_range[0]) + rscale_range[0]
+        #cube[4] = cube[4]*(rscale_range[1] - rscale_range[0]) + rscale_range[0]
 
     def log_likelihood(cube, ndim, nparams):
         i = random.choice(nchoice)
         L = Ldpost[i, 0]
         d = Ldpost[i, 1]
 
-        rrr = np.zeros_like(rr)
-        for i in xrange(nr):
-            rrr[i] = pdfs[i].rvs(1)[0]
+        #rrr = np.zeros_like(rr)
+        #for i in xrange(nr):
+        #    rrr[i] = pdfs[i].rvs(1)[0]
 
-        linear_out = model.forward4(rrr, L, d, cube[0],
-                [Ti_Th, cube[1]], [muTh, muAr], [cube[2], cube[3]], [wTh, wAr]) 
-        linear_out *= np.exp(-(rrr / cube[4])**2)
-
-        #linear_out = model.forward4(rr, L, d, cube[0],
+        #linear_out = model.forward4(rrr, L, d, cube[0],
         #        [Ti_Th, cube[1]], [muTh, muAr], [cube[2], cube[3]], [wTh, wAr]) 
+        #linear_out *= np.exp(-(rrr / cube[4])**2)
+
+        linear_out = model.forward4(rr, L, d, cube[0],
+                [Ti_Th, cube[1]], [muTh, muAr], [cube[2], cube[3]], [wTh, wAr]) 
         #linear_out *= np.exp(-(rr / cube[4])**2)
         chisq = np.sum( (linear_out - data)**2 / data_sd**2 )
         return -chisq/2.0 
@@ -169,10 +169,11 @@ def finesse_solver(savedir, param_fname, etalon_dir):#, L, d):
         param_dict = pickle.load(paramfile)
 
     finesse_range = param_dict["finesse_range"]
-    Ti_Ar_range= param_dict["Ti_Ar_range"]
-    Th_amp_range= param_dict["Th_amp_range"]
-    Ar_amp_range= param_dict["Ar_amp_range"]
-    rscale_range= param_dict["rscale_range"]
+    Ti_Ar_range = param_dict["Ti_Ar_range"]
+    Th_amp_range = param_dict["Th_amp_range"]
+    Ar_amp_range = param_dict["Ar_amp_range"]
+    rscale_range = param_dict["rscale_range"]
+    rscale_range = [500.0, 3000.0]
 
     r = param_dict["binarr"]
     binsize = param_dict["binsize"]
@@ -190,15 +191,16 @@ def finesse_solver(savedir, param_fname, etalon_dir):#, L, d):
     Ti_Ar_range = [x*.025 / 300.0 for x in Ti_Ar_range]
     Ti_Th = 1000.0 * .025 / 300.0
 
-    nparams = len(params)
+    #nparams = len(params)
+    nparams = len(params)-1
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=True, verbose=True, sampling_efficiency='model', n_live_points=500,
+            resume=True, verbose=True, sampling_efficiency='model', n_live_points=100,
             outputfiles_basename=savedir+"fp_", max_modes=500)
 
 def check_peaks(savedir, peak_file, basename="fp_Ld_"):
     with open(peak_file, 'r') as infile:
         peaks = json.load(infile, parse_float=np.float64)
-    npks = 4
+    npks = 3
     peak_labels = peaks.keys()
     wavelengths = [float(x) for x in peak_labels]
     
@@ -422,12 +424,14 @@ if __name__ == "__main__":
     #args = parser.parse_args()
     #savedir = fix_save_directory("ThAr_ThHe_testing_solver22")
     #Th_two_image_solver(savedir)
-    savedir = fix_save_directory("Ld_test17")
-    #solve_L_d(savedir, "calibration_peaks6.json", "calibration_peaks6_sig.json")
+    #savedir = fix_save_directory("Ld_test20")
+    #solve_L_d(savedir, "calibration_peaks8.json", "calibration_peaks8_sig.json")
     #savedir = fix_save_directory("finesse_solver10")
-    check_peaks(savedir, "calibration_peaks6.json", basename="fp_Ld_")
-    #finesse_solver(savedir, "fp_ringsum_params.p", "saves/Ld_test16/")
-    plot_marginals(savedir, basename="fp_Ld_", param_fname="param_file.json", save=False)
+    #check_peaks(savedir, "calibration_peaks8.json", basename="fp_Ld_")
+    #savedir = fix_save_directory("finesse_solver15")
+    #finesse_solver(savedir, "fp_ringsum_params.p", "saves/Ld_test20/")
+    #plot_marginals(savedir, basename="fp_Ld_", param_fname="param_file.json", save=False)
+    #plot_marginals(savedir, basename="fp_", param_fname="param_file.json", save=False)
 #    He_Th_test_solver(savedir)
     #if args.etalon:
     #    savedir = fix_save_directory(args.etalon_dir)
@@ -442,8 +446,11 @@ if __name__ == "__main__":
     #    finesse_solver(savedir, args.param_fname, L, d)
     #else:
     #    print "You did not specify a calibration routine.  Exiting..."
-    #savedir = fix_save_directory("Ld_test6")
-    #peak_fname = "calibration_peaks.json"
+    savedir = fix_save_directory("Ld_newtest0")
+    peak_fname = "calibration_peaks_new0.json"
+    peak_sig_fname = "calibration_peaks_new0_sig.json"
+    solve_L_d(savedir, peak_fname, peak_sig_fname)
+    check_peaks(savedir, peak_fname, basename="fp_Ld_")
     #solve_L_d(savedir, peak_fname)
     #L, d = read_L_d_results(savedir)
     #plot_marginals(savedir, basename="fp_Ld_", param_fname="param_file.json", save=False)

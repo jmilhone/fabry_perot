@@ -65,8 +65,8 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     print f[-3:].lower()
     if f[-3:].lower() == "nef":
         #print "changed it to green dumbass"
-        #data = im.get_image_data(f, bgname=f_bg, color='g')
-        data = im.get_image_data(f, bgname=f_bg, color='b')
+        data = im.get_image_data(f, bgname=f_bg, color='g')
+        #data = im.get_image_data(f, bgname=f_bg, color='b')
     elif f[-3:].lower() == "npy":
         data = np.load(f)
     else:
@@ -86,7 +86,7 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     times += [time.time()]
     print "Center found, {0} seconds".format(times[-1] - times[-2])
     
-    binarr, UL, UR, BL, BR = rs.quick_ringsum(data, x0, y0, binsize=1.0)
+    binarr, UL, UR, BL, BR = rs.quick_ringsum(data, x0, y0, binsize=0.1)
 
 
     r = np.concatenate(([0.0], binarr))
@@ -106,22 +106,25 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     plt.show()
     
 
-    binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=1.0, quadrants=False)
-    bg_Th = np.abs(norm(scale=0.2).rvs(data.shape))
-    _, bg_sig_Th = rs.quick_ringsum(bg_Th, x0, y0, binsize=1.0, quadrants=False)
-
+    binarr, sigarr = rs.quick_ringsum(data, x0, y0, binsize=0.1, quadrants=False)
+    #bg_Th = np.abs(norm(scale=0.2).rvs(data.shape))
+    bg_Th = im.get_image_data("Images/DSC_0099.NEF", color='b')
+    _, bg_sig_Th = rs.quick_ringsum(bg_Th, x0, y0, binsize=0.1, quadrants=False)
+    plt.plot(binarr, sigarr)
+    plt.plot(binarr, bg_sig_Th)
+    plt.show()
     sigarr -= bg_sig_Th
 
-    _, err_sqd = rs.quick_ringsum(100.0**2 * np.ones_like(data), x0, y0, binsize=1.0, quadrants=False)
-    err = np.sqrt(err_sqd)
-    fig, ax = plt.subplots()
-    ax.errorbar(rr, sigarr, xerr=rdiff/2.0, yerr=err)
-    rrr = np.zeros_like(rr)
-    for idx, rval in enumerate(rr):
-        rrr[idx] = norm(scale=rdiff[idx]/6.0, loc=rval).rvs(1)[0]
-    ax.ticklabel_format(style='sci', axis='both', scilimits=(0,0))
-    ax.plot(rrr, sigarr,'g')
-    plt.show()
+    #_, err_sqd = rs.quick_ringsum(100.0**2 * np.ones_like(data), x0, y0, binsize=1.0, quadrants=False)
+    #err = np.sqrt(err_sqd)
+    #fig, ax = plt.subplots()
+    #ax.errorbar(rr, sigarr, xerr=rdiff/2.0, yerr=err)
+    #rrr = np.zeros_like(rr)
+    #for idx, rval in enumerate(rr):
+    #    rrr[idx] = norm(scale=rdiff[idx]/6.0, loc=rval).rvs(1)[0]
+    #ax.ticklabel_format(style='sci', axis='both', scilimits=(0,0))
+    #ax.plot(rrr, sigarr,'g')
+    #plt.show()
 
     binarr = np.concatenate(([0.0], binarr))
     binarr = 0.5*(binarr[0:-1] + binarr[1:])
@@ -199,7 +202,8 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     inds = [] 
     print "Changed peaks from 8 to 6"
     print "Using all indexes between argon and th peaks"
-    for i in range(3):
+    #for i in range(3):
+    for i in range(0,1):
         inds += range(LL[2*i], RR[2*i+1])
        
     amp0 = np.max(sigarr[LL[0]:RR[0]])
@@ -241,6 +245,7 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
 
     fig, ax = plt.subplots()
     plt.plot(binarr, sigarr, 'b')
+    plt.plot(binarr[inds], sigarr[inds], 'g')
     print len(binarr)
     #ax1 = ax.twinx()
     #ax1.plot(r, fall_off * (linear_out0 + linear_out1), 'r')
@@ -262,8 +267,10 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     a1 = amp1 / np.exp(-(pk1/rscale)**2)
     #Th_amp_range = [.5*a0, 2.0*a0]
     #Ar_amp_range = [.5*a1, 2.0*a1]
-    Th_amp_range = [.75*a0, 1.5*a0]
-    Ar_amp_range = [.75*a1, 1.5*a1]
+    #Th_amp_range = [.75*a0, 1.5*a0]
+    #Ar_amp_range = [.75*a1, 1.5*a1]
+    Th_amp_range = [.1*a0, 1.5*a0]
+    Ar_amp_range = [.1*a1, 1.5*a1]
     rscale_range = [500.0, 3500.0]
     print a0, a1 
 
@@ -334,9 +341,9 @@ def run_calibration(f, f_bg, center_guess, save_dir, gas='Ar', L=None, d=None):
     #          "ind": inds}
 
 
-    folder = mns.fix_save_directory(save_dir)
-    with open(folder + "fp_ringsum_params.p", 'wb') as outfile:
-        pickle.dump(params, outfile)
+    #folder = mns.fix_save_directory(save_dir)
+    #with open(folder + "fp_ringsum_params.p", 'wb') as outfile:
+    #    pickle.dump(params, outfile)
 
 
 if __name__ == "__main__":
@@ -361,8 +368,13 @@ if __name__ == "__main__":
     bg_fname = None
     #bg_fname = join(folder, "0012443_001.nef")
     #fname = "thorium_lamp_data.npy"
-    fname = join("synthetic_data/test1/","th_lamp_ar.npy") 
+    #fname = join("synthetic_data/test1/","th_lamp_ar.npy") 
     #fname = join(folder, "DSC_0098.NEF")
+    #fname = join(folder, "testing", "DSC_0001.NEF")
+    #fname = join(folder, "testing", "DSC_0003.NEF")
+    #fname = join(folder, "testing", "DSC_0008.NEF")
+    fname = join(folder, "testing", "DSC_0015.NEF")
+    #fname = join(folder, "testing", "DSC_0002.NEF")
     #fname = join(folder, "0025203_000.nef")
     #fname = "FM_150_88_195_4000_0.3eV.npy"
     #bg_fname = None
@@ -375,7 +387,11 @@ if __name__ == "__main__":
     #center_guess = (3068.57005213, 2032.17646934)
     #center_guess = (3040.78197222, 2003.29777455) # Old thorium calibration data center
     center_guess = (3018.0, 2010.0)
+    center_guess = (2950.0, 1967.0)
     #center_guess = (3041., 2028.)
+    #center_guess = (3041., 2220.)
+    #center_guess = (2975., 2018.)
+    #center_guess = (3041., 2340.)
     #center_guess = (3068.56, 2033.17)
     #center_guess = (3040.78197222, 2003.29777455) # old Th calib center guess
     #center_guess = (3068.57005213, 2032.17646934)
@@ -385,7 +401,8 @@ if __name__ == "__main__":
     #center_guess = (3070.0, 2500.0)
     #folder ="ForwardModelData"
     #save_dir = "NewCalibration_Ar_run0"
-    save_dir = "finesse_solver10"
+    save_dir = "finesse_solver15"
+    save_dir = "sep_amp_solver_smallbin0"
     #fname = join(folder, "th_lamp_FM_14987_8824.npy")
     #bg_fname = None
     #save_dir = "FW_test_14987_8824_0"

@@ -90,13 +90,13 @@ def check_finesse_solver(savedir, basename='fp_', param_fname="param_file.json",
     Ti_Ar = mode_vals[1]
     Amp_Th = mode_vals[2]
     Amp_Ar = mode_vals[3]
-    r0 = mode_vals[4]
+    #r0 = mode_vals[4]
     Ti_Th = 1000.0 * 0.025 / 300.0
-    L, d = read_L_d_results("saves/Ld_test16")
+    L, d = read_L_d_results("saves/Ld_test20")
 
     lin_data = model.forward4(r, L, d, F, [Ti_Th, Ti_Ar], [muTh, muAr], [Amp_Th, Amp_Ar],[wTh, wAr])
     #lin_data = model.forward4(r, L, d, F, [Ti_Th, Ti_Ar, Ti_Th], [muTh, muAr, muTh], [Amp_Th, Amp_Ar, .1*Amp_Ar],[wTh, wAr, 487.800942])
-    lin_data *= np.exp(-(r/r0)**2)
+    #lin_data *= np.exp(-(r/r0)**2)
 
     ringsum_sd = 0.01 * ringsum[idx] + 100.0 
     chisq = np.sum((lin_data[idx] - ringsum[idx])**2 / ringsum_sd**2)
@@ -107,7 +107,7 @@ def check_finesse_solver(savedir, basename='fp_', param_fname="param_file.json",
     print "Ti Ar = {} eV".format(Ti_Ar)
     print "Amp_Th = {} Counts".format(Amp_Th)
     print "Amp_Ar = {} Counts".format(Amp_Ar)
-    print "R0 = {} pixels".format(r0)
+    #print "R0 = {} pixels".format(r0)
     print "Chi Squared: {0:e}".format(chisq)
     print "Reduced Chi Squared: {0:e}".format(chisq / (len(idx)-len(params)))
     print "Log Evidence: {0:e}\n".format(log_ev)
@@ -123,10 +123,10 @@ def check_finesse_solver(savedir, basename='fp_', param_fname="param_file.json",
         down = [x[sig][0] for x in st['marginals']]
 
         lin_up =model.forward4(rr, L, d, up[0], [Ti_Th, up[1]], [muTh, muAr], [up[2], up[3]],[wTh, wAr])  
-        lin_up *= np.exp(-(rr/up[4])**2)
+        #lin_up *= np.exp(-(rr/up[4])**2)
 
         lin_down =model.forward4(rr, L, d, down[0], [Ti_Th, down[1]], [muTh, muAr], [down[2], down[3]],[wTh, wAr])  
-        lin_down *= np.exp(-(rr/down[4])**2)
+        #lin_down *= np.exp(-(rr/down[4])**2)
         ax.fill_between(rr**2, lin_down, lin_up, facecolor='r', alpha=alpha)
         #ax.plot(r**2, lin_up)
         #ax.plot(r**2, lin_down)
@@ -378,7 +378,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--savedir", "-s", action='store', dest='savedir', type=str, 
             #default="saves/finesse_solver8", help="Directory where MultiNest save files are located")
-            default="saves/finesse_solver10/", help="Directory where MultiNest save files are located")
+            default="saves/finesse_solver15/", help="Directory where MultiNest save files are located")
     parser.add_argument("--basename", "-b", action='store', dest='base_name', type=str, 
             #default="fp_", help="Basename for MultiNest save file")
             default="fp_", help="Basename for MultiNest save file")

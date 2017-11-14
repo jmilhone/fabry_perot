@@ -10,14 +10,14 @@ import model
 import json
 from calibration_solver import read_L_d_results, read_finesse_results
 from os.path import join
-shotnum = 9215
+shotnum = 25250 
 rcParams['xtick.direction'] = 'in'
 rcParams['ytick.direction'] = 'in'
 
-#analyzer = pymultinest.Analyzer(n_params=4, outputfiles_basename="saves/solver_Ar4/fp_full_")
+analyzer = pymultinest.Analyzer(n_params=4, outputfiles_basename="saves/solver_Ar_real0/fp_full_")
 #analyzer = pymultinest.Analyzer(n_params=4, outputfiles_basename="saves/modifiedArsolver_run1/fp_full_")
 #analyzer = pymultinest.Analyzer(n_params=4, outputfiles_basename="saves/Ar_solver_syntest1_17/fp_full_")
-analyzer = pymultinest.Analyzer(n_params=4, outputfiles_basename="saves/Ar_solver_run25/fp_full_")
+#analyzer = pymultinest.Analyzer(n_params=4, outputfiles_basename="saves/Ar_solver_run25/fp_full_")
 stats = analyzer.get_mode_stats()
 
 local_log_ev = [x['local log-evidence'] for x in stats['modes']]
@@ -38,8 +38,8 @@ print "Ti (eV):", Ti
 print "V (km/s):",  V
 print "r0 (px):",r0
 #with open("0015676_data.json", 'r') as infile:
-#with open("{0:07d}_data.json".format(shotnum), 'r') as infile:
-with open("{0:07d}_data2.json".format(shotnum), 'r') as infile:
+with open("{0:07d}_data.json".format(shotnum), 'r') as infile:
+#with open("{0:07d}_data2.json".format(shotnum), 'r') as infile:
 #datafname = join("synthetic_data/test1/", "Ar_V_4.7_data.json")
 #datafname = join("synthetic_data/test1/", "Ar_V_4.7_bgfix_data.json")
 #datafname = join("synthetic_data/test1/", "Ar_noV_Ti_1.1_data.json")
@@ -51,8 +51,8 @@ with open("{0:07d}_data2.json".format(shotnum), 'r') as infile:
 #datafname = join("synthetic_data/test1/", "Ar_noV_data.json")
 #with open(datafname, 'r') as infile:
     data = json.load(infile, parse_float=np.float64)
-#L, d = read_L_d_results("saves/Ld_test11")
-#F = read_finesse_results("saves/finesse_solver7")
+L, d = read_L_d_results("saves/Ld_test20")
+F = read_finesse_results("saves/finesse_solver15")
 
 
 #F = 19.77149120640
@@ -68,9 +68,9 @@ with open("{0:07d}_data2.json".format(shotnum), 'r') as infile:
 #F = 22.2018789225
 
 # real calib with fake F
-L = 148.715306908/ .004
-d = 0.872201921125
-F = 20.0
+#L = 148.715306908/ .004
+#d = 0.872201921125
+#F = 20.0
 #print "overwrote L and d  and v to be perfect model"
 #L = 150.1 / .004
 #d = .881
@@ -93,16 +93,16 @@ idx = data['idx']
 #ax.plot(r[idx]**2, sig[idx], 'g')
 #plt.errorbar(r**2, sig, yerr=.03*sig+100, color='r')
 #ax.plot(r**2, vals, '--')
-#ax.plot(rr**2, vals, '--', label="Fit")
+ax.plot(rr**2, vals, '--', label="Fit")
 ptools.add_thick_box(ax, minor=False)
 ax.set_xlabel(r"R${}^2$ (px${}^2$)", fontsize=20)
 ax.set_ylabel("Counts", fontsize=20)
 ax.ticklabel_format(axis='both', style='sci', scilimits=(0,0))
-#ax.set_title("Ti = {0:4.3f} +/- {1:4.3f} eV".format(Ti, mode_sigma[0]))
-#ax.legend(frameon=False, loc='upper right', fontsize=18)
+ax.set_title("Ti = {0:4.3f} +/- {1:4.3f} eV".format(Ti, mode_sigma[0]))
+ax.legend(frameon=False, loc='upper right', fontsize=18)
 plt.tight_layout()
 #fname = "Ar_9215_fit.pdf"
 fname = "Ar_9215_nofit.pdf"
 fname = join("Plots/",fname)
-fig.savefig(fname)
+#fig.savefig(fname)
 plt.show()

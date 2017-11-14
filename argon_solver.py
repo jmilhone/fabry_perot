@@ -18,10 +18,10 @@ import random
 from os.path import join
 
 #def solve_Ar(savedir, data_fname, L, d, F):
-#def solve_Ar(savedir, data_fname, etalon_dir, finesse_dir):
+def solve_Ar(savedir, data_fname, etalon_dir, finesse_dir):
 #def solve_Ar(savedir, data_fname, L, d, finesse_dir):
 #def solve_Ar(savedir, data_fname, L, d):
-def solve_Ar(savedir, data_fname, L, d, F):
+#def solve_Ar(savedir, data_fname, L, d, F):
 
     def log_prior(cube, ndim, nparams):
         cube[0] = cube[0]*(Ti_lim[1] - Ti_lim[0]) + Ti_lim[0]
@@ -31,12 +31,12 @@ def solve_Ar(savedir, data_fname, L, d, F):
 
     def log_likelihood(cube, ndim, nparams):
 
-        #i = random.choice(n1)
-        #j = random.choice(n2)
+        i = random.choice(n1)
+        j = random.choice(n2)
 
-        #L = Ldpost[i, 0]
-        #d = Ldpost[i, 1]
-        #F = Fpost[j, 0]
+        L = Ldpost[i, 0]
+        d = Ldpost[i, 1]
+        F = Fpost[j, 0]
         #F = 19.7714912064 
         linear_out = model.forward3(r, L, d, F, cube[0], muAr, wAr, nlambda=512, V=cube[1]) 
         linear_out *= cube[3]*np.exp(-(r / cube[2])**2)
@@ -56,23 +56,23 @@ def solve_Ar(savedir, data_fname, L, d, F):
     with open(data_fname, 'r') as infile:
         data = json.load(infile, parse_float=np.float64)
 
-    #with open(join(etalon_dir, "fp_Ld_post_equal_weights.dat"), 'r') as postfile:
-    #    Ldpost = np.loadtxt(postfile, ndmin=2)
+    with open(join(etalon_dir, "fp_Ld_post_equal_weights.dat"), 'r') as postfile:
+        Ldpost = np.loadtxt(postfile, ndmin=2)
 
-    #with open(join(finesse_dir, "fp_post_equal_weights.dat"), 'r') as postfile:
-    #    Fpost = np.loadtxt(postfile, ndmin=2)
+    with open(join(finesse_dir, "fp_post_equal_weights.dat"), 'r') as postfile:
+        Fpost = np.loadtxt(postfile, ndmin=2)
     
-    #n1 = range(Ldpost.shape[0])
-    #n2 = range(Fpost.shape[0])
+    n1 = range(Ldpost.shape[0])
+    n2 = range(Fpost.shape[0])
 
     rarr = np.array(data["r"])
     sig = np.array(data["sig"])
     idx = np.array(data['idx'])
     r = rarr[idx]
     s = sig[idx]
-    #s_sd = 0.01 * s + 100.0
+    s_sd = 0.01 * s + 100.0
     #s_sd = np.sqrt(s) + 10.0
-    s_sd = 0.005 * s + 1.0
+    #s_sd = 0.005 * s + 1.0
     #plt.plot(rarr, sig)
     #plt.plot(rarr[idx], sig[idx])
     #plt.show()
@@ -81,7 +81,7 @@ def solve_Ar(savedir, data_fname, L, d, F):
     A_lim = [0.01 * data['A'], 2*data['A']]
     Ti_lim = [0.025, 4.0]  # eV
     V_lim = [-10.0, 10.0]  # km/s
-    r0_lim = [2000.0, 6000.0] # px
+    r0_lim = [500.0, 3000.0] # px
     nparams = len(params) 
     #print A_lim, sig.max()
 
@@ -92,16 +92,16 @@ def solve_Ar(savedir, data_fname, L, d, F):
     #plt.show()
 
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=True, verbose=True, sampling_efficiency='model', n_live_points=2000,
+            resume=True, verbose=True, sampling_efficiency='model', n_live_points=200,
             outputfiles_basename=savedir+"fp_full_", max_modes=500)    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Argon Solver for the Fabry-Perot Interferometer.")
-    parser.add_argument("--etalon-dir", action='store', type=str, default='saves/Ld_test7', dest='etalon_dir',
+    parser.add_argument("--etalon-dir", action='store', type=str, default='Ld_test20', dest='etalon_dir',
                         help="Directory of etalon solver from calibration_solver.py")
-    parser.add_argument("--finesse-dir", action='store', type=str, default="saves/finesse_solver4",
+    parser.add_argument("--finesse-dir", action='store', type=str, default="finesse_solver15",
                         dest="finesse_dir", help="Directory of finesse solver from calibration_solver.py")
-    parser.add_argument("--savedir", "-s", action='store', type=str, default="solver_Ar1", dest='savedir',
+    parser.add_argument("--savedir", "-s", action='store', type=str, default="solver_Ar_real0", dest='savedir',
                         help="Directory to store Ar solver files")
     args = parser.parse_args()
 
@@ -135,8 +135,8 @@ if __name__ == "__main__":
     #print "L (mm), d(mm), F", L*.004, d, F
     print "L (mm), d(mm)", L*.004, d
     #solve_Ar(savedir, "0009215_data.json", L, d, F)
-    solve_Ar(savedir, "0009215_data2.json", L, d, F)
-    #solve_Ar(savedir, "0009215_data.json", etalon_dir, finesse_dir)
+    #solve_Ar(savedir, "0009215_data2.json", L, d, F)
+    solve_Ar(savedir, "0025250_data.json", etalon_dir, finesse_dir)
     #solve_Ar(savedir, "0009215_data2.json", etalon_dir, finesse_dir)
     #solve_Ar(savedir, "0009215_data2.json", L, d, finesse_dir)
     #solve_Ar(savedir, "0009215_data2.json", L, d)
