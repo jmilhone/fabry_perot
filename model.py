@@ -63,8 +63,8 @@ def forward3(r, L, d, F, Ti, mu, w0, nlambda=512, V=0):
     #print w_arr.max() - w_arr.min()
     nr = len(r)
 
-    #cos_th = L / np.sqrt(L**2 + r**2).reshape((1,nr))
-    cos_th = 1.0 - 0.5 * (r / L)**2
+    cos_th = L / np.sqrt(L**2 + r**2).reshape((1,nr))
+    #cos_th = 1.0 - 0.5 * (r / L)**2
     spec = eval_spec(w_arr, 1.0, w0, sigma, V=V)
 
     lin_out = trapz(spec*eval_airy(w_arr, cos_th, d, F), w_arr, axis=0)
