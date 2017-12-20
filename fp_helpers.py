@@ -31,6 +31,14 @@ def read_finesse_results(folder):
     Ti_Ar = post[:, 3]
     return F, Amp, rel, Ti_Ar
 
+def read_pcx_finesse_results(folder):
+    fname = join(folder, "fp_F_post_equal_weights.dat")
+    post = np.loadtxt(fname, ndmin=2)
+    F = post[:, 0]
+    Amp = post[:, 1]
+    return F, Amp
+
+
 def read_Ar_Ti_results(folder):
     fname = join(folder, "fp_post_equal_weights.dat")
     post = np.loadtxt(fname, ndmin=2)

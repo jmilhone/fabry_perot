@@ -113,6 +113,12 @@ def argon_calib(fname, x0, y0, bg=None, plotit=True, color='b', binsize=0.5, wri
         else:
             bgdata = np.load(bg)
         _, bg_sig = rs.quick_ringsum(bgdata, x0, y0, binsize=1.0, quadrants=False)
+        plt.plot(r, bg_sig, 'g')
+        plt.plot(r, sig, 'b')
+        ax = plt.gca()
+        _, yhi = ax.get_ylim()
+        ax.set_ylim(0, yhi)
+        plt.show()
         sig -= bg_sig
 
     boundaries = {'Ar left': [],
@@ -124,13 +130,16 @@ def argon_calib(fname, x0, y0, bg=None, plotit=True, color='b', binsize=0.5, wri
                  'Th left': "Click to the left of the Th peaks",
                  'Th right': "Click to the right of the Th peaks"}
 
+    #print "arb subtraction"
+    #sig -= 3e7
     fig, ax = plt.subplots()
-    ax.plot(r, sig, 'b')
-    #ax.plot(r**2, sig, 'b')
+    #ax.plot(r, sig, 'b')
+    ax.plot(r**2, sig, 'b')
     ax.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
-    ax.set_xlabel("R (px)")
-    #ax.set_xlabel(r"$R^2$ (px${}^2$)")
+    #ax.set_xlabel("R (px)")
+    ax.set_xlabel(r"$R^2$ (px${}^2$)")
     ax.set_ylabel("Counts")
+    ax.ticklabel_format(style="sci", axis='both', scilimits=(0,0))
     plt.show()
 
     fname = "calibration_peaks_location_data_2017_10_30.json"
@@ -208,22 +217,30 @@ def argon_calib(fname, x0, y0, bg=None, plotit=True, color='b', binsize=0.5, wri
     rdiff = np.diff(r)
     r = 0.5 * (r[0:-1] + r[1:])
 
+
     # Handle background image here
     if bg:
         _, bg_sig = rs.quick_ringsum(bgdata, x0, y0, binsize=binsize, quadrants=False)
         sig -= bg_sig
 
-    # print "Arbitrary offset subtraction"
+    #print "Arbitrary offset subtraction"
     # sig -= 25000.0
     # sig -= 2.5e6
+    #sig -= 0.8*np.min(sig)
 
+    plt.plot(binarr, sig)
+    plt.show()
     fit_range = []
+
     for i in xrange(norders):
-        L_Ar, R_Ar = determine_fit_range(r, sig, peak_location_data['left'][w0[1]][i],
-                peak_location_data['right'][w0[1]][i], thres=0.3)
+    #    L_Ar, R_Ar = determine_fit_range(r, sig, peak_location_data['left'][w0[1]][i],
+    #            peak_location_data['right'][w0[1]][i], thres=0.3)
+    #    L_Th, R_Th = determine_fit_range(r, sig, peak_location_data['left'][w0[0]][i],
+    #           peak_location_data['right'][w0[0]][i], thres=0.3)
+    #    fit_range.append(range(L_Th, R_Ar+1))
         L_Th, R_Th = determine_fit_range(r, sig, peak_location_data['left'][w0[0]][i],
-               peak_location_data['right'][w0[0]][i], thres=0.3)
-        fit_range.append(range(L_Th, R_Ar+1))
+            peak_location_data['right'][w0[0]][i], thres=0.3)
+        fit_range.append(range(L_Th, R_Th+1))
 
 
 
@@ -233,9 +250,10 @@ def argon_calib(fname, x0, y0, bg=None, plotit=True, color='b', binsize=0.5, wri
     ax.ticklabel_format(style='sci', axis='both', scilimits=(0, 0))
     for i in xrange(norders):
         #ax.plot(r[fit_range[i]]**2, sig[fit_range[i]])
+        ax.plot(r[fit_range[i]], sig[fit_range[i]])
         #ax.axvline(ar_peaks[i]**2, color='c')
         #ax.axvline(th_peaks[i]**2, color='m')
-        ax.plot(r[fit_range[i]], sig[fit_range[i]])
+        #ax.plot(r[fit_range[i]], sig[fit_range[i]])
         ax.axvline(ar_peaks[i], color='c')
         ax.axvline(th_peaks[i], color='m')
     # ax.set_xlabel(r"R${}^2$ (px${}^2$)")
@@ -273,7 +291,7 @@ if __name__ == "__main__":
     fp_helpers.make_directory(Ld_dir)
 
     print args.argon_fname
-    binsize = 0.1 
+    binsize = 0.25 
     rarr, counts, Ar_peaks, Th_peaks, fit_indices = argon_calib(
             args.argon_fname, args.x, args.y, bg=args.argon_bg_fname, plotit=True, binsize=binsize, folder=finesse_dir)
 

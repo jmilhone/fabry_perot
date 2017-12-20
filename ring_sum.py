@@ -280,7 +280,12 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         # t0 = time.time()
         binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = quick_ringsum(data, xguess, yguess, binsize=binsize)
         # print time.time()-t0
-
+        
+        jj = np.where(binarr < 300)
+        ULsigarr[jj] = 0.0
+        URsigarr[jj] = 0.0
+        BRsigarr[jj] = 0.0
+        BLsigarr[jj] = 0.0
         thres = 0.3* np.max(ULsigarr + URsigarr)
         i = np.where(ULsigarr + URsigarr > thres)[0]
 
@@ -325,7 +330,7 @@ def locate_center(data, xguess, yguess, maxiter=25, binsize=0.1, plotit=False):
         if UBfit[0] < 0.0:
             # concave down
             # print "UB concave down"
-            UBcent = -1 * np.max(sarr) * np.sign(UBfit[1])
+            UBcent = -2 * np.max(sarr) * np.sign(UBfit[1])
         else:
             # concave up
             UBcent = -UBfit[1] / (2*UBfit[0])

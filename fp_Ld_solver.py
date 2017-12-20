@@ -11,10 +11,11 @@ import matplotlib.pyplot as plt
 from fp_helpers import peak_calculator
 
 wavelengths = {'Th': 487.873302,
-               'Ar': 487.98634,
-               'He': 468.619458}
+               'Ar': 487.98634,}
+               #'He': 468.619458}
 
-pk_error = 0.25
+# pk_error = 0.25
+pk_error = 0.5
 
 
 def Ld_solver(folder, peak_name):
@@ -32,12 +33,12 @@ def Ld_solver(folder, peak_name):
 
         return -chisq / 2.0
     # BRB
-    d_lim = (0.88-0.01, 0.88+0.01)
-    L_lim = (145.0/0.004, 155.0/0.004)
-    
+    #d_lim = (0.88-0.01, 0.88+0.01)
+    #L_lim = (145.0/0.004, 155.0/0.004)
+
     # PCX
-    #d_lim = (0.4739-0.01, 0.4739+0.01)
-    #L_lim = (100.0/0.004, 110.0/0.004)
+    d_lim = (0.4739-0.01, 0.4739+0.01)
+    L_lim = (100.0/0.004, 110.0/0.004)
 
     log_d_lim = [np.log10(x) for x in d_lim]
 
@@ -47,12 +48,12 @@ def Ld_solver(folder, peak_name):
 
     Ar_peaks = peak_data['Ar']
     Th_peaks = peak_data['Th']
-    He_peaks = peak_data['He']
+    #He_peaks = peak_data['He']
 
     orders = {}
     orders['Ar'] = np.linspace(0.0, len(Ar_peaks)-1, len(Ar_peaks))
     orders['Th'] = np.linspace(0.0, len(Th_peaks)-1, len(Th_peaks))
-    orders['He'] = np.linspace(0.0, len(He_peaks)-1, len(He_peaks))
+    #orders['He'] = np.linspace(0.0, len(He_peaks)-1, len(He_peaks))
 
     n_params = 2
     pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,

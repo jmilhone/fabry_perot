@@ -1,2 +1,44 @@
 Let's get this working so the FP is a much easier, more 
 reliable diagnostic for the Forest/Egedal Group.
+
+Ken is doing a lot of edits that I'm unaware of at this moment. But here is the layout of my working version.
+
+Requirements: 
+Make this directory structure
+    /python_FabryPerot
+        /Calibration
+            /Ld_saves
+            /Finesse_saves
+
+There are some dependencies on mpdx_scripts.  For the most part, I believe they
+     are only for plotting.  You can remove them or add 
+    mpdx_scripts/PythonModules to your PythonPath environment variable.
+
+Running a Calibration for Argon:
+1. Run fp_calibration.py on an Thorium picture with the Argon filter.  Since 
+    this will be your first time running, you will want to turn write_peaks=True
+    in the argon_calib function.  This will ask you to click to the left or 
+    right of the various peaks for a wavelength. JSON files will be written to 
+    the Ld_saves and Finesse_saves directors.
+2. Run fp_Ld_solver.py to solve for L and d using pymultinest.  For now, the 
+    error bar for the peaks is a global variable called pk_error.  
+3. Check output of fp_Ld_solver.py by running fp_peak_check.py
+4. Run fp_finesse_solver.py to solve for the finesse using pymultinest.  For now, 
+    the error is just a percentage error plus an offset to avoid zero defined 
+    in the solver function.
+5. Check output of fp_finesse_solver.py by running fp_check_finesse.py
+
+Other files to note:
+1. ring_sum.py handles all of the ring summing functionality including center 
+    finding.
+2. fp_helpers.py has a lot of useful helper functions including reading the 
+    pymultinest files.
+3. model.py is where the foward model is located that multinest calls.  This 
+    is a gigantic mess at the moment.  There are essentially two categories of
+    models (with/without numpy broadcasting for speed, one or multiple 
+    wavelengths).
+4. forward_model.py is Ken's script for making synthetic fabry-perot images.  
+
+
+Good Luck!
+
