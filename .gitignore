@@ -19,4 +19,4 @@
 *.pdf
 
 # Data Folder
-./Data/*
+Data/*
