@@ -18,8 +18,5 @@
 *-converted-to.pdf
 *.pdf
 
-# Multinest save files
-saves/*
-
-# json
-*.json
+# Data Folder
+./Data/*
