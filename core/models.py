@@ -166,10 +166,11 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=True):
     model = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
     return model
 
-def match_finesse_forward(r, L, d, F, temp, v, A, errtemp, w0=487.98634, mu=39.948):
+def match_finesse_forward(r, L, d, F, temp, v, A, errtemp=None, w0=487.98634, mu=39.948):
     sigma, w = doppler_calc(w0, mu, temp, v*1000.)
-    errsigma, _ = doppler_calc(w0, mu, errtemp, v*1000.)
-    sigma = np.sqrt(sigma**2 + errsigma**2)
+    if errtemp is not None:
+        errsigma, _ = doppler_calc(w0, mu, errtemp, v*1000.)
+        sigma = np.sqrt(sigma**2 + errsigma**2)
     wavelength = np.linspace(w - 10.*sigma, w + 10.*sigma, 512)[:,np.newaxis]
     spec = gaussian(wavelength, w, sigma, A, norm=False)
     

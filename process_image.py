@@ -1,5 +1,5 @@
 import numpy as np
-from tools.images import get_data, get_metadata
+from tools.images import get_data, get_metadata, check_nef
 from tools.plotting import center_plot, ringsum_click, ring_plot
 from core.ringsum import smAng_ringsum, locate_center
 from tools.file_io import dict_2_h5, prep_folder
@@ -64,6 +64,9 @@ def remove_prof(r, sig, min_r=None, poly_num=5):
 def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None, 
         yguess=None, block_center=False, click_center=True, find_center=True,
         sub_prof=False, poly_num=5, plotit=False, write=True, folder='./Data'):
+
+    fname = check_nef(fname)
+    bgfname = check_nef(bgfname)
 
     print 'loading image...'
     data = get_data(fname, color=color)

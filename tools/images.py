@@ -1,8 +1,20 @@
 import rawpy
 import exifread
 import numpy as np
+from os.path import isfile
+
+def check_nef(filename):
+    if filename[-4:].lower() != '.nef':
+        if isfile(filename+'.NEF'):
+            filename += '.NEF'
+        elif isfile(filename+'.nef'):
+            filename += '.nef'
+        else:
+            raise Exception('{0} does not exist!'.format(filename))
+    return filename
 
 def get_data(filename, color=None):
+    filename = check_nef(filename)
     image = rawpy.imread(filename).postprocess(demosaic_algorithm=rawpy.DemosaicAlgorithm.LINEAR,
             output_color=rawpy.ColorSpace.raw, output_bps=16, no_auto_bright=True, 
             adjust_maximum_thr=0., gamma=(1, 1)).astype('float64')
@@ -21,6 +33,7 @@ def get_data(filename, color=None):
     return a
 
 def get_metadata(filename):
+    filename = check_nef(filename)
     with open(filename, 'rb') as f:
         tags = exifread.process_file(f, details=False)
     date = str(tags['Image DateTime'].values.replace(':','_').split(' ')[0])
