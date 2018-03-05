@@ -84,7 +84,7 @@ def ld_multinest_solver(peaks, orders, basename, pk_error, L_lim, d_lim, livepoi
             resume=True, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
             outputfiles_basename=basename, max_modes=500)
 
-def ld_check(folder, bins=20, saveit=True):
+def ld_check(folder, bins=None, saveit=True):
     '''
     plots results from a Ld calibration
 
@@ -184,8 +184,10 @@ if __name__ == "__main__":
         org_fname = abspath(join(args.folder, 'ringsum.h5'))
 
         if args.erase_multinest:
+            # Highly against this... Empty the folder and delete it after, but -rf?"
+            # Also, if you are starting over but there are files already there, you can say resume=False
             subprocess.Popen('rm -rf {0}'.format(join(args.folder,'Ld_solver_*')),shell=True)
-        
+
         if not isfile(fname) or args.overwrite:
             if isfile(org_fname):
                 data = h5_2_dict(org_fname)
@@ -201,7 +203,7 @@ if __name__ == "__main__":
            sig = a['sig']
            peaks = a['peaks']
            orders = a['orders']
-        
+
         binsizes = np.diff(np.concatenate(([0],r)))
         pkerr = {}
         for i,w in enumerate(peaks.keys()):

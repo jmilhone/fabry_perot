@@ -6,6 +6,7 @@ from tools.file_io import dict_2_h5, prep_folder
 import matplotlib.pyplot as plt
 from os.path import join, abspath
 import argparse
+import h5py 
 
 def get_ringsum(data,x0,y0,binsize=1.0):
     '''
@@ -63,21 +64,25 @@ def remove_prof(r, sig, min_r=None, poly_num=5):
 
 def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None, 
         yguess=None, block_center=False, click_center=True, find_center=True,
-        sub_prof=False, poly_num=5, plotit=False, write=True, folder='./Data'):
+        sub_prof=False, poly_num=5, plotit=False, write=None, folder='./Data'):
 
-    fname = check_nef(fname)
-    bgfname = check_nef(bgfname)
+    if fname[-2:].lower() == "h5":
+       with h5py.File(fname, 'r') as f:
+           data = f.get("2Ddata").value
+    else:
+        fname = check_nef(fname)
+        bgfname = check_nef(bgfname)
 
-    print 'loading image...'
-    data = get_data(fname, color=color)
+        print 'loading image...'
+        data = get_data(fname, color=color)
 
     if find_center:
         if click_center:
             xguess,yguess = center_plot(data)
-        
+
         x0,y0 = locate_center(data, xguess=xguess, yguess=yguess, 
                 block_center=block_center, binsize=binsize, plotit=plotit)
-        
+
         if plotit:
             fig,ax = plt.subplots(figsize=(10,8))
             ring_plot(data, fax=(fig,ax))
@@ -93,6 +98,10 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             y0 = data.shape[0]/2.
         else:
             y0 = yguess
+    # this is from my annulus finder on a real image, ignore
+    #print 'overwrite x0, y0...'
+    #x0 =  2923.499075195907
+    #y0 =  1984.5553261036002
 
     print 'performing ringsums...'
     smooth_r, smooth_sig0 = get_ringsum(data, x0, y0, binsize=1.0)
@@ -115,12 +124,17 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
         _,p = remove_prof(r, sig, min_r=min_r, poly_num = poly_num)
         smooth_sig -= smooth_p
         sig -= p
-    
-    a = get_metadata(fname)
-    dic = {'date':a['date'], 'time':a['time'], 'fname':abspath(fname),
-                'color':color, 'center':(x0,y0),
-                'smooth_r':smooth_r, 'smooth_sig':smooth_sig, 
-                'binsize':binsize, 'r':r, 'sig':sig}
+
+    if fname[-2:].lower() == "h5": 
+        dic = {'fname': abspath(fname), 'color': color, 'center': (x0, y0),
+               'smooth_r': smooth_r, "smooth_sig": smooth_sig, 
+               'binsize': binsize, 'r': r, 'sig': sig}
+    else:
+        a = get_metadata(fname)
+        dic = {'date':a['date'], 'time':a['time'], 'fname':abspath(fname),
+                    'color':color, 'center':(x0,y0),
+                    'smooth_r':smooth_r, 'smooth_sig':smooth_sig, 
+                    'binsize':binsize, 'r':r, 'sig':sig}
     if bgfname is not None:
         dic['bg_fname'] = abspath(bgfname)
 
@@ -198,7 +212,7 @@ if __name__ == "__main__":
     parser.add_argument('--write', '-w', type=str, default=None, help='saves data and plot to\
             specified folder, default is None which will not write data.')
     args = parser.parse_args()
-    
+
     plotit = not args.no_plot
     click_center = not args.no_click
     find_center = not args.no_search

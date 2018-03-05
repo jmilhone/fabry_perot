@@ -102,6 +102,18 @@ def read_match_finesse_results(finesse_directory, errtemp=False):
     else:
         return F,V,A,O,T
 
+
+def read_finesse_results(finesse_directory):
+    fname = os.path.join(finesse_directory, "finesse_post_equal_weights.dat")
+    post = np.loadtxt(fname, ndmin=2)
+    F = post[:, 0]
+    A = post[:, 1]
+    Arel = post[:, 2]
+    Ti = post[:, 3]
+
+    return F, A, Arel, Ti
+
+
 def read_lyon_temp_results(temp_directory):
     fname = os.path.join(temp_directory,'temp_solver_post_equal_weights.dat')
     post = np.loadtxt(fname, ndmin=2)
