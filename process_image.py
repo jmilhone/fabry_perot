@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from os.path import join, abspath
 import argparse
 import h5py 
+from scipy.stats import norm
 
 def get_ringsum(data,x0,y0,binsize=1.0):
     '''
@@ -66,9 +67,11 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
         yguess=None, block_center=False, click_center=True, find_center=True,
         sub_prof=False, poly_num=5, plotit=False, write=None, folder='./Data'):
 
+    bgdata = None
     if fname[-2:].lower() == "h5":
        with h5py.File(fname, 'r') as f:
            data = f.get("2Ddata").value
+           bgdata = np.abs(norm(scale=0.1).rvs(data.shape))
     else:
         fname = check_nef(fname)
         bgfname = check_nef(bgfname)
@@ -107,9 +110,10 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     smooth_r, smooth_sig0 = get_ringsum(data, x0, y0, binsize=1.0)
     r, sig0 = get_ringsum(data, x0, y0, binsize=binsize)
 
-    if bgfname is not None:
+    if bgfname is not None or fname[-2:].lower() == "h5":
         print 'removing background...'
-        bgdata = get_data(bgfname, color=color)
+        if bgdata is None:
+            bgdata = get_data(bgfname, color=color)
         _,smooth_bg = get_ringsum(bgdata, x0, y0, binsize=1.0)
         _,bg = get_ringsum(bgdata, x0, y0, binsize=binsize)
         smooth_sig = smooth_sig0 - smooth_bg

@@ -3,6 +3,7 @@ import argparse
 from tools.file_io import h5_2_dict, dict_2_h5, prep_folder,read_Ld_results
 from core.fitting import determine_fit_range, find_maximum
 from tools.plotting import ringsum_click, peak_plot, my_hist, tableau20_colors
+from tools.images import get_data
 import matplotlib.pyplot as plt
 from core.models import peak_calculator
 from os.path import join,isfile,abspath
@@ -37,12 +38,12 @@ def get_pk_locations(r, s, w, names=None, pkthresh=0.10, plotit=True):
     peaks = {}
     orders = {}
     for i,wstr in enumerate(wnames):
-        pkguess,_ = ringsum_click(r, s, 
+        pkguess,_ = ringsum_click(r**2, s, 
                 title='Click on {0} peaks you wish to include'.format(names[i]))
         
         peak_list = []
         for pk in pkguess:
-            idxs = determine_fit_range(r,s,pk,thres=pkthresh[i])
+            idxs = determine_fit_range(r,s,np.sqrt(pk),thres=pkthresh[i])
             pk_r = find_maximum(r[idxs],s[idxs])
             peak_list.append(pk_r)
         peaks[wstr] = np.array(peak_list)
@@ -191,9 +192,37 @@ if __name__ == "__main__":
         if not isfile(fname) or args.overwrite:
             if isfile(org_fname):
                 data = h5_2_dict(org_fname)
+                print(data.keys())
                 r = data['smooth_r']
                 sig = data['smooth_sig']
                 peaks, orders = get_pk_locations(r, sig, args.wavelengths, pkthresh=args.pkthresh)
+                image_name = data['fname']
+                if image_name[-3:].lower() == "nef":
+                    image_data = get_data(image_name, color='b')
+                    ny, nx = image_data.shape
+                    x = np.arange(0, nx, 1)
+                    y = np.arange(0, ny, 1)
+                    x0, y0 = data['center']
+                    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+                    R = np.sqrt(xx**2 + yy**2)
+
+                    R = R.flatten()
+                    image_data = image_data.flatten()
+
+                    idx_sort = np.argsort(R)
+
+                    fig, ax = plt.subplots()
+                    ax.plot(R[idx_sort], image_data[idx_sort])
+                    for w in peaks:
+                        for pk in peaks[w]:
+                            ax.axvline(pk)
+                    plt.show()
+
+
+
+
+                print(peaks)
+                print(orders)
                 dict_2_h5(fname, {'r':r, 'sig':sig, 'peaks':peaks, 'orders':orders})
             else:
                 raise ValueError('{0} does not exist!'.format(org_fname))
@@ -216,7 +245,7 @@ if __name__ == "__main__":
         inputs = {'pkerr':pkerr, 'L_lim':args.L_lim, 
                 'd_lim':args.d_lim, 'livepoints':args.livepoints}
         dict_2_h5(fname, inputs, append=True)
-        
+
         if args.no_solve:
             solver_in = None
         else:
