@@ -40,14 +40,14 @@ def get_pk_locations(r, s, w, names=None, pkthresh=0.10, plotit=True):
     for i,wstr in enumerate(wnames):
         pkguess,_ = ringsum_click(r**2, s, 
                 title='Click on {0} peaks you wish to include'.format(names[i]))
-        
+
         peak_list = []
         for pk in pkguess:
             idxs = determine_fit_range(r,s,np.sqrt(pk),thres=pkthresh[i])
             pk_r = find_maximum(r[idxs],s[idxs])
             peak_list.append(pk_r)
         peaks[wstr] = np.array(peak_list)
-        
+
         order_list = raw_input("Please enter the {0} peak orders you've just selected, separated by commas: ".format(names[i]))
         order_list = [int(x) for x in order_list.split(',')]
         orders[wstr] = order_list
@@ -57,11 +57,11 @@ def get_pk_locations(r, s, w, names=None, pkthresh=0.10, plotit=True):
         for i,ww in enumerate(wnames):
             name_dic[ww] = names[i]
         peak_plot(r, s, peaks, orders)
-    
+
     return peaks, orders
 
-def ld_multinest_solver(peaks, orders, basename, pk_error, L_lim, d_lim, livepoints=1000):
-    
+def ld_multinest_solver(peaks, orders, basename, pk_error, L_lim, d_lim, livepoints=1000, resume=True):
+
     ## one pixel is 0.004 mm so we need to convert the L_lim
     L_lim = [x/0.004 for x in L_lim]
     ## d is computed in log space
@@ -82,7 +82,7 @@ def ld_multinest_solver(peaks, orders, basename, pk_error, L_lim, d_lim, livepoi
     
     nparams = 2
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=True, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
+            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
             outputfiles_basename=basename, max_modes=500)
 
 def ld_check(folder, bins=None, saveit=True):
@@ -112,22 +112,35 @@ def ld_check(folder, bins=None, saveit=True):
     nwaves = len(data['peaks'].keys())
 
     fig0, ax0 = plt.subplots(figsize=(10,6))
-    peak_plot(data['r'],data['sig'],data['peaks'],data['orders'],fax=(fig0,ax0),pkerr=data['pkerr'])
+    peak_plot(data['rs'],data['sigs'],data['peaks'],data['orders'],fax=(fig0,ax0),pkerr=data['pkerr'])
+    for key in hists:
+        for hist in hists[key]:
+            mean = np.mean(hist)
+            sd = np.std(hist)
+            ax0.axvspan(mean-sd, mean+sd, color='k', alpha=0.5)
     plt.show(block=False)
+    wtest = 468.335172
+    print wtest
+    print peak_calculator(0.382288362412689094E+05, 0.883875718242851827E+00, wtest, 0)
+    print peak_calculator(0.382288362412689094E+05, 0.883875718242851827E+00, wtest, 1)
 
     fig1, ax1 = plt.subplots(2,1,figsize=(6,8))
     my_hist(ax1[0], Lpost*0.004, bins=bins)
-    ax1[0].set_xlabel('L (mm)')
-    ax1[0].set_ylabel('P (L)')
+    ax1[0].set_xlabel('L (mm)', fontsize=18)
+    ax1[0].set_ylabel('P (L)', fontsize=18)
+    ax1[0].tick_params(labelsize=16)
     ax1[0].get_xaxis().get_major_formatter().set_useOffset(False)
     ax1[0].get_xaxis().get_major_formatter().set_scientific(False)
-    ax1[0].set_xlim(data['L_lim'])
+    #ax1[0].set_xlim(data['L_lim'])
     my_hist(ax1[1], dpost, bins=bins)
-    ax1[1].set_xlabel('d (mm)')
-    ax1[1].set_ylabel('P (d)')
+    ax1[1].set_xlabel('d (mm)', fontsize=18)
+    ax1[1].set_ylabel('P (d)', fontsize=18)
+    ax1[1].tick_params(labelsize=16)
     ax1[1].get_xaxis().get_major_formatter().set_useOffset(False)
     ax1[1].get_xaxis().get_major_formatter().set_scientific(False)
-    ax1[1].set_xlim(data['d_lim'])
+    ax1[1].set_xticks(ax1[1].get_xticks()[::2])
+    #ax1[1].set_xlim(data['d_lim'])
+    fig1.tight_layout()
     plt.show(block=False)
 
     fig2, ax2 = plt.subplots(norder,nwaves,figsize=(12,10))
@@ -137,19 +150,26 @@ def ld_check(folder, bins=None, saveit=True):
             my_hist(axx[j,i], hist, bins=bins)
             axx[j,i].axvline(data['peaks'][w][j], color='k',zorder=15)
             axx[j,i].axvspan(data['peaks'][w][j]-data['pkerr'][w][j],data['peaks'][w][j]+data['pkerr'][w][j],color='gray',alpha=0.4,zorder=15)
-            axx[j,i].set_ylabel('Order {0:d}'.format(data['orders'][w][j]))
+            axx[j,i].set_ylabel('Order {0:d}'.format(data['orders'][w][j]), fontsize=18)
             axx[j,i].get_xaxis().get_major_formatter().set_useOffset(False)
             axx[j,i].get_xaxis().get_major_formatter().set_scientific(False)
+            axx[j,i].tick_params(labelsize=16)
         axx[0,i].set_title('{0} nm'.format(w),fontsize=18)
-        axx[-1,i].set_xlabel('R (px)')
+        axx[-1,i].set_xlabel('R (px)', fontsize=18)
+    fig2.tight_layout()
 
     if saveit:
-        fig0.savefig(join(fig_folder,'peaks.png'))
-        fig1.savefig(join(fig_folder,'Ld_marginals.png'))
-        fig2.savefig(join(fig_folder,'peak_histograms.png'))
+        fig0.savefig(join(fig_folder,'peaks.png'), dpi=400)
+        fig1.savefig(join(fig_folder,'Ld_marginals.png'), dpi=400)
+        fig2.savefig(join(fig_folder,'peak_histograms.png'), dpi=400)
 
     plt.show()
 
+    fig, ax = plt.subplots()
+    #hist = peak_calculator(Lpost, dpost, float(468.619458), 1)
+    hist = peak_calculator(Lpost, dpost, float(468.925186), 1)
+    my_hist(ax, hist)
+    plt.show()
 
 if __name__ == "__main__":
     Comm = MPI.COMM_WORLD
@@ -195,35 +215,39 @@ if __name__ == "__main__":
                 print(data.keys())
                 r = data['smooth_r']
                 sig = data['smooth_sig']
+
+                rs = data['r']
+                sigs = data['sig']
+
                 peaks, orders = get_pk_locations(r, sig, args.wavelengths, pkthresh=args.pkthresh)
                 image_name = data['fname']
-                if image_name[-3:].lower() == "nef":
-                    image_data = get_data(image_name, color='b')
-                    ny, nx = image_data.shape
-                    x = np.arange(0, nx, 1)
-                    y = np.arange(0, ny, 1)
-                    x0, y0 = data['center']
-                    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
-                    R = np.sqrt(xx**2 + yy**2)
+                #if image_name[-3:].lower() == "nef":
+                #    image_data = get_data(image_name, color='b')
+                #    ny, nx = image_data.shape
+                #    x = np.arange(0, nx, 1)
+                #    y = np.arange(0, ny, 1)
+                #    x0, y0 = data['center']
+                #    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+                #    R = np.sqrt(xx**2 + yy**2)
 
-                    R = R.flatten()
-                    image_data = image_data.flatten()
+                #    R = R.flatten()
+                #    image_data = image_data.flatten()
 
-                    idx_sort = np.argsort(R)
+                #    idx_sort = np.argsort(R)
 
-                    fig, ax = plt.subplots()
-                    ax.plot(R[idx_sort], image_data[idx_sort])
-                    for w in peaks:
-                        for pk in peaks[w]:
-                            ax.axvline(pk)
-                    plt.show()
+                    #fig, ax = plt.subplots()
+                    #ax.plot(R[idx_sort], image_data[idx_sort])
+                    #for w in peaks:
+                    #    for pk in peaks[w]:
+                    #        ax.axvline(pk)
+                    #plt.show()
 
 
 
 
                 print(peaks)
                 print(orders)
-                dict_2_h5(fname, {'r':r, 'sig':sig, 'peaks':peaks, 'orders':orders})
+                dict_2_h5(fname, {'r':r, 'sig':sig, 'peaks':peaks, 'orders':orders, 'rs': rs, "sigs": sigs})
             else:
                 raise ValueError('{0} does not exist!'.format(org_fname))
         else:
@@ -256,9 +280,10 @@ if __name__ == "__main__":
     
     solver_in = Comm.bcast(solver_in, root=0)
     if solver_in is not None:
+        print(solver_in['peaks'])
         ld_multinest_solver(solver_in['peaks'], solver_in['orders'], solver_in['basename'],
                 solver_in['pkerr'], solver_in['L_lim'], solver_in['d_lim'], 
-                livepoints=solver_in['livepoints'])
+                livepoints=solver_in['livepoints'], resume=True)
 
     if rank == 0:
         ld_check(args.folder,bins=args.bins)
