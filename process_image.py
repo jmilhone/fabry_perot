@@ -1,13 +1,15 @@
 import numpy as np
 from tools.images import get_data, get_metadata, check_nef
 from tools.plotting import center_plot, ringsum_click, ring_plot
-from core.ringsum import smAng_ringsum, locate_center
+from core.ringsum import smAng_ringsum, locate_center, new_ringsum
 from tools.file_io import dict_2_h5, prep_folder
 import matplotlib.pyplot as plt
 from os.path import join, abspath
 import argparse
 import h5py 
 from scipy.stats import norm
+from tools.helpers import bin_data
+
 
 def get_ringsum(data,x0,y0,binsize=1.0):
     '''
@@ -71,14 +73,14 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     if fname[-2:].lower() == "h5":
        with h5py.File(fname, 'r') as f:
            data = f.get("2Ddata").value
-           bgdata = np.abs(norm(scale=0.1).rvs(data.shape))
+           bgdata = np.abs(norm(scale=0.05).rvs(data.shape))
     else:
         fname = check_nef(fname)
         bgfname = check_nef(bgfname)
 
         print 'loading image...'
         data = get_data(fname, color=color)
-
+        
     if find_center:
         if click_center:
             xguess,yguess = center_plot(data)
@@ -101,14 +103,22 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             y0 = data.shape[0]/2.
         else:
             y0 = yguess
-    # this is from my annulus finder on a real image, ignore
-    #print 'overwrite x0, y0...'
-    #x0 =  2923.499075195907
-    #y0 =  1984.5553261036002
 
     print 'performing ringsums...'
     smooth_r, smooth_sig0 = get_ringsum(data, x0, y0, binsize=1.0)
-    r, sig0 = get_ringsum(data, x0, y0, binsize=binsize)
+    r, sig0 = smAng_ringsum(data, x0, y0, binsize=binsize, quadrants=False)
+    newsig, newsig_sd = new_ringsum(data, r, x0, y0)
+
+
+    fig, ax = plt.subplots(2, sharex=True)
+    ax[0].errorbar(r, newsig, yerr=newsig_sd, fmt='-', color='C1', ecolor='C0')
+    ax[0].set_xlabel('R (px)')
+    ax[0].set_ylabel('Mean Counts')
+    
+    ax[1].plot(r, newsig_sd / newsig * 100, color='C1')
+    ax[1].set_ylabel(r"$\sigma_S$ / S (%)")
+    ax[1].set_xlabel('R (px)')
+    plt.show()
 
     if bgfname is not None or fname[-2:].lower() == "h5":
         print 'removing background...'
@@ -188,6 +198,18 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             plt.show()
         else:
             plt.close()
+
+    fig, ax = plt.subplots()
+    #ax.plot(smooth_r, smooth_sig0, 'C1')
+    ax.plot(r, sig, 'C1')
+    #ax.ticklabel_format(style='sci', axis='both', scilimits=(0,0))
+    ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    # ax.set_xlabel(r"R${}^2$ (px${}^2$)", fontsize=18)
+    ax.set_xlabel("R (px)", fontsize=18)
+    ax.set_ylabel("Counts", fontsize=18)
+    ax.tick_params(labelsize=16)
+    fig.tight_layout()
+    plt.show()
 
     return dic
 
