@@ -115,7 +115,7 @@ def lorentzian(wavelength, w, gamma, amp=1.):
     A = (amp * 0.5 * gamma) / np.pi
     return A / ((wavelength - w)**2 + (0.5 * gamma)**2)
 
-def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=True):
+def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False):
     '''
     Convolves the Doppler spectrum with the ideal Fabry-Perot Airy function.
 
