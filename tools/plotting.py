@@ -21,7 +21,7 @@ def tableau20_colors():
 
     return tableau20
 
-def my_hist(ax, data, bins=None):
+def my_hist(ax, data, bins=None, horizontal=False):
     '''
     custom histogram function for plotting multinest output
 
@@ -36,18 +36,27 @@ def my_hist(ax, data, bins=None):
         hist, bins = np.histogram(data, density=True, bins='auto')
 
     bw = bins[1]-bins[0]
-
-    ax.bar(bins[0:-1], hist*bw, width=bw)
-    if data.max() > 1000:
-        # I don't think this works
-        #ax.get_xaxis().get_major_formatter().set_scientific(True)
-        ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    
+    if horizontal:
+        ax.barh(bins[0:-1], hist*bw, height=bw)
+        if data.max() > 1000:
+            ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+        else:
+            ax.get_yaxis().get_major_formatter().set_scientific(True)
+        ax.get_yaxis().get_major_formatter().set_useOffset(False)
     else:
-        ax.get_xaxis().get_major_formatter().set_scientific(True)
+        ax.bar(bins[0:-1], hist*bw, width=bw)
+        if data.max() > 1000:
+            # I don't think this works
+            #ax.get_xaxis().get_major_formatter().set_scientific(True)
+            ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+        else:
+            ax.get_xaxis().get_major_formatter().set_scientific(True)
 
-    ax.get_xaxis().get_major_formatter().set_useOffset(False)
+        ax.get_xaxis().get_major_formatter().set_useOffset(False)
+    return bins
 
-def my_hist2d(ax, data1, data2, bins=None):
+def my_hist2d(ax, data1, data2, bins=None, z=30):
     '''
     custom 2d histrogram option for plotting correlations
 
@@ -65,22 +74,25 @@ def my_hist2d(ax, data1, data2, bins=None):
     dx = xx[1]-xx[0]
     dy = yy[1]-yy[0]
    
-    im = ax.contourf(yy[0:-1], xx[0:-1], hist*dx*dy)
+    im = ax.contourf(yy[0:-1], xx[0:-1], hist*dx*dy, z)
     #ax_divider = make_axes_locatable(ax)
     #cax = ax_divider.append_axes("right", size="7%", pad="2%")
     cb = plt.colorbar(im, ax=ax)
 
     if data1.max() > 1000:
-        ax.get_yaxis().get_major_formatter().set_scientific(True)
+        #ax.get_yaxis().get_major_formatter().set_scientific(True)
+        ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
     else:
         ax.get_yaxis().get_major_formatter().set_scientific(False)
     if data2.max() > 1000:
-        ax.get_xaxis().get_major_formatter().set_scientific(True)
+        ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+        #ax.get_xaxis().get_major_formatter().set_scientific(True)
     else:
         ax.get_xaxis().get_major_formatter().set_scientific(False)
 
     ax.get_xaxis().get_major_formatter().set_useOffset(False)
     ax.get_yaxis().get_major_formatter().set_useOffset(False)
+    return cb
 
 class ClickBuilder():
     '''
@@ -210,7 +222,7 @@ def ring_plot(data, fax=None, block=True):
     else:
         fig, ax = fax
     
-    cb = ax.imshow(data, cmap='Greys_r', origin='lower')
+    cb = ax.imshow(data, cmap='Greys_r', origin='lower', interpolation=None)
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='5%', pad=0.05)
     fig.colorbar(cb, cax=cax, extend='max')
