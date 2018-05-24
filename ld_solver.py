@@ -59,7 +59,7 @@ def get_pk_locations(r, s, w, names=None, pkthresh=0.10, plotit=True):
     
     return peaks, orders
 
-def ld_multinest_solver(peaks, orders, basename, pk_error, L_lim, d_lim, livepoints=1000):
+def ld_multinest_solver(peaks, orders, basename, pk_error, L_lim, d_lim, livepoints=1000, resume=True):
     
     ## one pixel is 0.004 mm so we need to convert the L_lim
     L_lim = [x/0.004 for x in L_lim]
@@ -81,7 +81,7 @@ def ld_multinest_solver(peaks, orders, basename, pk_error, L_lim, d_lim, livepoi
     
     nparams = 2
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=True, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
+            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
             outputfiles_basename=basename, max_modes=500)
 
 def ld_check(folder, bins=20, saveit=True):
@@ -165,8 +165,6 @@ if __name__ == "__main__":
                 peaks). Default is 0.1')
         parser.add_argument('--overwrite',action='store_true', help='allows you to overwrite\
                 previously saved peak information')
-        parser.add_argument('--erase_multinest', action='store_true', help='erases any previous\
-                multinest information for a fresh start.')
         parser.add_argument('--pkerr', type=float, default=0.2, help='error for peak\
                 locations in units of percent of binsize at peak. Should be between 1/6 and 1/2. Default is 1/5')
         parser.add_argument('--L_lim', '-L', type=float, nargs=2, default=[100.,110.], help='limit\
@@ -180,11 +178,13 @@ if __name__ == "__main__":
         args = parser.parse_args()
 
         fname = abspath(join(args.folder, 'input_Ld_solver.h5'))
-        basename = abspath(join(args.folder, 'Ld_solver_'))
+        basename = abspath(join(args.folder, 'Ld_'))
         org_fname = abspath(join(args.folder, 'ringsum.h5'))
 
-        if args.erase_multinest:
-            subprocess.Popen('rm -rf {0}'.format(join(args.folder,'Ld_solver_*')),shell=True)
+        if args.overwrite:
+            resume = False
+        else:
+            resume = True
         
         if not isfile(fname) or args.overwrite:
             if isfile(org_fname):
@@ -219,7 +219,7 @@ if __name__ == "__main__":
             solver_in = None
         else:
             solver_in = {'peaks':peaks, 'orders':orders, 'basename':basename, 'pkerr':pkerr,
-                    'L_lim':args.L_lim, 'd_lim':args.d_lim, 'livepoints':args.livepoints}
+                    'L_lim':args.L_lim, 'd_lim':args.d_lim, 'livepoints':args.livepoints, 'resume':resume}
     else:
         solver_in = None
     
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     if solver_in is not None:
         ld_multinest_solver(solver_in['peaks'], solver_in['orders'], solver_in['basename'],
                 solver_in['pkerr'], solver_in['L_lim'], solver_in['d_lim'], 
-                livepoints=solver_in['livepoints'])
+                livepoints=solver_in['livepoints'], resume=solver_in['resume'])
 
     if rank == 0:
         ld_check(args.folder,bins=args.bins)

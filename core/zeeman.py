@@ -154,3 +154,6 @@ def zeeman_lambda(w0, B, factors, amps=None):
         return lambdas
     else:
         return lambdas, [x/sum(amps) for x in amps]
+
+if __name__ == "__main__":
+    print zeeman_factors(2,0.5,2.5,1,0.5,1.5)

@@ -1,11 +1,14 @@
 import numpy as np
 from tools.images import get_data, get_metadata, check_nef
 from tools.plotting import center_plot, ringsum_click, ring_plot
+from core.fitting import determine_fit_range, find_maximum
 from core.ringsum import smAng_ringsum, locate_center
+from tools.helpers import bin_data
 from tools.file_io import dict_2_h5, prep_folder
 import matplotlib.pyplot as plt
 from os.path import join, abspath
 import argparse
+from scipy.optimize import curve_fit
 
 def get_ringsum(data,x0,y0,binsize=1.0):
     '''
@@ -26,40 +29,73 @@ def get_ringsum(data,x0,y0,binsize=1.0):
     binarr = 0.5 * (binarr[0:-1] + binarr[1:])
     return binarr, sig
 
-def remove_prof(r, sig, min_r=None, poly_num=5):
+#def remove_prof(r, sig, min_r=None, poly_num=5):
+#    '''
+#    removes a polyfit of order minima from ringsum
+#
+#    Args:
+#        r (np.ndarray): binarr of ringsum
+#        sig (np.ndarray): ringsum to be subtracted
+#        min_r (list, default=None): r location of minima, if None
+#            an interactive click plot will show up
+#        poly_num (int, default=5): order used for polyfit
+#    
+#    Returns:
+#        min_r (list): minimum r locations of minima
+#        poff (np.ndarry): fit to be subtracted from sig
+#    '''
+#    if min_r is None:
+#        min_r, _ = ringsum_click(r,sig,title='Please click order minima')
+#    
+#    min_ix = [np.abs(r-x).argmin() for x in min_r]
+#    min_s = []
+#    min_r = []
+#    ixs = []
+#    for ix in min_ix:
+#        try:
+#            a = sig[ix-5:ix+5].argmin()
+#            min_s.append(sig[ix-5+a])
+#            min_r.append(r[ix-5+a])
+#            ixs.append(ix-5+a)
+#        except ValueError:
+#            ixs.append(ix)
+#
+#    p = np.polyfit(min_r,min_s,poly_num)
+#    poff = np.polyval(p,r)-sig[ixs[-1]]
+#    return min_r, poff
+
+def remove_prof(r, sig, max_r=None, poly_num=5):
     '''
     removes a polyfit of order minima from ringsum
 
     Args:
         r (np.ndarray): binarr of ringsum
         sig (np.ndarray): ringsum to be subtracted
-        min_r (list, default=None): r location of minima, if None
+        max_r (list, default=None): r location of peaks, if None
             an interactive click plot will show up
         poly_num (int, default=5): order used for polyfit
     
     Returns:
-        min_r (list): minimum r locations of minima
+        max_r (list): peak locations in r
         poff (np.ndarry): fit to be subtracted from sig
     '''
-    if min_r is None:
-        min_r, _ = ringsum_click(r,sig,title='Please click order minima')
-    
-    min_ix = [np.abs(r-x).argmin() for x in min_r]
-    min_s = []
-    min_r = []
-    ixs = []
-    for ix in min_ix:
-        try:
-            a = sig[ix-5:ix+5].argmin()
-            min_s.append(sig[ix-5+a])
-            min_r.append(r[ix-5+a])
-            ixs.append(ix-5+a)
-        except ValueError:
-            ixs.append(ix)
+    if max_r is None:
+        max_r, _ = ringsum_click(r,sig,title='Please click on peaks')
+   
+    peak_list = []
+    val_list = []
+    for pk in max_r:
+        idxs = determine_fit_range(r, sig, pk, thres=0.1)
+        pk_r,pk_val = find_maximum(r[idxs],sig[idxs],returnval=True)
+        peak_list.append(pk_r)
+        val_list.append(pk_val)
 
-    p = np.polyfit(min_r,min_s,poly_num)
-    poff = np.polyval(p,r)-sig[ixs[-1]]
-    return min_r, poff
+    peak_loc = np.array(peak_list)
+    peak_val = np.array(val_list)
+
+    p = np.polyfit(peak_loc,peak_val,poly_num)
+    poff = np.polyval(p,r)
+    return peak_loc, poff
 
 def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None, 
         yguess=None, block_center=False, click_center=True, find_center=True,
@@ -76,7 +112,7 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             xguess,yguess = center_plot(data)
         
         x0,y0 = locate_center(data, xguess=xguess, yguess=yguess, 
-                block_center=block_center, binsize=binsize, plotit=plotit)
+                block_center=block_center, binsize=binsize, plotit=False)
         
         if plotit:
             fig,ax = plt.subplots(figsize=(10,8))
@@ -112,10 +148,24 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     if sub_prof:
         print 'subtracting profile fit...'
         min_r,smooth_p = remove_prof(smooth_r, smooth_sig, poly_num=poly_num)
-        _,p = remove_prof(r, sig, min_r=min_r, poly_num = poly_num)
-        smooth_sig -= smooth_p
-        sig -= p
+        _,p = remove_prof(r, sig, max_r=min_r, poly_num = poly_num)
+        ### dividing keeps the original offset which is important for gettting the finesse
+        smooth_sig /= smooth_p
+        sig /= p
     
+    mn,st = bin_data(sig,npts=10)
+    
+    def _fit(x,a):
+        return a*x
+   
+    p0 = [(st[-1]-st[0])/(mn[-1]-mn[0])]
+    popt,pcov = curve_fit(_fit,mn,st,p0)
+    print popt
+    f,axs = plt.subplots()
+    axs.plot(mn,st,'o')
+    axs.plot(mn,_fit(mn,popt[0]),'r-')
+    plt.show()
+
     a = get_metadata(fname)
     dic = {'date':a['date'], 'time':a['time'], 'fname':abspath(fname),
                 'color':color, 'center':(x0,y0),
@@ -134,8 +184,8 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
         fig = plt.figure(figsize=(12,8))
         ax0 = fig.add_subplot(2,2,1)
         ax1 = fig.add_subplot(2,2,2,sharex=ax0)
-        ax2 = fig.add_subplot(2,2,3,sharex=ax0,sharey=ax0)
-        ax3 = fig.add_subplot(2,2,4,sharex=ax0,sharey=ax1)
+        ax2 = fig.add_subplot(2,2,3,sharex=ax0)
+        ax3 = fig.add_subplot(2,2,4,sharex=ax0)
 
         ax0.plot(smooth_r, smooth_sig, color='r',lw=2,zorder=10)
         ax0.axhline(0,color='k',alpha=0.7)

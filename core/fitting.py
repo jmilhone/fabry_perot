@@ -42,7 +42,7 @@ def determine_fit_range(r, sig, pkr, thres=0.15, plotit=False):
 
     return range(Lix-1, Rix) 
 
-def find_maximum(x, y):
+def find_maximum(x, y, returnval=False):
     '''
     finds maximum location of a single peak using
     simple derivative method. Assumes only one
@@ -63,14 +63,21 @@ def find_maximum(x, y):
         vals = y[i]
         idx = np.argmax(vals)
         i = i[idx]
+        val = vals.max()
+    else:
+        val = y[i]
     slope = (dy[i+1] - dy[i]) / (xx[i+1] - xx[i])
 
     if slope < 0.0:
         pk = xx[i] - dy[i] / slope
         if type(pk) is np.ndarray:
-            return pk[0]
+            pk_out = pk[0]
         else:
-            return pk
+            pk_out = pk
+        if returnval:
+            return pk_out, val
+        else:
+            return pk_out
     else:
         return None
 

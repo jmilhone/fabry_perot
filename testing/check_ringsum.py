@@ -8,14 +8,16 @@ from tools.images import get_data
 from tools.file_io import h5_2_dict
 from core.fitting import find_maximum
 
-def main(folder, big_range=[150.,1000.], atol=1.e-3, sm_range=[600.,700.], saveit=False):
+def main(folder, big_range=[150.,1000.], atol=1.e-3, sm_range=[600.,700.], center=None, saveit=False):
     a = h5_2_dict(join(folder, 'ringsum.h5'))
     data = get_data(a['fname'], color=a['color'])
     
     R,Z = np.meshgrid(np.arange(data.shape[1],dtype='float64'),np.arange(data.shape[0],dtype='float64'))
-    R -= a['center'][0]
-    Z -= a['center'][1]
-    
+    if center is None:
+        center = a['center']
+    R -= center[0]
+    Z -= center[1]
+
     Theta = -1.*(np.arctan2(Z,-R)-np.pi)
     Rho = np.sqrt(R**2+Z**2)
     del R,Z
@@ -31,7 +33,7 @@ def main(folder, big_range=[150.,1000.], atol=1.e-3, sm_range=[600.,700.], savei
     ax1.set_ylim([0, data.shape[0]-1])
     ax1.set_xticks([])
     ax1.set_yticks([])
-    ax1.set_title('Ringsum Comparison for \n {0}'.format(folder),fontsize=18)
+    #ax1.set_title('Ringsum Comparison for \n {0}'.format(folder),fontsize=18)
     
     Rho = Rho.flatten()
     Theta = Theta.flatten()
@@ -49,7 +51,7 @@ def main(folder, big_range=[150.,1000.], atol=1.e-3, sm_range=[600.,700.], savei
         dd = data[ixs]
         ix = np.argsort(rr)
         ax2.plot(rr[ix],dd[ix],label='{0}'.format(t))
-        ax1.plot([a['center'][0],a['center'][0]+2000.*np.cos(t*(np.pi/180.))],[a['center'][1],a['center'][1]+2000.*np.sin(t*(np.pi/180.))],lw=2)
+        ax1.plot([center[0],center[0]+2000.*np.cos(t*(np.pi/180.))],[center[1],center[1]+2000.*np.sin(t*(np.pi/180.))],lw=2)
     
     big_ix = np.where(np.logical_and(Rho < sm_range[1],Rho > sm_range[0]))
     data = data[big_ix]
@@ -72,11 +74,12 @@ def main(folder, big_range=[150.,1000.], atol=1.e-3, sm_range=[600.,700.], savei
     ix2 = np.abs(a['r']-sm_range[1]).argmin()
     rpk = find_maximum(a['r'][ix1:ix2],a['sig'][ix1:ix2])
    
-    dev = np.sqrt(np.nanmean(np.abs(pk - rpk)**2))
-    
+    #dev = np.sqrt(np.nanmean(np.abs(pk - rpk)**2))
+    dev = np.nanstd(pk)
 
     ax3.plot(thetas,pk, label='peaks from different angles, std_dev={0:.3f} px'.format(dev))
     ax3.axhline(rpk, label='ringsummed peak',color='r',lw=2)
+    ax3.axhline(np.nanmean(pk), label='mean={0} px'.format(np.nanmean(pk)), color='g', lw=2)
     ax3.legend(fontsize=14,frameon=False)
     ax3.set_xlabel(r'$\theta$ (deg.)',fontsize=14)
     ax3.set_ylabel('Pk location (pixels)',fontsize=14)
@@ -100,10 +103,11 @@ def main(folder, big_range=[150.,1000.], atol=1.e-3, sm_range=[600.,700.], savei
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='checks the ringsum regularity for Lyon data')
     parser.add_argument('folder', type=str, help='folder of ringsum.h5 file')
-    parser.add_argument('--big_range','-b',type=float, nargs=2, default=[150.,1000.], help='Raidus range to plot')
-    parser.add_argument('--pk_range','-p',type=float, nargs=2, default=[600.,700.], help='Radius range to find peak to compare angles')
+    parser.add_argument('--big_range','-b',type=float, nargs=2, default=[50.,940.], help='Raidus range to plot')
+    parser.add_argument('--pk_range','-p',type=float, nargs=2, default=[580.,640.], help='Radius range to find peak to compare angles')
+    parser.add_argument('--center', '-c', type=float, nargs=2, default=None, help='If you want to see a different center call this with x0 y0')
     parser.add_argument('--atol', type=float, default=1.e-3, help='Absolute tolerance (in radians) of isclose for angles')
     parser.add_argument('--saveit','-s',action='store_true', help='Flag to save figure in plots as ringsum_compare.png')
     args = parser.parse_args()
     
-    main(args.folder, big_range=args.big_range, sm_range=args.pk_range, atol=args.atol, saveit=args.saveit)
+    main(args.folder, big_range=args.big_range, center=args.center, sm_range=args.pk_range, atol=args.atol, saveit=args.saveit)
