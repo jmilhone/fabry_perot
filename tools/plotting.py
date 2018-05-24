@@ -33,13 +33,15 @@ def my_hist(ax, data, bins=None):
     if bins is not None:
         hist, bins = np.histogram(data, density=True, bins=bins)
     else:
-        hist, bins = np.histogram(data, density=True)
+        hist, bins = np.histogram(data, density=True, bins='auto')
 
     bw = bins[1]-bins[0]
 
     ax.bar(bins[0:-1], hist*bw, width=bw)
     if data.max() > 1000:
-        ax.get_xaxis().get_major_formatter().set_scientific(True)
+        # I don't think this works
+        #ax.get_xaxis().get_major_formatter().set_scientific(True)
+        ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
     else:
         ax.get_xaxis().get_major_formatter().set_scientific(True)
 

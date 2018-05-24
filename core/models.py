@@ -1,7 +1,10 @@
 import numpy as np
 from scipy.integrate import trapz
 from core.zeeman import zeeman_lambda
+from numba import jit
+#from test_module import trapezodial_integration, airy_func, gaussian
 
+@jit
 def peak_calculator(L, d, w, order):
     '''
     Simple peak calculator for ideal Fabry-Perot.
@@ -23,6 +26,7 @@ def peak_calculator(L, d, w, order):
     m0 = np.floor(m)
     return L * np.sqrt( m**2 / (m0 - order)**2 - 1.0 )
 
+@jit
 def airy_func(wavelength, cos_th, d, F):
     '''
     Computes the Airy function (ideal Fabry-Perot instument function)
@@ -44,6 +48,7 @@ def airy_func(wavelength, cos_th, d, F):
     airy = 1.0 / (1.0 + Q * np.sin(np.pi * 2.e6 * d * cos_th / wavelength)**2)
     return airy
 
+@jit
 def doppler_calc(w0, mu, temp, v):
     '''
     Computes the doppler broadening sigma and the new central wavelength
@@ -66,6 +71,7 @@ def doppler_calc(w0, mu, temp, v):
     w = w0 * (1.0 - 3.336e-9 * v)
     return sigma, w
 
+@jit
 def gaussian(wavelength, w, sigma, amp=1., norm=True):
     '''
     Computes a gaussian for a given central wavelength, sigma and amp
@@ -140,10 +146,8 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=True):
             s, l = doppler_calc(ww, mu[i], temp[i], v[i])
             sigma.append(s)
             w.append(l)
+        wavelength = np.linspace(min(w) - 10.*max(sigma), max(w) + 10.*max(sigma), nlambda)[:,np.newaxis]
 
-        wavelength = np.linspace(min(w) - 10.*max(sigma), 
-                max(w) + 10.*max(sigma), nlambda)[:,np.newaxis]
-        
         spec = 0.0
         for idx,ww in enumerate(w):
             spec += gaussian(wavelength, ww, sigma[idx], amp[idx])
