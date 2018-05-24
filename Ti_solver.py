@@ -118,22 +118,39 @@ def check_solution(folder, Ld_dir, finesse_dir, recover=False, w0=487.98634, mu=
     percentiles = calculate_percentile_ranges(sig_post)
     #vals = forward_model(r[ix], L, d, F, w0, mu, A, Ti, V, sm_ang=False, nlambda=1024)
 
-    fig, ax = plt.subplots()
-    ax.plot(r[ix], sig[ix], 'b', alpha=0.5)
+    fig, ax = plt.subplots(figsize=(3.5, 3.5/1.61))
+    # ax.plot(r[ix], sig[ix], 'C1', alpha=0.5, label='Data')
+    ax.plot(r[ix], sig[ix]/100.0, 'C1', alpha=0.5, label='Data')
     #ax.plot(r[ix], vals, 'r')
     alphas = [0.8, 0.5, 0.2]
     keys = [68, 95, 99]
     for alpha, per in zip(alphas, keys):
-        ax.fill_between(r[ix], percentiles[per][0], percentiles[per][1], color='r', alpha=alpha)
-
+        if per == 99:
+            # ax.fill_between(r[ix], percentiles[per][0], percentiles[per][1], color='C3', alpha=alpha, label='Fit')
+            ax.fill_between(r[ix], percentiles[per][0]/100.0, percentiles[per][1]/100.0, color='C3', alpha=alpha, label='Fit')
+        else:
+            # ax.fill_between(r[ix], percentiles[per][0], percentiles[per][1], color='C3', alpha=alpha)
+            ax.fill_between(r[ix], percentiles[per][0]/100.0, percentiles[per][1]/100.0, color='C3', alpha=alpha)
+    fig.legend(frameon=False, fontsize=8, loc='upper right', bbox_to_anchor=(0.5, 0.5))
+    ax.set_xlabel("R (px)", fontsize=8, labelpad=-1)
+    ax.set_ylabel("Counts (Hundreds)", fontsize=8, labelpad=-1)
+    ax.tick_params(labelsize=8)
+    #fig.tight_layout()
+    fig.savefig(join(folder, "Ti_Ar_fit.png"), dpi=400)
     plt.show(block=False)
 
     axis_labels = ["Ti (eV)", "V (m/s)","A (Counts)"]
-    fig, ax = plt.subplots(3)
-    for n in range(3):
+    ylabels = ["P(Ti)", "P(V)", "P(A)"]
+    # fig, ax = plt.subplots(3, figsize=(6, 15))
+    fig, ax = plt.subplots(2, figsize=(3.5, 2*3.5/1.61))
+    # for n in range(3):
+    for n in range(2):
         my_hist(ax[n], post[:, n])
-        ax[n].set_xlabel(axis_labels[n])
-    fig.tight_layout()
+        ax[n].set_xlabel(axis_labels[n], fontsize=8, labelpad=-1)
+        ax[n].set_ylabel(ylabels[n], fontsize=8, labelpad=-1)
+        ax[n].tick_params(labelsize=8)
+    #fig.tight_layout()
+    fig.savefig(join(folder, "Ti_solver_histograms.png"), dpi=400)
     plt.show()
 
 
