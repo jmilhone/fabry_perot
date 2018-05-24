@@ -29,41 +29,6 @@ def get_ringsum(data,x0,y0,binsize=1.0):
     binarr = 0.5 * (binarr[0:-1] + binarr[1:])
     return binarr, sig
 
-#def remove_prof(r, sig, min_r=None, poly_num=5):
-#    '''
-#    removes a polyfit of order minima from ringsum
-#
-#    Args:
-#        r (np.ndarray): binarr of ringsum
-#        sig (np.ndarray): ringsum to be subtracted
-#        min_r (list, default=None): r location of minima, if None
-#            an interactive click plot will show up
-#        poly_num (int, default=5): order used for polyfit
-#    
-#    Returns:
-#        min_r (list): minimum r locations of minima
-#        poff (np.ndarry): fit to be subtracted from sig
-#    '''
-#    if min_r is None:
-#        min_r, _ = ringsum_click(r,sig,title='Please click order minima')
-#    
-#    min_ix = [np.abs(r-x).argmin() for x in min_r]
-#    min_s = []
-#    min_r = []
-#    ixs = []
-#    for ix in min_ix:
-#        try:
-#            a = sig[ix-5:ix+5].argmin()
-#            min_s.append(sig[ix-5+a])
-#            min_r.append(r[ix-5+a])
-#            ixs.append(ix-5+a)
-#        except ValueError:
-#            ixs.append(ix)
-#
-#    p = np.polyfit(min_r,min_s,poly_num)
-#    poff = np.polyval(p,r)-sig[ixs[-1]]
-#    return min_r, poff
-
 def remove_prof(r, sig, max_r=None, poly_num=5):
     '''
     removes a polyfit of order minima from ringsum
