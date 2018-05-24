@@ -18,5 +18,9 @@
 *-converted-to.pdf
 *.pdf
 
+# Images
+*.png
+*.jpg
+
 # Data Folder
 Data/*

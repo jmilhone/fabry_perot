@@ -269,3 +269,79 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
         plt.close(fig)
         plt.ioff()
     return xguess, yguess
+
+
+def new_ringsum(data, redges, x0, y0):
+    """
+    redges are all of the right edges (the first left edge is zero)
+    """
+    ny, nx = data.shape
+    x = np.arange(0, nx, 1)
+    y = np.arange(0, ny, 1)
+
+    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+    R = np.sqrt(xx**2 + yy**2)
+
+    R = R.flatten()
+    d = data.flatten()
+
+    indsort = np.argsort(R)
+    R = R[indsort]
+    d = d[indsort]
+
+    n = len(redges)
+    means = np.zeros(n)
+    sigmas = np.zeros(n)
+    lengths = np.zeros(n)
+    start = 0
+    for idx, edge in enumerate(redges):
+        iedge = np.searchsorted(R[start:], edge, side='right')
+        portion = slice(start,start+iedge)
+        #means[idx] = np.mean(d[portion])
+        #sigmas[idx] = np.std(d[portion]) / np.sqrt(len(d[portion]))
+        means[idx], sigmas[idx] = calculate_weighted_mean(d[portion], np.sqrt(1.8*d[portion]))
+        lengths[idx] = len(d[portion])
+        start += iedge
+
+    fig, ax =plt.subplots()
+    ax.hist(lengths, bins='auto', density='True')
+    ax.set_xlabel('Number of Points in a Ring')
+    ax.set_title("{0:d} +/- {1:d}".format(int(np.mean(lengths)), int(np.std(lengths))))
+    plt.show(block=False)
+    return means, sigmas
+
+
+def calculate_weighted_mean(data, error):
+    idx = np.where(error > 0.0)
+    err = error[idx]
+    d = data[idx]
+
+    weights = 1.0 / err**2
+
+    denominator = np.nansum(weights)
+
+    sigma = np.sqrt(1.0 / denominator)
+
+    numerator = np.nansum(d * weights)
+
+    mean = numerator / denominator
+
+    return mean, sigma
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
