@@ -30,49 +30,31 @@ def get_finesse_region(r,s,error,plotit=True):
 
     return fit_ix, error
 
-def temp_match_solver(r, sig, sig_error, temp, temp_sigma, Lpost, dpost, basename, F_lim=(1.,18.), V_lim = [-2., 2.], livepoints=500, w0=487.98634, mu=39.948, errtemp=True,resume=True, arb_error=0.0):
+def temp_match_solver(r, sig, sig_error, temp, temp_sigma, Lpost, dpost, basename, F_lim=(1.,18.), V_lim = [-2., 2.], livepoints=500, w0=487.98634, mu=39.948, resume=True):
 
-    #A_lim = [0.5, 2]
+    A_lim = [0.5*sig.max(), 2*sig.max()]
+    S_lim = [0.1*r.max(), 100.*r.max()]
     T_lim = [0.025, temp+10.*temp_sigma]
     ixs = range(len(Lpost))
 
-    if errtemp:
-        E_lim = [0.05, 0.5]
-        nparams = 4
-        def log_prior(cube, ndim, nparams):
-            cube[0] = cube[0]*(F_lim[1]-F_lim[0]) + F_lim[0]
-            cube[1] = cube[1]*(V_lim[1]-V_lim[0]) + V_lim[0]
-            cube[2] = cube[2]*(T_lim[1]-T_lim[0]) + T_lim[0]
-            cube[3] = cube[3]*(E_lim[1]-E_lim[0]) + E_lim[0]
-            #cube[4] = cube[4]*(A_lim[1]-A_lim[0]) + A_lim[0]
+    nparams = 5
+    def log_prior(cube, ndim, nparams):
+        cube[0] = cube[0]*(F_lim[1]-F_lim[0]) + F_lim[0]
+        cube[1] = cube[1]*(V_lim[1]-V_lim[0]) + V_lim[0]
+        cube[2] = cube[2]*(T_lim[1]-T_lim[0]) + T_lim[0]
+        cube[3] = cube[3]*(A_lim[1]-A_lim[0]) + A_lim[0]
+        cube[4] = cube[4]*(S_lim[1]-S_lim[0]) + S_lim[0]
 
-        def log_likelihood(cube, ndim, nparams):
-            j = np.random.choice(ixs)
-            L = Lpost[j]
-            d = dpost[j]
-            pred = match_finesse_forward(r, L, d, cube[0], cube[2], cube[1], errtemp=cube[3], w0=w0, mu=mu)
-            pred /= pred.max()
-            #pred *= cube[4]
-            chisq = np.sum((sig - pred)**2 / sig_error**2) + ((cube[2] - temp)**2 / temp_sigma**2)
-            return -chisq / 2.0
-    else:
-        nparams = 3
-        def log_prior(cube, ndim, nparams):
-            cube[0] = cube[0]*(F_lim[1]-F_lim[0]) + F_lim[0]
-            cube[1] = cube[1]*(V_lim[1]-V_lim[0]) + V_lim[0]
-            cube[2] = cube[2]*(T_lim[1]-T_lim[0]) + T_lim[0]
-            #cube[3] = cube[3]*(A_lim[1]-A_lim[0]) + A_lim[0]
+    def log_likelihood(cube, ndim, nparams):
+        j = np.random.choice(ixs)
+        L = Lpost[j]
+        d = dpost[j]
 
-        def log_likelihood(cube, ndim, nparams):
-            j = np.random.choice(ixs)
-            L = Lpost[j]
-            d = dpost[j]
-            #pred = match_finesse_forward(r, L, d, cube[0], cube[2], cube[1], errtemp=None, w0=w0, mu=mu)
-            pred = lyon_temp_forward(r, L, d, cube[0], 50, cube[2], cube[1]) 
-            pred /= pred.max()
-            #pred *= cube[3]
-            chisq = np.sum((sig - pred)**2 / sig_error**2) + ((cube[2] - temp)**2 / temp_sigma**2)
-            return -chisq / 2.0
+
+
+
+        chisq = np.sum((sig - pred)**2 / sig_error**2) + ((cube[2] - temp)**2 / temp_sigma**2)
+        return -chisq / 2.0
 
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
             resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,

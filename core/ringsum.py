@@ -6,9 +6,11 @@ Core module contains ringsum codes that are the basis of this
 analysis. 
 
 Functions:
+    get_binarr: returns binarr for ringsums
     smAng_ringsum: main ringsum function, uses small angle approx.
     proper_ringsum: additional ringsum function that makes no approx.
-    locate_center: center finding function     
+    locate_center: center finding function 
+    new_ringsum: best ringsum to use currently
 '''
 
 def _histogram(bins, R, weights, out=None, label=None):
@@ -34,7 +36,39 @@ def _histogram(bins, R, weights, out=None, label=None):
         else:
             return sig, label
 
+def get_binarr(dat, x0, y0, binsize=0.1):
+    '''
+    returns equal area annuli bins for a ring image
+    given a center and binsize
 
+    Args:
+        dat (np.ndarray): pixel values for the camera image
+        x0 (float): x location (pixels) of the center of the image
+        y0 (float): y location (pixels) of the center of the image
+        binsize (float, default=0.1): smallest radial bin size 
+                (occurs at the largest bin)
+
+    Returns:
+        binarr (np.array): bins for the ring sum in pixels
+    '''
+    ny, nx = dat.shape
+    x = np.arange(0, nx, 1)
+    y = np.arange(0, ny, 1)
+
+    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+    R = np.sqrt(xx**2 + yy**2)
+
+    xmin = xx[0, 0]
+    xmax = xx[0, -1]
+    ymin = yy[0, 0]
+    ymax = yy[-1, 0]
+
+    ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
+    imax = int((ri ** 2. - 2. * ri - 1.) / (1. + 2. * ri) / binsize)
+
+    norm_radius = np.sqrt(2*binsize*ri + binsize**2)
+    return np.sqrt(range(1, imax))*norm_radius
+ 
 def smAng_ringsum(dat, x0, y0, binsize=0.1, quadrants=False):
     '''
     Performs a constant area ring sum in pixel space. This is valid
@@ -271,7 +305,7 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
     return xguess, yguess
 
 
-def new_ringsum(data, redges, x0, y0):
+def new_ringsum(data, redges, x0, y0, use_weighted=False):
     """
     redges are all of the right edges (the first left edge is zero)
     """
@@ -297,17 +331,20 @@ def new_ringsum(data, redges, x0, y0):
     for idx, edge in enumerate(redges):
         iedge = np.searchsorted(R[start:], edge, side='right')
         portion = slice(start,start+iedge)
-        #means[idx] = np.mean(d[portion])
-        #sigmas[idx] = np.std(d[portion]) / np.sqrt(len(d[portion]))
-        means[idx], sigmas[idx] = calculate_weighted_mean(d[portion], np.sqrt(1.8*d[portion]))
-        lengths[idx] = len(d[portion])
+        if use_weighted:
+            means[idx], sigmas[idx] = calculate_weighted_mean(d[portion], np.sqrt(1.8*d[portion]))
+        else:
+            means[idx] = np.mean(d[portion])
+            sigmas[idx] = np.std(d[portion]) / np.sqrt(len(d[portion]))
+
+        #lengths[idx] = len(d[portion])
         start += iedge
 
-    fig, ax =plt.subplots()
-    ax.hist(lengths, bins='auto', density='True')
-    ax.set_xlabel('Number of Points in a Ring')
-    ax.set_title("{0:d} +/- {1:d}".format(int(np.mean(lengths)), int(np.std(lengths))))
-    plt.show(block=False)
+    #fig, ax =plt.subplots()
+    #ax.hist(lengths, bins='auto', density='True')
+    #ax.set_xlabel('Number of Points in a Ring')
+    #ax.set_title("{0:d} +/- {1:d}".format(int(np.mean(lengths)), int(np.std(lengths))))
+    #plt.show(block=False)
     return means, sigmas
 
 
@@ -327,21 +364,4 @@ def calculate_weighted_mean(data, error):
     mean = numerator / denominator
 
     return mean, sigma
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -214,3 +214,6 @@ def lyon_temp_forward(r, L, d, F, current, T, V, E=None):
     cos_th = 1.0 - 0.5 * (r/L)**2
     model = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
     return model
+
+#def lyon_temp_forward_prof(r,L,d,F,current,T,V):
+
