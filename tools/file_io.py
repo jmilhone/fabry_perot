@@ -82,25 +82,28 @@ def read_Ld_results(Ld_directory):
         L (np.ndarray): L histogram values (in pixels)
         d (np.ndarray): d histogram values (in mm)
     '''
-    fname = os.path.join(Ld_directory,"Ld_solver_post_equal_weights.dat")
-    post = np.loadtxt(fname, ndmin=2)
+    try:
+        fname = os.path.join(Ld_directory,"Ld_post_equal_weights.dat")
+        post = np.loadtxt(fname, ndmin=2)
+    except IOError:
+        fname = os.path.join(Ld_directory,"Ld_solver_post_equal_weights.dat")
+        post = np.loadtxt(fname, ndmin=2)
+
     L = post[:, 0]
     d = post[:, 1]
     return L, d
 
 def read_match_finesse_results(finesse_directory, errtemp=False):
-    fname = os.path.join(finesse_directory,"match_finesse_post_equal_weights.dat")
+    fname = os.path.join(finesse_directory,"F_post_equal_weights.dat")
     post = np.loadtxt(fname, ndmin=2)
     F = post[:, 0]
     V = post[:, 1]
-    A = post[:, 2]
-    O = post[:, 3]
-    T = post[:, 4]
+    T = post[:, 2]
     if errtemp:
-        E = post[:, 5]
-        return F,V,A,O,T,E
+        E = post[:, 3]
+        return F,V,T,E
     else:
-        return F,V,A,O,T
+        return F,V,T
 
 
 def read_finesse_results(finesse_directory):
@@ -115,10 +118,10 @@ def read_finesse_results(finesse_directory):
 
 
 def read_lyon_temp_results(temp_directory):
-    fname = os.path.join(temp_directory,'temp_solver_post_equal_weights.dat')
+    fname = os.path.join(temp_directory,'temp_post_equal_weights.dat')
     post = np.loadtxt(fname, ndmin=2)
     T = post[:,0]
     V = post[:,1]
-    A = post[:,2]
-    O = post[:,3]
-    return T,V,A,O
+    #A = post[:,2]
+    #O = post[:,3]
+    return T,V#,A#,O

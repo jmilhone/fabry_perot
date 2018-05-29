@@ -170,29 +170,35 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False):
     model = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
     return model
 
-def match_finesse_forward(r, L, d, F, temp, v, A, errtemp=None, w0=487.98634, mu=39.948):
+def match_finesse_forward(r, L, d, F, temp, v, errtemp=None, w0=487.98634, mu=39.948):
     sigma, w = doppler_calc(w0, mu, temp, v*1000.)
     if errtemp is not None:
         errsigma, _ = doppler_calc(w0, mu, errtemp, v*1000.)
         sigma = np.sqrt(sigma**2 + errsigma**2)
     wavelength = np.linspace(w - 10.*sigma, w + 10.*sigma, 512)[:,np.newaxis]
-    spec = gaussian(wavelength, w, sigma, A, norm=False)
+    spec = gaussian(wavelength, w, sigma, norm=False)
     
     cos_th = 1.0 - 0.5 * (r/L)**2
     model = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
-    model -= model.min()
     return model
 
-def lyon_temp_forward(r, L, d, F, E, current, T, V, A):
+def lyon_temp_forward(r, L, d, F, current, T, V, E=None):
     w0 = 487.98634
     mu = 39.948
-    zeeman_fac = [-1.4, -19./15., -17./15., -1., 1., 17./15., 19./15., 1.4]
-    zeeman_amp = [1.0, 3.0, 6.0, 10.0, 6.0, 3.0, 1.0]
+
+    ### my previous calculation ###
+    #zeeman_fac = [-1.4, -19./15., -17./15., -1., 1., 17./15., 19./15., 1.4]
+    #zeeman_amp = [1.0, 3.0, 6.0, 10.0, 6.0, 3.0, 1.0]
+    ### Victor's calculation ###
+    zeeman_fac = [-1.,-17./15.,-19./15.,-1.4,1.4,19./15.,17./15.,1.]
+    zeeman_amp = [20., 12., 6., 2., 2., 6., 12., 20.] 
+    
     B = (0.0146/80.) * current
     
     sblah,w = doppler_calc(w0, mu, T, V*1.e3)
-    eblah,_ = doppler_calc(w0, mu, E, V*1.e3)
-    sblah = np.sqrt(sblah**2 + eblah**2)
+    if E is not None:
+        eblah,_ = doppler_calc(w0, mu, E, V*1.e3)
+        sblah = np.sqrt(sblah**2 + eblah**2)
     lambdas, amps = zeeman_lambda(w, B, zeeman_fac, amps=zeeman_amp)
     mn = w - 10.*sblah
     mx = w + 10.*sblah
@@ -200,11 +206,14 @@ def lyon_temp_forward(r, L, d, F, E, current, T, V, A):
     spec = 0.
     for l,a in zip(lambdas,amps):
         sigma, _ = doppler_calc(l, mu, T, 0.0) ## already did the velocity shift
-        esigma,_ = doppler_calc(l, mu, E, 0.0)
-        sigma = np.sqrt(sigma**2 + esigma**2)
-        spec += gaussian(wavelength, l, sigma, amp=a*A, norm=False)
+        if E is not None:
+            esigma,_ = doppler_calc(l, mu, E, 0.0)
+            sigma = np.sqrt(sigma**2 + esigma**2)
+        spec += gaussian(wavelength, l, sigma, amp=a, norm=False)
 
     cos_th = 1.0 - 0.5 * (r/L)**2
     model = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
-    model -= model.min()
     return model
+
+#def lyon_temp_forward_prof(r,L,d,F,current,T,V):
+

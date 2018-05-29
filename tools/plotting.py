@@ -172,7 +172,7 @@ def ringsum_click(r, sig, title='Click Me!'):
     fig.canvas.mpl_disconnect(clicks.cid)
     return clicks.x, clicks.y
 
-def peak_plot(r, sig, peaks, orders, fax=None, pkerr=None):
+def peak_plot(r, sig, peaks, peaks_sd, orders, fax=None, anspks=None, anspks_sd=None):
     '''
     plots ringsum data with labeled peaks and orders
 
@@ -181,14 +181,13 @@ def peak_plot(r, sig, peaks, orders, fax=None, pkerr=None):
         sig (np.ndarray): ringsum signal
         peaks (dict): dictionary of peak locations
             the keys are the wavelengths
+        peaks_sd (dict): dictionary of peak errors
         orders (dict): dictionary of peak orders
             the keys are the wavelengths
         fax (tuple, default=None): the figure and axis
             handles for the plot, if adding to existing
             plot. Default is None, which will make a 
             new set of figure and axes and run plt.show()
-        pkerr (dict, default=None): optional error dictionary
-            which will plot the axvspan of the peak error
     '''
     if fax is None:
         fig, ax = plt.subplots(figsize=(10,6))
@@ -196,19 +195,26 @@ def peak_plot(r, sig, peaks, orders, fax=None, pkerr=None):
         fig, ax = fax
 
     colors = tableau20_colors()
-    ax.plot(r, sig, color=colors[0], lw=2)
+    ax.plot(r**2, sig, 'o-',color=colors[0], lw=2)
     i = 1
     for key in peaks.keys():
         for j, pk in enumerate(peaks[key]):
-            if pkerr is None:
-                ax.axvline(pk, lw=2, color=colors[i], label='{0}: j={1}'.format(key, orders[key][j]))
-            else:
-                ax.axvspan(pk+pkerr[key][j], pk-pkerr[key][j], color=colors[i], label='{0}: j={1}'.format(key, orders[key][j]), alpha=0.7)
+            pk_sd = 2.*pk*peaks_sd[key][j]
+            ax.axvspan(pk**2-pk_sd, pk**2+pk_sd, color=colors[i],
+                    label='{0}: j={1}'.format(key, orders[key][j]), alpha=0.7)
             i += 1
             if i > len(colors):
                 i = 0
+            if anspks is not None:
+                anspk = anspks[key][j]
+                anspk_sd = 2.*anspk*anspks_sd[key][j]
+                ax.axvspan(anspk**2-anspk_sd, anspk**2+anspk_sd, color=colors[i],
+                        label='{0}: j={1} multinest'.format(key, orders[key][j]), alpha=0.7)
+                i += 1
+                if i > len(colors):
+                    i = 0
     ax.legend(fontsize=14)
-    ax.set_xlabel('R (pixels)',fontsize=18)
+    ax.set_xlabel(r'R$^{2}$',fontsize=18)
     ax.set_ylabel('Counts', fontsize=18)
     
     if fax is None:

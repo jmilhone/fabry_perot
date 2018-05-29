@@ -1,7 +1,8 @@
 import numpy as np
 from tools.images import get_data, get_metadata, check_nef
 from tools.plotting import center_plot, ringsum_click, ring_plot
-from core.ringsum import smAng_ringsum, locate_center, new_ringsum
+from core.fitting import determine_fit_range, find_maximum
+from core.ringsum import smAng_ringsum, locate_center, new_ringsum, get_binarr
 from tools.file_io import dict_2_h5, prep_folder
 import matplotlib.pyplot as plt
 from os.path import join, abspath
@@ -11,63 +12,43 @@ from scipy.stats import norm
 from tools.helpers import bin_data
 
 
-def get_ringsum(data,x0,y0,binsize=1.0):
-    '''
-    performs a ringsum given a center and data with 
-    bins centered on pixel
-
-    Args:
-        data (np.ndarray): image data
-        x0 (float): x center
-        y0 (float): y center
-        binsize (float, default=1.0): binsize
-    Returns:
-        binarr (np.ndarray): array of bins
-        sig (np.ndarray): ringsum values
-    '''
-    binarr, sig = smAng_ringsum(data, x0, y0, binsize=binsize, quadrants=False)
-    binarr = np.concatenate(([0.0], binarr))
-    binarr = 0.5 * (binarr[0:-1] + binarr[1:])
-    return binarr, sig
-
-def remove_prof(r, sig, min_r=None, poly_num=5):
+def remove_prof(r, sig, sig_sd, pk_guess=None, poly_num=5):
     '''
     removes a polyfit of order minima from ringsum
 
     Args:
         r (np.ndarray): binarr of ringsum
         sig (np.ndarray): ringsum to be subtracted
-        min_r (list, default=None): r location of minima, if None
-            an interactive click plot will show up
         poly_num (int, default=5): order used for polyfit
     
     Returns:
-        min_r (list): minimum r locations of minima
-        poff (np.ndarry): fit to be subtracted from sig
+        peak_loc (np.ndarray): peak locations in r
+        poff (np.ndarray): fit to be divided from sig
     '''
-    if min_r is None:
-        min_r, _ = ringsum_click(r,sig,title='Please click order minima')
+    ret_pk_guess = False
+    if pk_guess is None:
+        ret_pk_guess = True
+        pk_guess, _ = ringsum_click(r,sig,title='Please click on peaks')
     
-    min_ix = [np.abs(r-x).argmin() for x in min_r]
-    min_s = []
-    min_r = []
-    ixs = []
-    for ix in min_ix:
-        try:
-            a = sig[ix-5:ix+5].argmin()
-            min_s.append(sig[ix-5+a])
-            min_r.append(r[ix-5+a])
-            ixs.append(ix-5+a)
-        except ValueError:
-            ixs.append(ix)
+    peak_loc = np.zeros(len(pk_guess))
+    peak_val = np.zeros(len(pk_guess))
+    peak_wts = np.zeros(len(pk_guess))
+    for i,pk in enumerate(pk_guess):
+        idxs = determine_fit_range(r, sig, pk, thres=0.1)
+        peak_loc[i],peak_val[i] = find_maximum(r[idxs],sig[idxs],returnval=True)
+        peak_wts[i] = 1./(sig_sd[np.abs(peak_loc[i]-r).argmin()])
 
-    p = np.polyfit(min_r,min_s,poly_num)
-    poff = np.polyval(p,r)-sig[ixs[-1]]
-    return min_r, poff
+    p,cov = np.polyfit(peak_loc,peak_val,poly_num,w=peak_wts,cov=True)
+    poff = np.polyval(p,r)
+    poff_sd = np.sqrt(np.sum(np.diag(cov)))
+    if ret_pk_guess:
+        return pk_guess,poff,poff_sd
+    else:
+        return poff, poff_sd
 
 def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None, 
         yguess=None, block_center=False, click_center=True, find_center=True,
-        sub_prof=False, poly_num=5, plotit=False, write=None, folder='./Data'):
+        sub_prof=False, plotit=False, write=None):
 
     bgdata = None
     if fname[-2:].lower() == "h5":
@@ -86,8 +67,8 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             xguess,yguess = center_plot(data)
 
         x0,y0 = locate_center(data, xguess=xguess, yguess=yguess, 
-                block_center=block_center, binsize=binsize, plotit=plotit)
-
+                block_center=block_center, binsize=binsize, plotit=False)
+        
         if plotit:
             fig,ax = plt.subplots(figsize=(10,8))
             ring_plot(data, fax=(fig,ax))
@@ -105,52 +86,44 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             y0 = yguess
 
     print 'performing ringsums...'
-    smooth_r, smooth_sig0 = get_ringsum(data, x0, y0, binsize=1.0)
-    r, sig0 = smAng_ringsum(data, x0, y0, binsize=binsize, quadrants=False)
-    newsig, newsig_sd = new_ringsum(data, r, x0, y0)
-
-
-    fig, ax = plt.subplots(2, sharex=True)
-    ax[0].errorbar(r, newsig, yerr=newsig_sd, fmt='-', color='C1', ecolor='C0')
-    ax[0].set_xlabel('R (px)')
-    ax[0].set_ylabel('Mean Counts')
-    
-    ax[1].plot(r, newsig_sd / newsig * 100, color='C1')
-    ax[1].set_ylabel(r"$\sigma_S$ / S (%)")
-    ax[1].set_xlabel('R (px)')
-    plt.show()
+    binarr = get_binarr(data,x0,y0,binsize=binsize)
+    sig0,sig0_sd = new_ringsum(data,binarr,x0,y0) 
 
     if bgfname is not None or fname[-2:].lower() == "h5":
         print 'removing background...'
         if bgdata is None:
             bgdata = get_data(bgfname, color=color)
-        _,smooth_bg = get_ringsum(bgdata, x0, y0, binsize=1.0)
-        _,bg = get_ringsum(bgdata, x0, y0, binsize=binsize)
-        smooth_sig = smooth_sig0 - smooth_bg
+        bg,bg_sd = new_ringsum(bgdata,binarr,x0,y0)
         sig = sig0 - bg
+        sig_sd = np.sqrt(sig0_sd**2+bg_sd**2)
     else:
-        smooth_sig = smooth_sig0
-        sig = sig0
+        sig,sig_sd = sig0,sig0_sd
+
+    r = np.concatenate(([0.0], binarr))
+    r = 0.5 * (r[0:-1] + r[1:])
 
     if sub_prof:
         print 'subtracting profile fit...'
-        min_r,smooth_p = remove_prof(smooth_r, smooth_sig, poly_num=poly_num)
-        _,p = remove_prof(r, sig, min_r=min_r, poly_num = poly_num)
-        smooth_sig -= smooth_p
-        sig -= p
+        pk_guess,p,p_sd = remove_prof(r,sig,sig_sd,pk_guess=None,poly_num=5)
+        ### dividing keeps the original offset which is important for gettting the finesse
+        sig /= p
+        sig_sd = np.sqrt(sig_sd**2+p_sd**2)
+        sig_sd /= p
 
     if fname[-2:].lower() == "h5": 
         dic = {'fname': abspath(fname), 'color': color, 'center': (x0, y0),
-               'smooth_r': smooth_r, "smooth_sig": smooth_sig, 
-               'binsize': binsize, 'r': r, 'sig': sig}
+                'binsize': binsize, 'r': r, 'sig': sig, 'sig_sd': sig_sd}
     else:
         a = get_metadata(fname)
         dic = {'date':a['date'], 'time':a['time'], 'fname':abspath(fname),
                     'color':color, 'center':(x0,y0),
-                    'smooth_r':smooth_r, 'smooth_sig':smooth_sig, 
-                    'binsize':binsize, 'r':r, 'sig':sig}
+                    'binsize':binsize, 'r':r, 'sig':sig, 'sig_sd': sig_sd}
+
     if bgfname is not None:
         dic['bg_fname'] = abspath(bgfname)
+
+    if sub_prof:
+        dic['pk_guess'] = pk_guess
 
     print 'done!'
 
@@ -159,38 +132,20 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
         dict_2_h5(join(write,'ringsum.h5'),dic)
         
     if write is not None or plotit:
-        fig = plt.figure(figsize=(12,8))
-        ax0 = fig.add_subplot(2,2,1)
-        ax1 = fig.add_subplot(2,2,2,sharex=ax0)
-        ax2 = fig.add_subplot(2,2,3,sharex=ax0,sharey=ax0)
-        ax3 = fig.add_subplot(2,2,4,sharex=ax0,sharey=ax1)
+        fig,axs = plt.subplots(2,1,figsize=(12,8))
 
-        ax0.plot(smooth_r, smooth_sig, color='r',lw=2,zorder=10)
-        ax0.axhline(0,color='k',alpha=0.7)
-        ax0.set_title('binsize=1')
-        ax1.plot(r, sig, color='r',lw=2,zorder=10)
-        ax1.axhline(0,color='k',alpha=0.7)
-        ax1.set_title('binsize={0}'.format(binsize))
+        axs[0].errorbar(r, sig, yerr=sig_sd, fmt='-', errorevery=5, color='r', lw=2, zorder=10, ecolor='b')
+        axs[0].axhline(0,color='k',alpha=0.7)
+        axs[0].set_title('binsize={0}'.format(binsize))
 
-        ax2.plot(smooth_r, smooth_sig0, lw=2,label='raw',zorder=10)
-        ax3.plot(r, sig0, lw=2,label='raw',zorder=10)
-        ax2.axhline(0,color='k',alpha=0.7)
-        ax3.axhline(0,color='k',alpha=0.7)
+        axs[1].errorbar(r, sig0, yerr=sig0_sd, fmt='-', errorevery=5, lw=2,label='raw',zorder=10, color='C0', ecolor='C1')
+        axs[1].axhline(0,color='k',alpha=0.7)
         if bgfname is not None:
-            ax2.plot(smooth_r, smooth_bg, lw=2,label='background',zorder=10)
-            ax3.plot(r, bg, lw=2,label='background',zorder=10)
+            axs[1].errorbar(r, bg, yerr=bg_sd, fmt='-', errorevery=5, lw=2,label='background',zorder=10, color='C2', ecolor='C3')
         if sub_prof:
-            ax2.plot(smooth_r, smooth_p, lw=2,label='intensity profile',zorder=10)
-            ax3.plot(r, p, lw=2,label='intensity profile',zorder=10)
-            for r in min_r:
-                ax0.axvline(r,color='k',ls='--',zorder=1,alpha=0.7)
-                ax1.axvline(r,color='k',ls='--',zorder=1,alpha=0.7)
-                ax2.axvline(r,color='k',ls='--',zorder=1,alpha=0.7)
-                ax3.axvline(r,color='k',ls='--',zorder=1,alpha=0.7)
-        ax2.set_xlabel('R (px)')
-        ax3.set_xlabel('R (px)')
-        ax2.legend()
-        ax3.legend()
+            axs[1].fill_between(r, p+p_sd, p-p_sd, label='intensity profile', zorder=10, color='C4',alpha=0.3)
+        axs[1].set_xlabel('R (px)')
+        axs[1].legend()
         if write:
             prep_folder(join(write,'plots'))
             plt.savefig(join(write,'plots','ringsum.png'),bbox_inches='tight')
@@ -232,8 +187,6 @@ if __name__ == "__main__":
             block centered on xyguess for center finding')
     parser.add_argument('--sub_prof', '-sp', action='store_true', help='perform a polyfit\
             profile subtraction, launches an interactive plot')
-    parser.add_argument('--poly_num', type=int, default=5, help='polyfit order to use for\
-            profile subtraction: default is 5')
     parser.add_argument('--no_plot', action='store_true', help='supresses plots')
     parser.add_argument('--write', '-w', type=str, default=None, help='saves data and plot to\
             specified folder, default is None which will not write data.')
@@ -250,7 +203,7 @@ if __name__ == "__main__":
         xguess, yguess = args.xy
 
     _ = main(args.fname, bgfname=args.background, color=args.color, binsize=args.binsize,
-            block_center=args.block, sub_prof=args.sub_prof, poly_num=args.poly_num,
+            block_center=args.block, sub_prof=args.sub_prof, 
             write=args.write, plotit=plotit, click_center=click_center, xguess=xguess,
             yguess=yguess, find_center=find_center)
 
