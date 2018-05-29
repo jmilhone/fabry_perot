@@ -38,14 +38,14 @@ def my_hist(ax, data, bins=None, horizontal=False):
     bw = bins[1]-bins[0]
     
     if horizontal:
-        ax.barh(bins[0:-1], hist*bw, height=bw)
+        ax.barh(bins[0:-1], hist*bw, height=bw, color='dimgray')#, alpha=0.5)
         if data.max() > 1000:
             ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         else:
             ax.get_yaxis().get_major_formatter().set_scientific(True)
         ax.get_yaxis().get_major_formatter().set_useOffset(False)
     else:
-        ax.bar(bins[0:-1], hist*bw, width=bw)
+        ax.bar(bins[0:-1], hist*bw, width=bw, color='dimgray')#, alpha=0.5)
         if data.max() > 1000:
             # I don't think this works
             #ax.get_xaxis().get_major_formatter().set_scientific(True)
