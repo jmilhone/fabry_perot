@@ -1,15 +1,18 @@
+from __future__ import division, absolute_import
+import sys
+sys.path.append("../")
 import numpy as np
-from tools.images import get_data, get_metadata, check_nef
-from tools.plotting import center_plot, ringsum_click, ring_plot
-from core.fitting import determine_fit_range, find_maximum
-from core.ringsum import smAng_ringsum, locate_center, new_ringsum, get_binarr
-from tools.file_io import dict_2_h5, prep_folder
+from fabry.tools.images import get_data, get_metadata, check_nef
+from fabry.tools.plotting import center_plot, ringsum_click, ring_plot
+from fabry.core.fitting import determine_fit_range, find_maximum
+from fabry.core.ringsum import smAng_ringsum, locate_center, new_ringsum, get_binarr
+from fabry.tools.file_io import dict_2_h5, prep_folder
 import matplotlib.pyplot as plt
 from os.path import join, abspath
 import argparse
 import h5py 
 from scipy.stats import norm
-from tools.helpers import bin_data
+from fabry.tools.helpers import bin_data
 
 
 def remove_prof(r, sig, sig_sd, pk_guess=None, poly_num=5):
@@ -87,13 +90,13 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
 
     print 'performing ringsums...'
     binarr = get_binarr(data,x0,y0,binsize=binsize)
-    sig0,sig0_sd = new_ringsum(data,binarr,x0,y0) 
+    sig0,sig0_sd = new_ringsum(data,binarr,x0,y0, use_weighted=False) 
 
     if bgfname is not None or fname[-2:].lower() == "h5":
         print 'removing background...'
         if bgdata is None:
             bgdata = get_data(bgfname, color=color)
-        bg,bg_sd = new_ringsum(bgdata,binarr,x0,y0)
+        bg,bg_sd = new_ringsum(bgdata,binarr,x0,y0, use_weighted=False)
         sig = sig0 - bg
         sig_sd = np.sqrt(sig0_sd**2+bg_sd**2)
     else:
@@ -165,7 +168,10 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     ax.tick_params(labelsize=16)
     fig.tight_layout()
     plt.show()
-
+    
+    fig, ax = plt.subplots()
+    ax.plot(r, sig_sd / sig)
+    plt.show()
     return dic
 
 if __name__ == "__main__":

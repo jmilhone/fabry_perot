@@ -331,6 +331,10 @@ def new_ringsum(data, redges, x0, y0, use_weighted=False):
     for idx, edge in enumerate(redges):
         iedge = np.searchsorted(R[start:], edge, side='right')
         portion = slice(start,start+iedge)
+        if idx == 5000:
+            fig, ax = plt.subplots()
+            ax.hist(R[portion])
+            plt.show()
         if use_weighted:
             means[idx], sigmas[idx] = calculate_weighted_mean(d[portion], np.sqrt(1.8*d[portion]))
         else:
@@ -339,7 +343,14 @@ def new_ringsum(data, redges, x0, y0, use_weighted=False):
 
         #lengths[idx] = len(d[portion])
         start += iedge
+    print(redges[-1] - redges[-2])
+    fig, ax = plt.subplots()
+    plt.plot(redges[0:-1]**2, np.diff(redges**2))
+    plt.show(block=False)
 
+    fig, ax = plt.subplots()
+    plt.plot(np.diff(redges))
+    plt.show()
     #fig, ax =plt.subplots()
     #ax.hist(lengths, bins='auto', density='True')
     #ax.set_xlabel('Number of Points in a Ring')

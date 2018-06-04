@@ -199,7 +199,7 @@ def peak_plot(r, sig, peaks, peaks_sd, orders, fax=None, anspks=None, anspks_sd=
     i = 1
     for key in peaks.keys():
         for j, pk in enumerate(peaks[key]):
-            pk_sd = 2.*pk*peaks_sd[key][j]
+            pk_sd = 2.*pk*peaks_sd[key][j] / 2.0  # binwidth / 2.0
             ax.axvspan(pk**2-pk_sd, pk**2+pk_sd, color=colors[i],
                     label='{0}: j={1}'.format(key, orders[key][j]), alpha=0.7)
             i += 1

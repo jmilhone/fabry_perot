@@ -1,6 +1,7 @@
+from __future__ import absolute_import
 import numpy as np
 from scipy.integrate import trapz
-from core.zeeman import zeeman_lambda
+from .zeeman import zeeman_lambda
 from numba import jit
 #from test_module import trapezodial_integration, airy_func, gaussian
 

@@ -1,10 +1,12 @@
 from __future__ import print_function, division
+import sys
+sys.path.append("../")
 import numpy as np
 import argparse
-from tools.file_io import h5_2_dict, dict_2_h5, prep_folder, read_Ld_results, read_finesse_results
-from tools.plotting import ringsum_click, my_hist, tableau20_colors
+from fabry.tools.file_io import h5_2_dict, dict_2_h5, prep_folder, read_Ld_results, read_finesse_results
+from fabry.tools.plotting import ringsum_click, my_hist, tableau20_colors
 import matplotlib.pyplot as plt
-from core.models import forward_model
+from fabry.core.models import forward_model
 from os.path import join,isfile,abspath
 from mpi4py import MPI
 import pymultinest

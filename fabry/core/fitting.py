@@ -5,8 +5,8 @@ from scipy.odr import ODR, Model, RealData
 from pymultinest.solve import Solver
 import pymultinest
 import sys
-sys.path.append('../')
-from tools.plotting import my_hist
+#sys.path.append('../')
+from ..tools.plotting import my_hist
 
 def determine_fit_range(r, sig, pkr, thres=0.15, plotit=False):
     '''
@@ -161,7 +161,8 @@ def find_peak(x,y,x_sd,y_sd,returnval=False,plotit=False):
         output.pprint()
         f,ax = plt.subplots()
         ax.errorbar(x,y,xerr=x_sd,yerr=y_sd,fmt='.',color='C0')
-        ax.fill_between(output.xplus,output.y+output.eps,output.y-output.eps,alpha=0.3,color='C1')
+        # ax.fill_between(output.xplus,output.y+output.eps,output.y-output.eps,alpha=0.3,color='C1')
+        ax.fill_between(x, output.y+output.eps,output.y-output.eps,alpha=0.3,color='C1')
         ax.axvspan(pk-pk_err,pk+pk_err,color='C2',alpha=0.3)
         plt.show()
 

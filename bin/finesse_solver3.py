@@ -1,15 +1,17 @@
-from __future__ import print_function, division
+from __future__ import print_function, division, absolute_import
+import sys
+sys.path.append("../")
 import numpy as np
 import argparse
-from tools.file_io import h5_2_dict, dict_2_h5, prep_folder, read_Ld_results, read_finesse_results
-from tools.plotting import ringsum_click, my_hist, tableau20_colors, my_hist2d
+from fabry.tools.file_io import h5_2_dict, dict_2_h5, prep_folder, read_Ld_results, read_finesse_results
+from fabry.tools.plotting import ringsum_click, my_hist, tableau20_colors, my_hist2d
 import matplotlib.pyplot as plt
-from core.models import forward_model
+from fabry.core.models import forward_model
 from os.path import join,isfile,abspath
 from mpi4py import MPI
 import pymultinest
 import multiprocessing as mp
-from core.models import peak_calculator
+from fabry.core.models import peak_calculator
 
 extra_w = [488.185311, 487.800942, 488.15961, 487.291682, 487.293884, 487.436431]
 #extra_A = [0.087, 0.13, 0.065]
@@ -29,13 +31,13 @@ def get_finesse_region(r,s,error,plotit=True):
     fit_ix = np.arange(ix1,ix2+0.5,1).astype(int)
     rr = r[fit_ix]
     ss = s[fit_ix]
-
-    error = error * np.mean(ss) * np.ones_like(ss) + error * ss
+    ss_sd = error[fit_ix]
+    #error = error * np.mean(ss) * np.ones_like(ss) + error * ss
 
     if plotit:
         f,ax = plt.subplots()
         ax.plot(rr,ss)
-        ax.fill_between(rr,  ss+error, ss-error, color='r', alpha=0.4)
+        ax.fill_between(rr,  ss+ss_sd, ss-ss_sd, color='r', alpha=0.4)
         ax.set_xlim([rr.min()-0.1*(rr.max()-rr.min()),rr.max()+0.1*(rr.max()-rr.min())])
         plt.show()
 
@@ -369,8 +371,8 @@ if __name__ == "__main__":
                 help='only writes finesse region information, skipping multinest solve.')
         parser.add_argument('--error','-er',type=float,default=0.05,
                 help='error percentage to use in fitting. default is 0.05')
-        parser.add_argument('--livepoints', type=int, default=500, 
-                help='number of livepoints to use in multinest. Default is 500.')
+        parser.add_argument('--livepoints', type=int, default=200, 
+                help='number of livepoints to use in multinest. Default is 200.')
         parser.add_argument('--recover', action='store_true', 
                 help=("Recover finesse solver model posterior written to an h5 file because "
                       "calculation takes a long time"))
@@ -385,7 +387,8 @@ if __name__ == "__main__":
                 data = h5_2_dict(org_fname)
                 r = data['r']
                 sig = data['sig']
-                fit_ix, error = get_finesse_region(r, sig, args.error)
+                sig_sd = data['sig_sd']
+                fit_ix, error = get_finesse_region(r, sig, sig_sd)
                 maxval = np.max(sig[fit_ix])
                 amp_lim = [0.1*maxval, 10.0*maxval]
                 offset_lim = [0.1, np.abs(np.min(sig))]
@@ -415,7 +418,9 @@ if __name__ == "__main__":
             Lpost, dpost = read_Ld_results(abspath(args.ld_folder))
             rr = r[fit_ix]
             ss = sig[fit_ix]
-            solver_in = {'r':rr,'sig':ss,'basename':basename, 'error':error,
+            ss_sd = error[fit_ix]
+
+            solver_in = {'r':rr,'sig':ss,'basename':basename, 'error':ss_sd,
                     'F_lim':args.F_lim, 'livepoints':args.livepoints, 'Ti_lim': args.Ti_Ar_lim, 
                     'Arel_lim': args.Arel_lim, 'Amp_lim':amp_lim, 'w0':[487.873302, 487.98634], 
                     'mu':[232.03806, 39.948], 'Lpost':Lpost, 'dpost':dpost, 'offset_lim': offset_lim}
