@@ -11,6 +11,7 @@ from os.path import join,isfile,abspath
 from mpi4py import MPI
 import pymultinest
 import multiprocessing as mp
+import random 
 
 def get_fitting_region(r,s,error,plotit=True):
 
@@ -21,19 +22,19 @@ def get_fitting_region(r,s,error,plotit=True):
     rr = r[fit_ix]
     ss = s[fit_ix]
 
-    error = error * np.mean(ss) * np.ones_like(ss) + error * ss
+    # error = error * np.mean(ss) * np.ones_like(ss) + error * ss
 
     if plotit:
         f,ax = plt.subplots()
         ax.plot(rr,ss)
-        ax.fill_between(rr,  ss+error, ss-error, color='r', alpha=0.4)
+        ax.fill_between(rr,  ss+error[fit_ix], ss-error[fit_ix], color='r', alpha=0.4)
         ax.set_xlim([rr.min()-0.1*(rr.max()-rr.min()),rr.max()+0.1*(rr.max()-rr.min())])
         plt.show()
 
-    return fit_ix, error
+    return fit_ix, None
 
 
-def Ti_solver(r, sig, sig_error, Ld_dir, finesse_dir, Ti_lim, V_lim, A_lim, basename, resume=True, 
+def Ti_solver(r, sig, sig_error, Ld_dir, finesse_dir, Ti_lim, V_lim, A_lim, basename, resume=False, 
         w0=487.98634, mu=39.948, livepoints=1000):
 
     def log_prior(cube, ndim, nparams):
@@ -42,18 +43,23 @@ def Ti_solver(r, sig, sig_error, Ld_dir, finesse_dir, Ti_lim, V_lim, A_lim, base
         cube[2] = cube[2]*(A_lim[1] - A_lim[0]) + A_lim[0]
 
     def log_likelihood(cube, ndim, nparams):
-        i = np.random.choice(nL)
-        j = np.random.choice(nF)
+        #i = np.random.choice(nL)
+        #j = np.random.choice(nF)
 
-        L = Lpost[i]
-        d = dpost[i]
-        F = Fpost[j]
+        #L = Lpost[i]
+        #d = dpost[i]
+        #F = Fpost[j]
 
+        L = 0.380173301412519577E+05
+        d = 0.883628502371783142E+00
+        F = 21.0
         vals = forward_model(r, L, d, F, w0, mu, cube[2], cube[0], cube[1], sm_ang=False, nlambda=1024)
         chisq = np.sum((vals - sig)**2 / sig_error**2)
 
         return -chisq/2.0
-
+    r = r[::3]
+    sig = sig[::3]
+    sig_error = sig_error[::3]
     nparams = 3
 
     Lpost, dpost = read_Ld_results(Ld_dir)
@@ -61,6 +67,22 @@ def Ti_solver(r, sig, sig_error, Ld_dir, finesse_dir, Ti_lim, V_lim, A_lim, base
 
     nL = len(Lpost)
     nF = len(Fpost)
+
+    #L = 0.380173301412519577E+05
+    #d = 0.883628502371783142E+00
+    #F = 21.0
+    #npts = 200
+    #test_sig = np.zeros((npts, len(r)))
+    #for i in xrange(npts):
+    #    cube = [random.random() for _ in xrange(3)]
+    #    log_prior(cube, None, None)
+    #    test_sig[i, :] = forward_model(r, L, d, F, w0, mu, cube[2], cube[0], cube[1], sm_ang=False, nlambda=1024)
+    #fig, ax = plt.subplots()
+    #for i in xrange(npts):
+    #    ax.plot(r, test_sig[i, :], 'C0')
+    #ax.errorbar(r, sig, yerr=sig_error, color='C1', ecolor='C2')
+    #plt.show()
+
 
 
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
@@ -248,8 +270,8 @@ if __name__ == "__main__":
         parser.add_argument('--Ti_lim', '-Ti', type=float, nargs=2, default=[0.005,5.0],
                 help='bounds for Ti fit. Default is 0.005-5 eV')
 
-        parser.add_argument('--V_lim', type=float, nargs=2, default=[-10.0, 10.0],
-                help='bounds for V fit.  Default is -10-10 km/s')
+        parser.add_argument('--V_lim', type=float, nargs=2, default=[-2.0, 2.0],
+                help='bounds for V fit.  Default is -2 to +2 km/s')
 
         parser.add_argument('--overwrite',action='store_true',
                 help='allows you to overwrite previously saved finesse region')
@@ -277,9 +299,10 @@ if __name__ == "__main__":
                 data = h5_2_dict(org_fname)
                 r = data['r']
                 sig = data['sig']
-                fit_ix, error = get_fitting_region(r, sig, args.error)
+                error = data['sig_sd']
+                fit_ix, _ = get_fitting_region(r, sig, error)
                 maxval = np.max(sig[fit_ix])
-                amp_lim = [0.1*maxval, 10.0*maxval]
+                amp_lim = [0.5*maxval, 5.0*maxval]
                 dict_2_h5(fname, {'r':r, 'sig':sig, 'fit_ix':fit_ix, 'error':error})
             else:
                 raise ValueError('{0} does not exist!'.format(org_fname))
@@ -290,7 +313,7 @@ if __name__ == "__main__":
             fit_ix = a['fit_ix']
             error = a['error']
             maxval = np.max(sig[fit_ix])
-            amp_lim = [0.1*maxval, 10.0*maxval]
+            amp_lim = [0.5*maxval, 5.0*maxval]
 
         inputs = {'error_per': args.error, 'Ti_lim': args.Ti_lim, 'V_lim': args.V_lim, 
                 'livepoints': args.livepoints, 'Ld_folder':abspath(args.ld_folder), 
@@ -303,7 +326,8 @@ if __name__ == "__main__":
         else:
             rr = r[fit_ix]
             ss = sig[fit_ix]
-            solver_in = {'r':rr,'sig':ss,'basename':basename, 'error':error, 
+            ss_sd = error[fit_ix]
+            solver_in = {'r':rr,'sig':ss,'basename':basename, 'error':ss_sd, 
                     "Ld_dir": abspath(args.ld_folder), 'finesse_dir': abspath(args.finesse_folder),
                     "Ti_lim": args.Ti_lim, "V_lim": args.V_lim, "A_lim": amp_lim, 'w0': 487.98634,
                     "mu": 39.948, 'livepoints': args.livepoints}
@@ -312,9 +336,10 @@ if __name__ == "__main__":
 
     solver_in = Comm.bcast(solver_in, root=0)
     if solver_in is not None:
-        Ti_solver(solver_in['r'], solver_in['sig'], solver_in['error'], solver_in['Ld_dir'],
+        print('im cheating!')
+        Ti_solver(solver_in['r'], solver_in['sig']-150.0, solver_in['error'], solver_in['Ld_dir'],
                 solver_in['finesse_dir'], solver_in['Ti_lim'], solver_in['V_lim'], solver_in['A_lim'],
-                solver_in['basename'], resume=True, w0=solver_in['w0'], mu=solver_in['mu'], 
+                solver_in['basename'], resume=False, w0=solver_in['w0'], mu=solver_in['mu'], 
                 livepoints=solver_in['livepoints'],)
 
 
