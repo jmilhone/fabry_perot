@@ -1,6 +1,8 @@
+from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing as mp
+from numba import jit
 '''
 Core module contains ringsum codes that are the basis of this
 analysis. 
@@ -12,6 +14,7 @@ Functions:
     locate_center: center finding function 
     new_ringsum: best ringsum to use currently
 '''
+
 
 def _histogram(bins, R, weights, out=None, label=None):
         '''
@@ -36,7 +39,7 @@ def _histogram(bins, R, weights, out=None, label=None):
         else:
             return sig, label
 
-def get_binarr(dat, x0, y0, binsize=0.1):
+def get_bin_edges(dat, x0, y0, binsize=0.1):
     '''
     returns equal area annuli bins for a ring image
     given a center and binsize
@@ -51,24 +54,36 @@ def get_binarr(dat, x0, y0, binsize=0.1):
     Returns:
         binarr (np.array): bins for the ring sum in pixels
     '''
+    # ny, nx = dat.shape
+    # x = np.arange(0, nx, 1)
+    # y = np.arange(0, ny, 1)
+
+    # xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+    # R = np.sqrt(xx**2 + yy**2)
+
+    # xmin = xx[0, 0]
+    # xmax = xx[0, -1]
+    # ymin = yy[0, 0]
+    # ymax = yy[-1, 0]
+
+    # ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
+    # imax = int((ri ** 2. - 2. * ri - 1.) / (1. + 2. * ri) / binsize)
+
+    # norm_radius = np.sqrt(2*binsize*ri + binsize**2)
     ny, nx = dat.shape
-    x = np.arange(0, nx, 1)
-    y = np.arange(0, ny, 1)
+    x = np.array([0, nx-1]) - x0
+    y = np.array([0, ny-1]) - y0
+    xmin = np.abs(x).min()
+    ymin = np.abs(y).min()
+    ri = np.min([xmin, ymin])
 
-    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
-    R = np.sqrt(xx**2 + yy**2)
+    imax = int(np.floor(ri**2 / (2*ri-binsize) / binsize))
+    i =  np.linspace(0, imax, imax+1)
+    redges = np.sqrt(i * (2*ri - binsize)*binsize)
 
-    xmin = xx[0, 0]
-    xmax = xx[0, -1]
-    ymin = yy[0, 0]
-    ymax = yy[-1, 0]
+    return redges
 
-    ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
-    imax = int((ri ** 2. - 2. * ri - 1.) / (1. + 2. * ri) / binsize)
 
-    norm_radius = np.sqrt(2*binsize*ri + binsize**2)
-    return np.sqrt(range(1, imax))*norm_radius
- 
 def smAng_ringsum(dat, x0, y0, binsize=0.1, quadrants=False):
     '''
     Performs a constant area ring sum in pixel space. This is valid
@@ -99,7 +114,7 @@ def smAng_ringsum(dat, x0, y0, binsize=0.1, quadrants=False):
     xmax = xx[0, -1]
     ymin = yy[0, 0]
     ymax = yy[-1, 0]
-
+    #print(xmin, xmax, ymin, ymax)
     ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
     imax = int((ri ** 2. - 2. * ri - 1.) / (1. + 2. * ri) / binsize)
 
@@ -138,6 +153,7 @@ def smAng_ringsum(dat, x0, y0, binsize=0.1, quadrants=False):
         return binarr, sigs['UL'], sigs['UR'], sigs['BL'], sigs['BR']
     else:
         return binarr, sigs['UL']+sigs['UR']+sigs['BL']+sigs['BR']
+
 
 def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda, ndl=512):
     """
@@ -185,6 +201,7 @@ def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lam
         ringsum += [sig]
     return ringsum
 
+
 def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, plotit=False, block_center=False):
     '''
     Finds the center of a ring pattern image by preforming ringsums.
@@ -206,7 +223,7 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
         xguess = data.shape[1]/2.
     if yguess is None:
         yguess = data.shape[0]/2.
-        
+    print(xguess, yguess)    
     if block_center:
         data = np.copy(data_in)
         data[int(yguess-300):int(yguess+301),int(xguess-300):int(xguess+301)] = 0.0
@@ -224,13 +241,18 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
     print "Center finding:"
     print "start x0: {0} y0: {1}".format(xguess, yguess)
     for ii in range(maxiter):
-        binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = smAng_ringsum(data, xguess, yguess, binsize=binsize,quadrants=True)
+        #print(xguess, yguess)
+        #binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = smAng_ringsum(data, xguess, yguess, binsize=binsize,quadrants=True)
+        binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = ringsum(data, xguess, yguess, binsize=binsize,quadrants=True)
         #jj = np.where(binarr < 300)
         #ULsigarr[jj] = 0.0
         #URsigarr[jj] = 0.0
         #BRsigarr[jj] = 0.0
         #BLsigarr[jj] = 0.0
-
+        #fig, ax = plt.subplots()
+        #ax.plot(binarr, ULsigarr)
+        #ax.plot(binarr, URsigarr)
+        #plt.show()
         thres = 0.3* np.max(ULsigarr + URsigarr)
         i = np.where(ULsigarr + URsigarr > thres)[0]
 
@@ -238,7 +260,9 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
         if len(ULsigarr) - i.max() < 60:
             i = i[0:-50]
         ni = len(i)
-        ns = 25
+        #print(ni)
+        # ns = 25
+        ns = 13
         sarr = 2 * np.arange(-ns, ns+1, 1)
         sarr_max = np.max(sarr)
         UB = np.zeros(len(sarr))
@@ -276,9 +300,16 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
         if np.abs(UBcent) > sarr_max:
             UBcent = np.sign(UBcent) * np.max(sarr)
 
-        yguess += UBcent * binsize
-        xguess -= RLcent * binsize
+        if False:#~np.isfinite(RLcent):
+            xguess -= binsize
+        else:
+            xguess -= RLcent * binsize
 
+        if False:#~np.isfinite(UBcent):
+            yguess += binsize
+        else:
+            yguess += UBcent * binsize
+        
         print "{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii)
         if plotit:
             if line1 is not None:
@@ -295,7 +326,8 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
                 leg = ax.legend()
 
             fig.canvas.draw()
-            plt.pause(0.0001)
+            #plt.pause(0.0001)
+            plt.pause(1.0)
 
         if np.sqrt((UBcent*binsize)**2 + (RLcent*binsize)**2) / binsize < 0.1:
             break
@@ -331,34 +363,35 @@ def new_ringsum(data, redges, x0, y0, use_weighted=False):
     for idx, edge in enumerate(redges):
         iedge = np.searchsorted(R[start:], edge, side='right')
         portion = slice(start,start+iedge)
-        if idx == 5000:
-            fig, ax = plt.subplots()
-            ax.hist(R[portion])
-            plt.show()
+        #if idx == 5000:
+        #    fig, ax = plt.subplots()
+        #    ax.hist(R[portion])
+        #    plt.show()
         if use_weighted:
             means[idx], sigmas[idx] = calculate_weighted_mean(d[portion], np.sqrt(1.8*d[portion]))
         else:
             means[idx] = np.mean(d[portion])
             sigmas[idx] = np.std(d[portion]) / np.sqrt(len(d[portion]))
 
-        #lengths[idx] = len(d[portion])
+        lengths[idx] = len(d[portion])
         start += iedge
-    print(redges[-1] - redges[-2])
-    fig, ax = plt.subplots()
-    plt.plot(redges[0:-1]**2, np.diff(redges**2))
-    plt.show(block=False)
-
-    fig, ax = plt.subplots()
-    plt.plot(np.diff(redges))
-    plt.show()
-    #fig, ax =plt.subplots()
-    #ax.hist(lengths, bins='auto', density='True')
-    #ax.set_xlabel('Number of Points in a Ring')
-    #ax.set_title("{0:d} +/- {1:d}".format(int(np.mean(lengths)), int(np.std(lengths))))
+    #print(redges[-1] - redges[-2])
+    #fig, ax = plt.subplots()
+    #plt.plot(redges[0:-1]**2, np.diff(redges**2))
     #plt.show(block=False)
+
+    #fig, ax = plt.subplots()
+    #plt.plot(np.diff(redges))
+    #plt.show()
+    # fig, ax =plt.subplots()
+    # ax.hist(lengths, bins='auto', density='True')
+    # ax.set_xlabel('Number of Points in a Ring')
+    # ax.set_title("{0:d} +/- {1:d}".format(int(np.mean(lengths)), int(np.std(lengths))))
+    # plt.show()
     return means, sigmas
 
 
+@jit(nopython=True)
 def calculate_weighted_mean(data, error):
     idx = np.where(error > 0.0)
     err = error[idx]
@@ -375,4 +408,125 @@ def calculate_weighted_mean(data, error):
     mean = numerator / denominator
 
     return mean, sigma
+
+
+@jit(nopython=True)
+def super_pixelate(data, npix=2):
+    n, m = data.shape
+
+    n_new = n // npix
+    m_new = m // npix
+
+    d = np.zeros((n_new, m_new))
+
+    for i in xrange(n_new):
+        for j in xrange(m_new):
+            n_idx = slice(i*npix, (i+1)*npix)
+            m_idx = slice(j*npix, (j+1)*npix)
+            # d[i, j] = np.mean(data[n_idx, m_idx])
+            d[i, j] = np.sum(data[n_idx, m_idx])
+    return d
+
+
+def ringsum(data, x0, y0, binsize=0.1, quadrants=False, use_weighted=False):
+
+    ny, nx = data.shape
+    x = np.arange(0, nx, 1)
+    y = np.arange(0, ny, 1)
+
+    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+    R = np.sqrt(xx**2 + yy**2)
+
+    #xmin = xx[0, 0]
+    #xmax = xx[0, -1]
+    #ymin = yy[0, 0]
+    #ymax = yy[-1, 0]
+
+    #ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
+    #imax = int(np.floor(ri**2 / (2*ri-binsize) / binsize))
+    #i =  np.linspace(0, imax, imax+1)
+    #redges = np.sqrt(i * (2*ri - binsize)*binsize)
+
+    redges = get_bin_edges(data, x0, y0, binsize=0.1)
+    ri = int(redges[-1])
+
+    #print(ri, test[-1])
+    #fig, ax = plt.subplots()
+    #ax.plot(redges)
+    #ax.plot(test)
+    #plt.show(block=True)
+
+    #ri = int(redges[-1])+1
+    #print(ri, int(redges[-1]))
+
+    xi0 = int(x0)
+    yi0 = int(y0)
+
+    i1 = [yi0-ri, yi0-ri, yi0, yi0]
+    i2 = [yi0+1, yi0+1, yi0+ri+1, yi0+ri+1]
+    j1 = [xi0-ri, xi0, xi0-ri, xi0]
+    j2 = [xi0+1, xi0+ri+1, xi0+1, xi0+ri+1]
+
+    rarr = 0.5 * (redges[0:-1] + redges[1:])
+
+    if quadrants:
+        procs = []
+        nprocs = 4
+        sigs = {}
+        out = mp.Queue()
+        labels = ['UL', 'UR', 'BL', 'BR']
+        for k in range(nprocs):
+            p = mp.Process(target=_ringsum, args=(redges[1:],
+                R[i1[k]:i2[k], j1[k]:j2[k]], data[i1[k]:i2[k], j1[k]:j2[k]]),
+                kwargs={'out': out, 'label': labels[k], 'use_weighted':False})
+            procs.append(p)
+            p.start()
+
+        for i in range(nprocs):
+            tup = out.get()
+            sigs[tup[0]] = tup[1]
+
+        for p in procs:
+            p.join()
+
+        return rarr, sigs['UL'], sigs['UR'], sigs['BL'], sigs['BR']
+    else:
+        sig, sigma = _ringsum(redges[1:], R, data, out=None, label=None, use_weighted=False)
+        return rarr, sig, sigma
+
+
+def _ringsum(redges, radii, data, out=None, label=None, use_weighted=False):
+    # redges does not include zero!
+    n = len(redges) 
+
+    R = radii.flatten()
+    d = data.flatten()
+
+    indsort = np.argsort(R)
+    R = R[indsort]
+    d = d[indsort]
+
+    n = len(redges)
+    means = np.zeros(n)
+    sigmas = np.zeros(n)
+    lengths = np.zeros(n)
+    start = 0
+    for idx, edge in enumerate(redges):
+        iedge = np.searchsorted(R[start:], edge, side='right')
+        portion = slice(start,start+iedge)
+        if use_weighted:
+            means[idx], sigmas[idx] = calculate_weighted_mean(d[portion], np.sqrt(1.8*d[portion]))
+        else:
+            means[idx] = np.mean(d[portion])
+            sigmas[idx] = np.std(d[portion]) / np.sqrt(len(d[portion]))
+
+        lengths[idx] = len(d[portion])
+        start += iedge
+
+
+    if out and label:
+        out.put((label, means, sigmas))
+    else:
+        return means, sigmas
+
 
