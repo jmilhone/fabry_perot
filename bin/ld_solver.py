@@ -4,7 +4,7 @@ sys.path.append("../")
 import numpy as np
 import argparse
 from fabry.tools.file_io import h5_2_dict, dict_2_h5, prep_folder,read_Ld_results
-from fabry.core.fitting import determine_fit_range, find_peak
+from fabry.core.fitting import determine_fit_range, find_peak, find_maximum
 from fabry.tools.plotting import ringsum_click, peak_plot, my_hist, tableau20_colors
 from fabry.tools.images import get_data
 import matplotlib.pyplot as plt
@@ -15,7 +15,9 @@ import pymultinest
 import subprocess
 from scipy.special import erf
 
-def get_pk_locations(r, s, s_sd, w, folder, pkerr=1, names=None, pkthresh=0.10, plotit=True):
+px_size = 0.004
+
+def get_pk_locations(r, s, s_sd, w, folder, pkerr=1, names=None, pkthresh=0.20, plotit=True):
     '''
     interactive clicking to get peak locations from ringsum
 
@@ -61,13 +63,14 @@ def get_pk_locations(r, s, s_sd, w, folder, pkerr=1, names=None, pkthresh=0.10, 
         peaks_sd_list = []
         for i,pk in enumerate(pkguess):
             idxs = determine_fit_range(r,s,np.sqrt(pk),thres=pkthresh[i])
-            pk_r,pk_sd = find_peak(r[idxs],s[idxs],binsizes[idxs]/2.0,s_sd[idxs],plotit=True)
+            # pk_r,pk_sd = find_peak(r[idxs],s[idxs],binsizes[idxs]/2.0,s_sd[idxs],plotit=True)
             #ix = np.abs(pk_r - r).argmin()
+            pk_r = find_maximum(r[idxs], s[idxs], returnval=False)
             peak_list.append(pk_r)
             # peaks_sd_list.append(pk_sd)
             rvals = np.sort(r[idxs])
             ifind = np.searchsorted(rvals, pk_r, side='left')
-            print(rvals[ifind-1], pk_r, rvals[ifind])
+            #print(rvals[ifind-1], pk_r, rvals[ifind])
             peaks_sd_list.append(rvals[ifind] - rvals[ifind-1])
             #print pk_r, pk_sd, binsizes[ix]
         peaks[wstr] = np.array(peak_list)
@@ -82,13 +85,13 @@ def get_pk_locations(r, s, s_sd, w, folder, pkerr=1, names=None, pkthresh=0.10, 
         for i,ww in enumerate(wnames):
             name_dic[ww] = names[i]
         peak_plot(r, s, peaks, peaks_sd, orders)
-
+    print(peaks_sd)
     return peaks, peaks_sd, orders
 
 def ld_multinest_solver(peaks, peaks_sd, orders, basename, L_lim, d_lim, livepoints=1000, resume=True):
 
-    ## one pixel is 0.004 mm so we need to convert the L_lim
-    L_lim = [x/0.004 for x in L_lim]
+    ## one pixel is px_size mm so we need to convert the L_lim
+    L_lim = [x/px_size for x in L_lim]
     ## d is computed in log space
     log_d_lim = [np.log10(x) for x in d_lim]
 
@@ -102,24 +105,28 @@ def ld_multinest_solver(peaks, peaks_sd, orders, basename, L_lim, d_lim, livepoi
     def log_likelihood(cube, ndim, nparams):
         #chisq = 0.0
         prob = 1
+        log_prob = 0.0
         for w in wavelengths:
             r = peak_calculator(cube[0], cube[1], float(w), orders[w])
             #chisq += np.sum( (r-peaks[w])**2 / peaks_sd[w]**2 )
             for rj, sd, peak in zip(r, peaks_sd[w], peaks[w]):
         #        # prob += cumulative_distribution(rj-peak, 0.2*sd)
         #        #print(rj, peak, sd)
-                prob *= tanh_distribution(rj, peak, sd)
+                #prob *= uniform_distribution(rj, peak, sd)
+                #prob *= tanh_distribution(rj, peak, sd)
+                log_prob += tanh_distribution(rj, peak, sd)
+        return log_prob
         # print(prob)
         #print(prob)
         #if any(p <= 0 for p in prob):
         #    print 'im here'
         #    return -np.inf
 
-        if prob <= 0.0:
-            print('im here')
-            return -np.inf
-        else:
-            return np.log(prob)
+        #if prob <= 0.0:
+        #    print('im here')
+        #    return -np.inf
+        #else:
+        #    return np.log(prob)
 
         #return sum(np.log(p) for p in prob)
         #return -chisq / 2.0
@@ -134,31 +141,53 @@ def ld_multinest_solver(peaks, peaks_sd, orders, basename, L_lim, d_lim, livepoi
         # print(left, right, x, sigma)
         prob = 0.5*(np.tanh((x-left)/weight) - np.tanh((x-right)/weight))
         if plotit:
-            print np.trapz(prob/sigma, x=x)
-            print(prob[0:10])
-            print(np.tanh(-10))
+            #print np.trapz(prob/sigma, x=x)
+            #print(prob[0:10])
+            #print(np.tanh(-10))
             fig, ax = plt.subplots()
             ax.plot(x, prob/sigma)
             plt.show()
-        return (prob+1e-9) / sigma
+        return np.log((prob+1e-11) / sigma)
 
     def uniform_distribution(x, x0, sigma):
         if x0-sigma/2.0 < x < x0+sigma/2.0:
             return 1.0 / sigma
         else:
-            return 0.0
-    k = '487.873302'
-    x0 = peaks[k][0]
-    sigma = peaks_sd[k][0]
+            return 1e-12 
+
+    #k = '487.873302'
+    #x0 = peaks[k][0]
+    #sigma = peaks_sd[k][0]
     #sigma = 0.5
-    xarr = np.linspace(x0-3, x0+3, 1000)
-    print(peaks, peaks_sd)
+    #xarr = np.linspace(x0-3, x0+3, 1000)
+    #print(peaks, peaks_sd)
     # _ = tanh_distribution(xarr, x0, sigma, plotit=True)
 
     nparams = 2
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
             resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
             outputfiles_basename=basename, max_modes=500)
+
+    Lpost, dpost = read_Ld_results("/home/milhone/Research/python_FabryPerot/Data/2018_06_01/ArgonCalib/")
+    #idx = np.where(dpost > 0.8834)
+    #idx = np.where(Lpost > 154.65 / px_size)
+    #idx = np.where(Lpost < 154.45 / px_size)
+    idx = np.where(np.logical_and(Lpost > 154.45/px_size, Lpost < 154.65/px_size))
+    w = wavelengths[1]
+    print(w)
+    order = 0
+    rvals = peak_calculator(Lpost, dpost, float(w), order)
+    peak_sd, peak = peaks_sd[w][order], peaks[w][order]
+    likeli = tanh_distribution(rvals, peak, peak_sd)
+    print(np.min(np.exp(likeli)))
+    rarr = np.linspace(peak-2*peak_sd, peak+2*peak_sd, 1000)
+    #fig, ax = plt.subplots()
+    #ax.plot(rvals, np.exp(likeli), '.')
+    #ax.plot(rvals[idx], np.exp(likeli)[idx], '.', color='C1')
+    #ax.plot(rarr, np.exp(tanh_distribution(rarr, peak, peak_sd)), 'C2')
+    #print(np.trapz(np.exp(tanh_distribution(rarr, peak, peak_sd)), rarr))
+    #plt.show()
+    #a=raw_input('press enter')
 
 def ld_check(folder, bins=None, saveit=True):
     '''
@@ -202,12 +231,12 @@ def ld_check(folder, bins=None, saveit=True):
 
     plt.show(block=False)
     wtest = 468.335172
-    print wtest
-    print peak_calculator(0.382288362412689094E+05, 0.883875718242851827E+00, wtest, 0)
-    print peak_calculator(0.382288362412689094E+05, 0.883875718242851827E+00, wtest, 1)
+    # print wtest
+    # print peak_calculator(0.382288362412689094E+05, 0.883875718242851827E+00, wtest, 0)
+    # print peak_calculator(0.382288362412689094E+05, 0.883875718242851827E+00, wtest, 1)
 
     fig1, ax1 = plt.subplots(2,1,figsize=(6,8))
-    my_hist(ax1[0], Lpost*0.004, bins=bins)
+    my_hist(ax1[0], Lpost*px_size, bins=bins)
     ax1[0].set_xlabel('L (mm)', fontsize=18)
     ax1[0].set_ylabel('P (L)', fontsize=18)
     ax1[0].tick_params(labelsize=16)
@@ -264,17 +293,17 @@ if __name__ == "__main__":
         parser.add_argument('--pkerr', type=float, default=0.2,
                 help='error for peak locations in units of percent of binsize at peak. \
                 Should be between 1/6 and 1/2. Default is 1/5')
-        parser.add_argument('--pkthresh', type=float, default=0.05,
+        parser.add_argument('--pkthresh', type=float, default=0.4,
                 help='threshold for finding peak (can be a list corresponding to the various\
-                peaks). Default is 0.05')
+                peaks). Default is 0.4')
         parser.add_argument('--overwrite',action='store_true', help='allows you to overwrite\
                 previously saved peak information')
-        parser.add_argument('--L_lim', '-L', type=float, nargs=2, default=[200.,210.], help='limit\
-                for fitting L in units of mm. Default is 200-210.')
-        parser.add_argument('--d_lim', '-d', type=float, nargs=2, default=[3.84,3.90], help='limit\
-                for fitting d in units of mm. Default is 3.84-3.90')
-        parser.add_argument('--livepoints', type=int, default=3000, help='number of livepoints\
-                for multinest to use. Default is 3000.')
+        parser.add_argument('--L_lim', '-L', type=float, nargs=2, default=[145.,155.], help='limit\
+                for fitting L in units of mm. Default is 145-155.')
+        parser.add_argument('--d_lim', '-d', type=float, nargs=2, default=[0.87,0.89], help='limit\
+                for fitting d in units of mm. Default is 0.87-0.89')
+        parser.add_argument('--livepoints', type=int, default=2000, help='number of livepoints\
+                for multinest to use. Default is 2000.')
         parser.add_argument('--no_solve',action='store_true', help='only writes peak information')
         parser.add_argument('--bins',type=int, default=20, help='number of bins to plot in histograms')
         args = parser.parse_args()
@@ -287,7 +316,7 @@ if __name__ == "__main__":
             resume = False
         else:
             resume = True
-        resume = False
+        #resume = False 
         if not isfile(fname) or args.overwrite:
             if isfile(org_fname):
                 data = h5_2_dict(org_fname)

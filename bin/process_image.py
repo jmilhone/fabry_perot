@@ -1,18 +1,14 @@
 from __future__ import division, absolute_import
 import sys
 sys.path.append("../")
-import numpy as np
-from fabry.tools.images import get_data, get_metadata, check_nef
-from fabry.tools.plotting import center_plot, ringsum_click, ring_plot
-from fabry.core.fitting import determine_fit_range, find_maximum
-from fabry.core.ringsum import smAng_ringsum, locate_center, new_ringsum, get_binarr
-from fabry.tools.file_io import dict_2_h5, prep_folder
-import matplotlib.pyplot as plt
 from os.path import join, abspath
 import argparse
+import numpy as np
+from fabry.tools import images, plotting, file_io
+from fabry.core import fitting, ringsum
+import matplotlib.pyplot as plt
 import h5py 
 from scipy.stats import norm
-from fabry.tools.helpers import bin_data
 
 
 def remove_prof(r, sig, sig_sd, pk_guess=None, poly_num=5):
@@ -23,22 +19,22 @@ def remove_prof(r, sig, sig_sd, pk_guess=None, poly_num=5):
         r (np.ndarray): binarr of ringsum
         sig (np.ndarray): ringsum to be subtracted
         poly_num (int, default=5): order used for polyfit
-    
+
     Returns:
         peak_loc (np.ndarray): peak locations in r
         poff (np.ndarray): fit to be divided from sig
     '''
     ret_pk_guess = False
-    if pk_guess is None:
+    if pk_guess is None: 
         ret_pk_guess = True
-        pk_guess, _ = ringsum_click(r,sig,title='Please click on peaks')
-    
+        pk_guess, _ = plotting.ringsum_click(r,sig,title='Please click on peaks')
+
     peak_loc = np.zeros(len(pk_guess))
     peak_val = np.zeros(len(pk_guess))
     peak_wts = np.zeros(len(pk_guess))
     for i,pk in enumerate(pk_guess):
-        idxs = determine_fit_range(r, sig, pk, thres=0.1)
-        peak_loc[i],peak_val[i] = find_maximum(r[idxs],sig[idxs],returnval=True)
+        idxs = fitting.determine_fit_range(r, sig, pk, thres=0.1)
+        peak_loc[i],peak_val[i] = fitting.find_maximum(r[idxs],sig[idxs],returnval=True)
         peak_wts[i] = 1./(sig_sd[np.abs(peak_loc[i]-r).argmin()])
 
     p,cov = np.polyfit(peak_loc,peak_val,poly_num,w=peak_wts,cov=True)
@@ -59,22 +55,24 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
            data = f.get("2Ddata").value
            bgdata = np.abs(norm(scale=0.05).rvs(data.shape))
     else:
-        fname = check_nef(fname)
-        bgfname = check_nef(bgfname)
+        fname = images.check_nef(fname)
+        bgfname = images.check_nef(bgfname)
 
         print 'loading image...'
-        data = get_data(fname, color=color)
-        
+        data = images.get_data(fname, color=color)
+    npix = 1
+    data = ringsum.super_pixelate(data, npix=npix)
+
     if find_center:
         if click_center:
-            xguess,yguess = center_plot(data)
+            xguess,yguess = plotting.center_plot(data)
 
-        x0,y0 = locate_center(data, xguess=xguess, yguess=yguess, 
-                block_center=block_center, binsize=binsize, plotit=False)
-        
+        x0,y0 = ringsum.locate_center(data, xguess=xguess, yguess=yguess, 
+                block_center=block_center, binsize=binsize, plotit=True)
+
         if plotit:
             fig,ax = plt.subplots(figsize=(10,8))
-            ring_plot(data, fax=(fig,ax))
+            plotting.ring_plot(data, fax=(fig,ax))
             ax.axhline(y0,color='b')
             ax.axvline(x0,color='r')
             plt.show()
@@ -89,21 +87,19 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             y0 = yguess
 
     print 'performing ringsums...'
-    binarr = get_binarr(data,x0,y0,binsize=binsize)
-    sig0,sig0_sd = new_ringsum(data,binarr,x0,y0, use_weighted=False) 
+    r, sig0,sig0_sd = ringsum.ringsum(data,x0,y0, use_weighted=False, quadrants=False) 
 
     if bgfname is not None or fname[-2:].lower() == "h5":
         print 'removing background...'
         if bgdata is None:
-            bgdata = get_data(bgfname, color=color)
-        bg,bg_sd = new_ringsum(bgdata,binarr,x0,y0, use_weighted=False)
+            bgdata = images.get_data(bgfname, color=color)
+            bgdata = ringsum.super_pixelate(bgdata, npix=npix)
+        _, bg,bg_sd = ringsum.ringsum(bgdata,x0,y0, use_weighted=False)
         sig = sig0 - bg
         sig_sd = np.sqrt(sig0_sd**2+bg_sd**2)
     else:
         sig,sig_sd = sig0,sig0_sd
 
-    r = np.concatenate(([0.0], binarr))
-    r = 0.5 * (r[0:-1] + r[1:])
 
     if sub_prof:
         print 'subtracting profile fit...'
@@ -117,7 +113,7 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
         dic = {'fname': abspath(fname), 'color': color, 'center': (x0, y0),
                 'binsize': binsize, 'r': r, 'sig': sig, 'sig_sd': sig_sd}
     else:
-        a = get_metadata(fname)
+        a = images.get_metadata(fname)
         dic = {'date':a['date'], 'time':a['time'], 'fname':abspath(fname),
                     'color':color, 'center':(x0,y0),
                     'binsize':binsize, 'r':r, 'sig':sig, 'sig_sd': sig_sd}
@@ -131,9 +127,9 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     print 'done!'
 
     if write is not None:
-        prep_folder(write)
-        dict_2_h5(join(write,'ringsum.h5'),dic)
-        
+        file_io.prep_folder(write)
+        file_io.dict_2_h5(join(write,'ringsum.h5'),dic)
+
     if write is not None or plotit:
         fig,axs = plt.subplots(2,1,figsize=(12,8))
 
@@ -150,7 +146,7 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
         axs[1].set_xlabel('R (px)')
         axs[1].legend()
         if write:
-            prep_folder(join(write,'plots'))
+            file_io.prep_folder(join(write,'plots'))
             plt.savefig(join(write,'plots','ringsum.png'),bbox_inches='tight')
         if plotit:
             plt.show()
@@ -158,12 +154,12 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             plt.close()
 
     fig, ax = plt.subplots()
-    #ax.plot(smooth_r, smooth_sig0, 'C1')
-    ax.plot(r, sig, 'C1')
-    #ax.ticklabel_format(style='sci', axis='both', scilimits=(0,0))
-    ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-    # ax.set_xlabel(r"R${}^2$ (px${}^2$)", fontsize=18)
-    ax.set_xlabel("R (px)", fontsize=18)
+    ax.plot(r**2, sig, 'C1')
+    #ax.plot(r, sig, color='C1')
+    ax.ticklabel_format(style='sci', axis='both', scilimits=(0,0))
+    #ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    ax.set_xlabel(r"R${}^2$ (px${}^2$)", fontsize=18)
+    #ax.set_xlabel("R (px)", fontsize=18)
     ax.set_ylabel("Counts", fontsize=18)
     ax.tick_params(labelsize=16)
     fig.tight_layout()
@@ -182,7 +178,7 @@ if __name__ == "__main__":
     parser.add_argument('--color', '-c', type=str, default='b', help='r,g,b color to use\
             when ringsumming image: default is b')
     parser.add_argument('--binsize', '-b', type=float, default=0.1, help='binsize for fine\
-            ringsum: default is 0.1')
+            ringsum: default is 0.25')
     parser.add_argument('-xy', type=float, nargs='+', default=None, help='x and y guess for\
             the center of image, if not provided the center of the ccd is assumed')
     parser.add_argument('--no_search', action='store_true',help='supresses the center finding\

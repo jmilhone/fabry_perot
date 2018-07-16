@@ -43,15 +43,15 @@ def Ti_solver(r, sig, sig_error, Ld_dir, finesse_dir, Ti_lim, V_lim, A_lim, base
         cube[2] = cube[2]*(A_lim[1] - A_lim[0]) + A_lim[0]
 
     def log_likelihood(cube, ndim, nparams):
-        #i = np.random.choice(nL)
+        i = np.random.choice(nL)
         #j = np.random.choice(nF)
 
-        #L = Lpost[i]
-        #d = dpost[i]
+        L = Lpost[i]
+        d = dpost[i]
         #F = Fpost[j]
 
-        L = 0.380173301412519577E+05
-        d = 0.883628502371783142E+00
+        # L = 0.380173301412519577E+05
+        # d = 0.883628502371783142E+00
         F = 21.0
         vals = forward_model(r, L, d, F, w0, mu, cube[2], cube[0], cube[1], sm_ang=False, nlambda=1024)
         chisq = np.sum((vals - sig)**2 / sig_error**2)
@@ -144,7 +144,7 @@ def check_solution(folder, Ld_dir, finesse_dir, recover=False, w0=487.98634, mu=
 
     fig, ax = plt.subplots(figsize=(3.5, 3.5/1.61))
     # ax.plot(r[ix], sig[ix], 'C1', alpha=0.5, label='Data')
-    ax.plot(r[ix], sig[ix]/100.0, 'C1', alpha=0.5, label='Data')
+    ax.plot(r[ix], (sig[ix]-3000.0)/100.0, 'C1', alpha=0.5, label='Data')
     #ax.plot(r[ix], vals, 'r')
     alphas = [0.8, 0.5, 0.2]
     keys = [68, 95, 99]
@@ -267,11 +267,11 @@ if __name__ == "__main__":
         parser.add_argument('finesse_folder', type=str,
                 help='folder containing finesse calibration multinest output')
 
-        parser.add_argument('--Ti_lim', '-Ti', type=float, nargs=2, default=[0.005,5.0],
-                help='bounds for Ti fit. Default is 0.005-5 eV')
+        parser.add_argument('--Ti_lim', '-Ti', type=float, nargs=2, default=[2.00,10.0],
+                help='bounds for Ti fit. Default is 2-10 eV')
 
-        parser.add_argument('--V_lim', type=float, nargs=2, default=[-2.0, 2.0],
-                help='bounds for V fit.  Default is -2 to +2 km/s')
+        parser.add_argument('--V_lim', type=float, nargs=2, default=[-10.0, 10.0],
+                help='bounds for V fit.  Default is -10 to +10 km/s')
 
         parser.add_argument('--overwrite',action='store_true',
                 help='allows you to overwrite previously saved finesse region')
@@ -337,9 +337,9 @@ if __name__ == "__main__":
     solver_in = Comm.bcast(solver_in, root=0)
     if solver_in is not None:
         print('im cheating!')
-        Ti_solver(solver_in['r'], solver_in['sig']-150.0, solver_in['error'], solver_in['Ld_dir'],
+        Ti_solver(solver_in['r'], solver_in['sig']-3000.0, solver_in['error'], solver_in['Ld_dir'],
                 solver_in['finesse_dir'], solver_in['Ti_lim'], solver_in['V_lim'], solver_in['A_lim'],
-                solver_in['basename'], resume=False, w0=solver_in['w0'], mu=solver_in['mu'], 
+                solver_in['basename'], resume=True, w0=solver_in['w0'], mu=solver_in['mu'], 
                 livepoints=solver_in['livepoints'],)
 
 

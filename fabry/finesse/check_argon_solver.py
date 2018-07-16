@@ -71,9 +71,11 @@ def check_solver(finesse_folder, Lpost, dpost):
     Ti = [0.025*1000.0/300.0, mode[3]]
     Ti += [0.025*1000.0/300.0 for _ in w_extra]
 
-    L = 0.380173301412519577E+05
-    d = 0.883628502371783142E+00
-
+    #L = 0.380173301412519577E+05
+    #d = 0.883628502371783142E+00
+    ichoice = random.choice(range(len(Lpost)))
+    L = Lpost[ichoice]
+    d = dpost[ichoice]
     vals = forward_model(r, L, d, mode[0], w, mass, amps, Ti, V, sm_ang=False, nlambda=2000)
     
     

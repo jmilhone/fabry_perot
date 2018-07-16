@@ -8,7 +8,7 @@ import sys
 #sys.path.append('../')
 from ..tools.plotting import my_hist
 
-def determine_fit_range(r, sig, pkr, thres=0.15, plotit=False):
+def determine_fit_range(r, signal, pkr, thres=0.15, plotit=False):
     '''
     helper function to pick fitting
     range using peak guess and a threshold
@@ -27,6 +27,7 @@ def determine_fit_range(r, sig, pkr, thres=0.15, plotit=False):
             of peak guess
     '''
     pkix = np.abs(pkr-r).argmin()
+    sig = signal - signal.min()
     pkthr = (1. - thres) * sig[pkix]
     diff = 1.
     i = 1
@@ -138,8 +139,9 @@ def find_peak(x,y,x_sd,y_sd,returnval=False,plotit=False):
             function at peak location in units of y array
     '''
     
-    beta0 = [y.max(),x.mean(),5*(x.max()-x.min())]
-
+    # beta0 = [y.max(),x.mean(),5*(x.max()-x.min())]
+    beta0 = [y.max(), np.sqrt(np.mean(x**2)), 5.0*(x.max() - x.min())]
+    print(beta0[1])
     if plotit:
         f,ax = plt.subplots()
         ax.errorbar(x,y,xerr=x_sd,yerr=y_sd,fmt='.',color='C0')

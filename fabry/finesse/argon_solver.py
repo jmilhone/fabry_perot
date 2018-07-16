@@ -39,11 +39,11 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
 
     def log_likelihood(cube, ndim, nparams):
         # I want to fix this at some point
-        #i = random.randint(0, nL-1)
-        #L = Lpost[i]
-        #d = dpost[i]
-        L = 0.380173301412519577E+05
-        d = 0.883628502371783142E+00
+        i = random.randint(0, nL-1)
+        L = Lpost[i]
+        d = dpost[i]
+        # L = 0.380173301412519577E+05
+        # d = 0.883628502371783142E+00
         amps, w, mass, V, Ti = build_function_parameters(cube, nparams)
 
         vals = forward_model(r, L, d, cube[0], w, mass, amps, Ti,

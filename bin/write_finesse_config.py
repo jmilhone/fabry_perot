@@ -41,6 +41,9 @@ def get_extra_rel_amplitudes(wavelengths):
 def get_and_parse_user_input(input_string, type_to_cast, n_elements=None):
     user_input = input(input_string)
     user_input = user_input.split(",")
+    if len(user_input[0]) == 0:
+        print('im here')
+        return []
     if n_elements:
         # we know how many elements we need
         return (type_to_cast(x) for _, x in zip(range(n_elements), user_input))
@@ -54,8 +57,10 @@ def main(fname):
     Arel_lim = get_Arel_limits()
     Ti_lim = get_Ti_limits()
     w0 = get_wavelengths()
-    amps = get_extra_rel_amplitudes(w0)
-
+    if w0:
+        amps = get_extra_rel_amplitudes(w0)
+    else:
+        amps = []
     config = {'F_lim': F_lim,
               'Arel_lim': Arel_lim,
               'Ti_lim': Ti_lim,
