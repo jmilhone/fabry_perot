@@ -218,3 +218,14 @@ def lyon_temp_forward(r, L, d, F, current, T, V, E=None):
 
 #def lyon_temp_forward_prof(r,L,d,F,current,T,V):
 
+def general_model(r, L, d, wavelength, emission):
+    cos_th = L / np.sqrt(L**2 + r**2)
+    cos_th = cos_th.reshape((1,len(r)))
+    airy = airy_func(wavelength, cos_th, d, F)
+
+    emis = emission[:, np.newaxis]
+    w = wavelength[:, np.newaxis]
+    model = trapz(emis * airy, w, axis=0)
+
+    return model
+
