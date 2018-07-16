@@ -128,10 +128,12 @@ def center_plot(data, x0=None, y0=None):
         x0 = data.shape[1]/2.
     if y0 is None:
         y0 = data.shape[0]/2.
-    
+    dx = int(0.3 * x0)
+    dy = int(0.3 * y0)
+
     fig, axs = plt.subplots(1,2,figsize=(12,6))
     cb = axs[0].imshow(data, cmap='gray', origin='lower')
-    axs[0].add_patch(Rectangle((x0-500,y0-500),1001,1001,lw=2,linestyle='--',ec='red',fc='none'))
+    axs[0].add_patch(Rectangle((x0-dx,y0-dy),2*dx,2*dy,lw=2,linestyle='--',ec='red',fc='none'))
     divider = make_axes_locatable(axs[0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
     fig.colorbar(cb, cax=cax)
@@ -140,8 +142,8 @@ def center_plot(data, x0=None, y0=None):
     plt.setp(axs[1].spines.values(), color='red')
     [i.set_linewidth(5) for i in axs[1].spines.itervalues()]
     [i.set_linestyle('--') for i in axs[1].spines.itervalues()]
-    axs[1].set_ylim(y0-500,y0+501)
-    axs[1].set_xlim(x0-500,x0+501)
+    axs[1].set_ylim(y0-dy,y0+dy)
+    axs[1].set_xlim(x0-dx,x0+dy)
 
     center_guess = ClickBuilder(fig)
     plt.tight_layout()
