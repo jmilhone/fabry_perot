@@ -43,7 +43,7 @@ if __name__ == "__main__":
         Lpost, dpost = read_Ld_results(abspath(args.ld_folder))
         restart = args.restart
         if restart:
-            a = input("Are you sure you want to restart?")
+            a = input("Are you sure you want to restart? ")
             try:
                 a = bool(strtobool(a))
             except ValueError:
@@ -73,13 +73,16 @@ if __name__ == "__main__":
 
     if solver_in is not None:
         if solver_in['filter'] == 'argon':
-            from fabry.finesse.argon_solver import solver
+            from fabry.finesse.argon_solver import solver, full_solver
         else:
             print("No idea how you got here...")
             sys.exit(1)
         resume = not solver_in['restart']
         solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
                solver_in['Lpost'], solver_in['dpost'], resume=resume, test_plot=False)
+
+        # full_solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
+        #         resume=resume, test_plot=False)
 
     if rank == 0:
         if solver_in['filter'] == 'argon':

@@ -48,6 +48,8 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
 
         vals = forward_model(r, L, d, cube[0], w, mass, amps, Ti,
                 V, sm_ang=False, nlambda=2000)
+        # trying to model offset here
+        vals += cube[1] * 0.15 / (1.0 + cube[0])
 
         chisq = np.sum((vals - sig)**2 / error**2)
         return -chisq / 2.0
@@ -132,6 +134,72 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
                 resume=resume, verbose=True, sampling_efficiency='model', n_live_points=100,
                 outputfiles_basename=join(folder, 'finesse_'))
+
+
+def full_solver(output_folder, prior_filename, data_filename, resume=True, test_plot=False):
+    def log_prior(cube, ndim, nparams):
+        cube[0] = cube[0]*(L_lim[1] - L_lim[0]) + L_lim[0]
+        cube[1] = cube[1]*(d_lim[1] - d_lim[0]) + d_lim[0]
+        cube[2] = cube[2]*(F_lim[1] - F_lim[0]) + F_lim[0]
+        cube[3] = cube[3]*(A_lim[1] - A_lim[0]) + A_lim[0]
+        cube[4] = cube[4]*(Arel_lim[1] - Arel_lim[0]) + Arel_lim[0]
+        cube[5] = cube[5]*(Ti_lim[1] - Ti_lim[0]) + Ti_lim[0]
+
+
+    def log_likelihood(cube, ndim, nparams):
+        vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
+                [0.0, 0.0], sm_ang=False, nlambda=2000)
+
+        chisq = np.sum((vals - sig)**2 / error**2)
+        return -chisq / 2.0
+
+    data = io.h5_2_dict(data_filename)
+
+    ix = data['fit_ix'][0:-1:3]
+    r = data['r'][ix]
+    sig = data['sig'][ix]
+    error = data['sig_sd'][ix]
+
+
+
+    Ti_Th = 0.025
+
+    L_lim = [145.0, 155.0]
+    L_lim = [x / 0.004 for x in L_lim]
+
+    d_lim = [0.87, 0.89]
+
+    F_lim = [19.0, 23.0]
+
+    Amax = np.max(sig)
+    A_lim = [0.75*Amax, 2.0*Amax]
+
+    Arel_lim = [0.3, 0.6]
+
+    Ti_lim = [0.025, 0.3]
+
+    n_params = 6
+    folder = abspath(output_folder)
+
+    if test_plot:
+        npts = 100
+        test_sig = np.zeros((npts, len(r)))
+        for i in xrange(npts):
+            cube = [random.random() for _ in xrange(n_params)] 
+            log_prior(cube, None, None)
+            test_sig[i, :] = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]],
+                                           [Ti_Th, cube[5]], [0.0, 0.0], sm_ang=False, nlambda=2000)
+
+        fig, ax = plt.subplots()
+        for i in xrange(npts):
+            ax.plot(r, test_sig[i, :], 'C0')
+        ax.errorbar(r, sig, yerr=error, fmt='', ecolor='C2', color='C1')
+        plt.show()
+
+    else:
+        pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
+                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=100,
+                outputfiles_basename=join(folder, 'full_'))
 
 
 

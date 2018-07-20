@@ -48,7 +48,7 @@ def determine_fit_range(r, signal, pkr, thres=0.15, plotit=False):
         ax.plot(r[Lix-1:Rix], sig[Lix-1:Rix],'r')
         plt.show()
 
-    return range(Lix-1, Rix) 
+    return range(Lix-1, Rix+1) 
 
 def find_maximum(x, y, returnval=False):
     '''
@@ -159,15 +159,34 @@ def find_peak(x,y,x_sd,y_sd,returnval=False,plotit=False):
     pk_err = output.sd_beta[1]
     val = _gauss(output.beta,pk)
     
+    print('Peak {0:.4f} +/- {1:.4f}'.format(pk, pk_err))
     if plotit:
         output.pprint()
         f,ax = plt.subplots()
         ax.errorbar(x,y,xerr=x_sd,yerr=y_sd,fmt='.',color='C0')
         # ax.fill_between(output.xplus,output.y+output.eps,output.y-output.eps,alpha=0.3,color='C1')
-        ax.fill_between(x, output.y+output.eps,output.y-output.eps,alpha=0.3,color='C1')
+        # nvals = 100
+        # npts = len(x)
+        # yvals = np.zeros((nvals, npts))
+        # beta0 = np.random.normal(loc=output.beta[0], scale=output.sd_beta[0], size=nvals)
+        # beta1 = np.random.normal(loc=output.beta[1], scale=output.sd_beta[1], size=nvals)
+        # beta2 = np.random.normal(loc=output.beta[2], scale=output.sd_beta[2], size=nvals)
+
+        # for i in xrange(nvals):
+        #     yvals[i, :] = _gauss([beta0[i], beta1[i], beta2[i]], x)
+
+        # ymean = np.nanmean(yvals, axis=0)
+        # ystd = np.nanstd(yvals, axis=0)
+
+        # ax.fill_between(x, output.y+output.eps,output.y-output.eps,alpha=0.3,color='C1')
+        err = np.abs(output.eps)
+        ax.fill_between(x, _gauss(output.beta, x)+err,_gauss(output.beta, x)-err,alpha=0.6,color='C1')
+        # output.pprint()
+        #ax.errorbar(x, _gauss(output.beta, x), yerr=output.eps, color='C2')
+        # ax.fill_between(x, ymean-ystd, ymean+ystd, alpha=0.3, color='C1')
         ax.axvspan(pk-pk_err,pk+pk_err,color='C2',alpha=0.3)
         plt.show()
-
+ 
     if returnval:
         return pk,pk_err,val
     else:
@@ -212,3 +231,45 @@ def find_maximum_3(x,y,y_sd,basename,plotit=False):
         plt.show()
 
     return pk,pk_err
+
+
+def gaussian_fit(x, y):
+
+    imax = np.argmax(y)
+    ymax = y[imax]
+    yy = y / ymax
+
+    if any(val < 0.5 for val in y):
+        # try finding the fwhm
+        left = np.abs(yy[0:imax] - 0.5).argmin()
+        right = np.abs(yy[imax:] - 0.5).argmin() + imax
+        fwhm = x[right] - x[left]
+    else:
+        fwhm = np.max(x) - np.min(x)
+
+    guess = [x[imax], fwhm / 2 / np.sqrt(2*np.log(2)) ]
+    fig, ax = plt.subplots()
+    ax.plot(x, yy, 'o')
+    xx = np.linspace(x.min(), x.max(), 100)
+    ax.plot(xx, _gaussian(xx, *guess))
+    plt.show()
+
+    popt, pcov = curve_fit(_gaussian, x, yy, p0=guess, sigma=0.01*yy, absolute_sigma=True)
+
+    fig, ax = plt.subplots()
+    ax.plot(x, yy, 'o')
+    ax.plot(xx, _gaussian(xx, *popt))
+    plt.show()
+
+    print('popt')
+    print(popt)
+    print(np.sqrt(popt[0]))
+    print(pcov)
+    pk = np.sqrt(popt[0])
+    pk_sd = 0.5 * np.sqrt(pcov[0,0]) / pk
+    return pk, pk_sd
+
+def _gaussian(x, b, c):
+    return np.exp(-0.5 * (x-b)**2 / c**2)
+
+

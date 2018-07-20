@@ -78,7 +78,9 @@ def check_solver(finesse_folder, Lpost, dpost):
     d = dpost[ichoice]
     vals = forward_model(r, L, d, mode[0], w, mass, amps, Ti, V, sm_ang=False, nlambda=2000)
     
-    
+    # trying to model offset here
+    vals += mode[1] * 0.15 / (1.0 + mode[0])
+
     fig, ax = plt.subplots()
     ax.errorbar(r, sig, yerr=error, ecolor='C2', color='C0', label='Data')
     ax.plot(r, vals, color='C1', label='Fit')

@@ -4,7 +4,7 @@ sys.path.append("../")
 import numpy as np
 import argparse
 from fabry.tools.file_io import h5_2_dict, dict_2_h5, prep_folder,read_Ld_results
-from fabry.core.fitting import determine_fit_range, find_peak, find_maximum
+from fabry.core.fitting import determine_fit_range, find_peak, find_maximum, gaussian_fit
 from fabry.tools.plotting import ringsum_click, peak_plot, my_hist, tableau20_colors
 from fabry.tools.images import get_data
 import matplotlib.pyplot as plt
@@ -15,7 +15,7 @@ import pymultinest
 import subprocess
 from scipy.special import erf
 
-px_size = 0.004
+px_size = 0.004# * 3
 
 def get_pk_locations(r, s, s_sd, w, folder, pkerr=1, names=None, pkthresh=0.20, plotit=True):
     '''
@@ -63,11 +63,13 @@ def get_pk_locations(r, s, s_sd, w, folder, pkerr=1, names=None, pkthresh=0.20, 
         peaks_sd_list = []
         for i,pk in enumerate(pkguess):
             idxs = determine_fit_range(r,s,np.sqrt(pk),thres=pkthresh[i])
-            # pk_r,pk_sd = find_peak(r[idxs],s[idxs],binsizes[idxs]/2.0,s_sd[idxs],plotit=True)
+            #pk_r,pk_sd = find_peak(r[idxs],s[idxs],binsizes[idxs]/2.0,s_sd[idxs],plotit=True)
+            #pk_r, pk_sd = gaussian_fit(r[idxs]**2, s[idxs])
+            #print('kens', pk_r)
             #ix = np.abs(pk_r - r).argmin()
             pk_r = find_maximum(r[idxs], s[idxs], returnval=False)
             peak_list.append(pk_r)
-            # peaks_sd_list.append(pk_sd)
+            #peaks_sd_list.append(pk_sd)
             rvals = np.sort(r[idxs])
             ifind = np.searchsorted(rvals, pk_r, side='left')
             #print(rvals[ifind-1], pk_r, rvals[ifind])
@@ -84,6 +86,9 @@ def get_pk_locations(r, s, s_sd, w, folder, pkerr=1, names=None, pkthresh=0.20, 
         name_dic = {}
         for i,ww in enumerate(wnames):
             name_dic[ww] = names[i]
+        print(peaks)
+        print(peaks_sd)
+        print(orders)
         peak_plot(r, s, peaks, peaks_sd, orders)
     print(peaks_sd)
     return peaks, peaks_sd, orders
@@ -103,33 +108,38 @@ def ld_multinest_solver(peaks, peaks_sd, orders, basename, L_lim, d_lim, livepoi
         cube[1] = cube[1]*(d_lim[1] - d_lim[0]) + d_lim[0]
 
     def log_likelihood(cube, ndim, nparams):
-        #chisq = 0.0
+        chisq = 0.0
         prob = 1
         log_prob = 0.0
         for w in wavelengths:
             r = peak_calculator(cube[0], cube[1], float(w), orders[w])
-            #chisq += np.sum( (r-peaks[w])**2 / peaks_sd[w]**2 )
+            #chisq += np.sum( (r-peaks[w])**2 / (peaks_sd[w])**2 )
             for rj, sd, peak in zip(r, peaks_sd[w], peaks[w]):
         #        # prob += cumulative_distribution(rj-peak, 0.2*sd)
         #        #print(rj, peak, sd)
                 #prob *= uniform_distribution(rj, peak, sd)
-                #prob *= tanh_distribution(rj, peak, sd)
-                log_prob += tanh_distribution(rj, peak, sd)
-        return log_prob
+                prob *= tanh_distribution(rj, peak, sd)
+                #log_prob += tanh_distribution(rj, peak, sd)
+        #if prob <= 0.0:
+        #    print('im here')
+        #    return -np.inf
+
+        #log_prob = np.log(prob)
+        #return log_prob
         # print(prob)
         #print(prob)
         #if any(p <= 0 for p in prob):
         #    print 'im here'
         #    return -np.inf
 
-        #if prob <= 0.0:
-        #    print('im here')
-        #    return -np.inf
-        #else:
-        #    return np.log(prob)
+        if prob <= 0.0:
+            print('im here')
+            return -np.inf
+        else:
+            return np.log(prob)
 
         #return sum(np.log(p) for p in prob)
-        #return -chisq / 2.0
+        return -chisq / 2.0
 
     def cumulative_distribution(delta_x, sigma_x):
         return 0.5 * (1.0 + erf(-delta_x / (np.sqrt(2)*sigma_x)))
@@ -147,7 +157,9 @@ def ld_multinest_solver(peaks, peaks_sd, orders, basename, L_lim, d_lim, livepoi
             fig, ax = plt.subplots()
             ax.plot(x, prob/sigma)
             plt.show()
-        return np.log((prob+1e-11) / sigma)
+        #return np.log((prob+1e-11) / sigma)
+        #return np.log((prob / sigma) + 1e-15)
+        return (prob+1e-9)/sigma
 
     def uniform_distribution(x, x0, sigma):
         if x0-sigma/2.0 < x < x0+sigma/2.0:
@@ -174,12 +186,12 @@ def ld_multinest_solver(peaks, peaks_sd, orders, basename, L_lim, d_lim, livepoi
     #idx = np.where(Lpost < 154.45 / px_size)
     idx = np.where(np.logical_and(Lpost > 154.45/px_size, Lpost < 154.65/px_size))
     w = wavelengths[1]
-    print(w)
+    #print(w)
     order = 0
     rvals = peak_calculator(Lpost, dpost, float(w), order)
     peak_sd, peak = peaks_sd[w][order], peaks[w][order]
     likeli = tanh_distribution(rvals, peak, peak_sd)
-    print(np.min(np.exp(likeli)))
+    #print(np.min(np.exp(likeli)))
     rarr = np.linspace(peak-2*peak_sd, peak+2*peak_sd, 1000)
     #fig, ax = plt.subplots()
     #ax.plot(rvals, np.exp(likeli), '.')
@@ -230,6 +242,13 @@ def ld_check(folder, bins=None, saveit=True):
     peak_plot(data['r'],data['sig'],data['peaks'],data['peaks_sd'],data['orders'],fax=(fig0,ax0),anspks=means,anspks_sd=stds)
 
     plt.show(block=False)
+
+    fig_, ax_ = plt.subplots()
+    for i, w in enumerate(hists.keys()):
+        for j, hist in enumerate(hists[w]):
+            ax_.axvline(data['peaks'][w][j], zorder=15)
+    ax_.plot(data['r'], data['sig'])
+    plt.show(block=False)
     wtest = 468.335172
     # print wtest
     # print peak_calculator(0.382288362412689094E+05, 0.883875718242851827E+00, wtest, 0)
@@ -267,18 +286,18 @@ def ld_check(folder, bins=None, saveit=True):
         axx[-1,i].set_xlabel('R (px)', fontsize=18)
     fig2.tight_layout()
 
-    if saveit:
-        fig0.savefig(join(fig_folder,'peaks.png'), dpi=400)
-        fig1.savefig(join(fig_folder,'Ld_marginals.png'), dpi=400)
-        fig2.savefig(join(fig_folder,'peak_histograms.png'), dpi=400)
+    #if saveit:
+    #    fig0.savefig(join(fig_folder,'peaks.png'), dpi=400)
+    #    fig1.savefig(join(fig_folder,'Ld_marginals.png'), dpi=400)
+    #    fig2.savefig(join(fig_folder,'peak_histograms.png'), dpi=400)
 
     plt.show()
 
-    fig, ax = plt.subplots()
-    #hist = peak_calculator(Lpost, dpost, float(468.619458), 1)
-    hist = peak_calculator(Lpost, dpost, float(468.925186), 1)
-    my_hist(ax, hist)
-    plt.show()
+    #fig, ax = plt.subplots()
+    ##hist = peak_calculator(Lpost, dpost, float(468.619458), 1)
+    #hist = peak_calculator(Lpost, dpost, float(468.925186), 1)
+    #my_hist(ax, hist)
+    #plt.show()
 
 if __name__ == "__main__":
     Comm = MPI.COMM_WORLD
@@ -293,7 +312,7 @@ if __name__ == "__main__":
         parser.add_argument('--pkerr', type=float, default=0.2,
                 help='error for peak locations in units of percent of binsize at peak. \
                 Should be between 1/6 and 1/2. Default is 1/5')
-        parser.add_argument('--pkthresh', type=float, default=0.4,
+        parser.add_argument('--pkthresh', type=float, default=0.7,
                 help='threshold for finding peak (can be a list corresponding to the various\
                 peaks). Default is 0.4')
         parser.add_argument('--overwrite',action='store_true', help='allows you to overwrite\
@@ -316,7 +335,7 @@ if __name__ == "__main__":
             resume = False
         else:
             resume = True
-        #resume = False 
+        # resume = False 
         if not isfile(fname) or args.overwrite:
             if isfile(org_fname):
                 data = h5_2_dict(org_fname)

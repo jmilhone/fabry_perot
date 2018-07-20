@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from os.path import join, abspath
 
 
-def get_finesse_region(r_array, sig_array, plot_fit_region=True):
+def get_finesse_region(r_array, sig_array, sig_err_array, plot_fit_region=True):
     """
     User clicks the left and right edges of the region they would like to fit for the finesse solver
 
@@ -26,8 +26,9 @@ def get_finesse_region(r_array, sig_array, plot_fit_region=True):
 
     if plot_fit_region:
         fig, ax = plt.subplots()
-        ax.plot(r_array, sig_array, 'C0', label='Signal')
-        ax.plot(r_array[fit_indices], sig_array[fit_indices], 'C1', label='Signal to Fit')
+        ax.errorbar(r_array, sig_array, yerr=sig_err_array , color='C0', label='Signal', ecolor='C2', errorevery=5)
+        ax.plot(r_array[fit_indices], sig_array[fit_indices], 'C1', label='Signal to Fit', zorder=100)
+        ax.axhline(sig_array.max() * 0.15 / (1.0 + 21.0), color='k')
         ax.legend(frameon=False)
         plt.show()
     return fit_indices
@@ -45,10 +46,19 @@ if __name__ == "__main__":
     print(data.keys())
     r = data['r']
     sig = data['sig']
+    data['sig_sd'] = np.sqrt(data['sig_sd']**2 + (0.01*sig)**2) # this is the error contribution from the center error
+    min_loc = np.argmin(sig)
+    # data['sig'] -= sig.min()
 
-    ix = get_finesse_region(r, sig, plot_fit_region=True)
+    # data['sig_sd'] = np.sqrt(data['sig_sd']**2 + data['sig_sd'][min_loc]**2) # Adding in the offset error
+
+    ix = get_finesse_region(r, sig, data['sig_sd'], plot_fit_region=True)
 
     data['fit_ix'] = ix
+
+    fig, ax = plt.subplots()
+    ax.plot(r, data['sig_sd'] / data['sig'])
+    plt.show()
 
     dict_2_h5(join(folder, 'finesse_input.h5'), data)
 

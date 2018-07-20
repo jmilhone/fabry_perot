@@ -68,7 +68,7 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             xguess,yguess = plotting.center_plot(data)
 
         x0,y0 = ringsum.locate_center(data, xguess=xguess, yguess=yguess, 
-                block_center=block_center, binsize=binsize, plotit=True)
+                block_center=block_center, binsize=0.1, plotit=True)
 
         if plotit:
             fig,ax = plt.subplots(figsize=(10,8))
@@ -87,14 +87,14 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             y0 = yguess
 
     print 'performing ringsums...'
-    r, sig0,sig0_sd = ringsum.ringsum(data,x0,y0, use_weighted=False, quadrants=False) 
+    r, sig0,sig0_sd = ringsum.ringsum(data,x0,y0, use_weighted=False, quadrants=False, binsize=binsize) 
 
     if bgfname is not None or fname[-2:].lower() == "h5":
         print 'removing background...'
         if bgdata is None:
             bgdata = images.get_data(bgfname, color=color)
             bgdata = ringsum.super_pixelate(bgdata, npix=npix)
-        _, bg,bg_sd = ringsum.ringsum(bgdata,x0,y0, use_weighted=False)
+        _, bg,bg_sd = ringsum.ringsum(bgdata,x0,y0, use_weighted=False, binsize=binsize)
         sig = sig0 - bg
         sig_sd = np.sqrt(sig0_sd**2+bg_sd**2)
     else:

@@ -261,8 +261,8 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
             i = i[0:-50]
         ni = len(i)
         #print(ni)
-        # ns = 25
-        ns = 13
+        ns = 25
+        # ns = 13
         sarr = 2 * np.arange(-ns, ns+1, 1)
         sarr_max = np.max(sarr)
         UB = np.zeros(len(sarr))
@@ -447,7 +447,7 @@ def ringsum(data, x0, y0, binsize=0.1, quadrants=False, use_weighted=False):
     #i =  np.linspace(0, imax, imax+1)
     #redges = np.sqrt(i * (2*ri - binsize)*binsize)
 
-    redges = get_bin_edges(data, x0, y0, binsize=0.1)
+    redges = get_bin_edges(data, x0, y0, binsize=binsize)
     ri = int(redges[-1])
 
     #print(ri, test[-1])
