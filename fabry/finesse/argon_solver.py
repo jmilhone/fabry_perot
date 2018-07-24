@@ -5,7 +5,7 @@ from ..core.models import forward_model, offset_forward_model
 import json
 import argparse
 import h5py
-import matplotlib.pyplot as plt # For testing purposes only
+#import matplotlib.pyplot as plt # For testing purposes only
 from ..tools import file_io as io
 import random
 from os.path import abspath, join
@@ -134,11 +134,11 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
             test_sig[i, :] = forward_model(r, L, d, cube[0], w, mass, amps, Ti,
                                            V, sm_ang=False, nlambda=2000)
 
-        fig, ax = plt.subplots()
-        for i in xrange(npts):
-            ax.plot(r, test_sig[i, :], 'C0')
-        ax.errorbar(r, sig, yerr=error, fmt='', ecolor='C2', color='C1')
-        plt.show()
+        # fig, ax = plt.subplots()
+        # for i in xrange(npts):
+        #     ax.plot(r, test_sig[i, :], 'C0')
+        # ax.errorbar(r, sig, yerr=error, fmt='', ecolor='C2', color='C1')
+        # plt.show()
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
                 resume=resume, verbose=True, sampling_efficiency='model', n_live_points=100,
@@ -201,11 +201,11 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
             test_sig[i, :] = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]],
                                            [Ti_Th, cube[5]], [0.0, 0.0], sm_ang=False, nlambda=2000)
 
-        fig, ax = plt.subplots()
-        for i in xrange(npts):
-            ax.plot(r, test_sig[i, :], 'C0')
-        ax.errorbar(r, sig, yerr=error, fmt='', ecolor='C2', color='C1')
-        plt.show()
+        # fig, ax = plt.subplots()
+        # for i in xrange(npts):
+        #     ax.plot(r, test_sig[i, :], 'C0')
+        # ax.errorbar(r, sig, yerr=error, fmt='', ecolor='C2', color='C1')
+        # plt.show()
 
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,

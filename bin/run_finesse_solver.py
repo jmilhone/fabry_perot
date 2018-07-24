@@ -88,8 +88,8 @@ if __name__ == "__main__":
         #solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
         #       solver_in['Lpost'], solver_in['dpost'], resume=resume, test_plot=False)
 
-        #full_solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
-        #        resume=resume, test_plot=False)
+        full_solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
+                resume=resume, test_plot=False)
 
     if rank == 0:
         end_time = time.time()
