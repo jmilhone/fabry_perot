@@ -1,7 +1,7 @@
 from __future__ import print_function, division, absolute_import
 import pymultinest
 import numpy as np
-from ..core.models import forward_model
+from ..core.models import forward_model, offset_forward_model
 import json
 import argparse
 import h5py
@@ -39,17 +39,26 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
 
     def log_likelihood(cube, ndim, nparams):
         # I want to fix this at some point
-        i = random.randint(0, nL-1)
+        # i = random.randint(0, nL-1)
+        i = np.random.choice(nL)
         L = Lpost[i]
         d = dpost[i]
         # L = 0.380173301412519577E+05
         # d = 0.883628502371783142E+00
-        amps, w, mass, V, Ti = build_function_parameters(cube, nparams)
+        # amps, w, mass, V, Ti = build_function_parameters(cube, nparams)
 
-        vals = forward_model(r, L, d, cube[0], w, mass, amps, Ti,
+        amps = [cube[1]*cube[2], cube[1]]
+        w = list(w0)
+        mass = list(mu)
+        Ti = [0.025, cube[3]]
+        V = [0.0, 0.0]
+
+        #vals = forward_model(r, L, d, cube[0], w, mass, amps, Ti,
+        #        V, sm_ang=False, nlambda=2000)
+        vals = offset_forward_model(r, L, d, cube[0], w, mass, amps, Ti,
                 V, sm_ang=False, nlambda=2000)
         # trying to model offset here
-        vals += cube[1] * 0.15 / (1.0 + cube[0])
+        #vals += cube[1] * 0.15 / (1.0 + cube[0])
 
         chisq = np.sum((vals - sig)**2 / error**2)
         return -chisq / 2.0
@@ -147,15 +156,17 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
 
     def log_likelihood(cube, ndim, nparams):
-        vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
-                [0.0, 0.0], sm_ang=False, nlambda=2000)
+        #vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
+        #        [0.0, 0.0], sm_ang=False, nlambda=2000)
+        vals = offset_forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
+                [0.0, 0.0], sm_ang=False, nlambda=2000, coeff=0.5)
 
         chisq = np.sum((vals - sig)**2 / error**2)
         return -chisq / 2.0
 
     data = io.h5_2_dict(data_filename)
 
-    ix = data['fit_ix'][0:-1:3]
+    ix = data['fit_ix'][0:-1:2]
     r = data['r'][ix]
     sig = data['sig'][ix]
     error = data['sig_sd'][ix]
@@ -164,12 +175,12 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
     Ti_Th = 0.025
 
-    L_lim = [145.0, 155.0]
+    L_lim = [135.0, 150.0]
     L_lim = [x / 0.004 for x in L_lim]
 
-    d_lim = [0.87, 0.89]
+    d_lim = [0.86, 0.88]
 
-    F_lim = [19.0, 23.0]
+    F_lim = [18.0, 22.0]
 
     Amax = np.max(sig)
     A_lim = [0.75*Amax, 2.0*Amax]
@@ -198,7 +209,7 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=100,
+                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=75,
                 outputfiles_basename=join(folder, 'full_'))
 
 

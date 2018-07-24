@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -143,8 +144,8 @@ def main(temp,I,plotit=True):
 if __name__ == "__main__":
     #wavelength, spec = main(0.8, 600)
     a = zeeman_factors(2,0.5,2.5,1,0.5,1.5)
-    print a['sm_fac']+a['sp_fac']
-    print a['sm_amp']+a['sp_amp']
+    print( a['sm_fac']+a['sp_fac'])
+    print( a['sm_amp']+a['sp_amp'])
     #f,ax = plt.subplots(figsize=(10,7))
     #temps = [0.4,0.6,0.8,1.0,1.2,1.4]
     #for t in temps:

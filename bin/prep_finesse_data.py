@@ -28,7 +28,7 @@ def get_finesse_region(r_array, sig_array, sig_err_array, plot_fit_region=True):
         fig, ax = plt.subplots()
         ax.errorbar(r_array, sig_array, yerr=sig_err_array , color='C0', label='Signal', ecolor='C2', errorevery=5)
         ax.plot(r_array[fit_indices], sig_array[fit_indices], 'C1', label='Signal to Fit', zorder=100)
-        ax.axhline(sig_array.max() * 0.15 / (1.0 + 21.0), color='k')
+        ax.axhline(sig_array.max() * 0.5 / (1.0 + (2*21.0 / np.pi)**2), color='k')
         ax.legend(frameon=False)
         plt.show()
     return fit_indices
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     print(data.keys())
     r = data['r']
     sig = data['sig']
-    data['sig_sd'] = np.sqrt(data['sig_sd']**2 + (0.01*sig)**2) # this is the error contribution from the center error
+    data['sig_sd'] = np.sqrt(100.0*data['sig_sd']**2 + (0.01*sig)**2) # this is the error contribution from the center error
     min_loc = np.argmin(sig)
     # data['sig'] -= sig.min()
 
@@ -60,5 +60,6 @@ if __name__ == "__main__":
     ax.plot(r, data['sig_sd'] / data['sig'])
     plt.show()
 
-    dict_2_h5(join(folder, 'finesse_input.h5'), data)
+    # dict_2_h5(join(folder, 'finesse_input.h5'), data)
+    dict_2_h5(join(folder, 'test_finesse_input.h5'), data)
 

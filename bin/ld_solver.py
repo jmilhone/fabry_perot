@@ -73,7 +73,7 @@ def get_pk_locations(r, s, s_sd, w, folder, pkerr=1, names=None, pkthresh=0.20, 
             rvals = np.sort(r[idxs])
             ifind = np.searchsorted(rvals, pk_r, side='left')
             #print(rvals[ifind-1], pk_r, rvals[ifind])
-            peaks_sd_list.append(rvals[ifind] - rvals[ifind-1])
+            peaks_sd_list.append(2.0*(rvals[ifind] - rvals[ifind-1]))
             #print pk_r, pk_sd, binsizes[ix]
         peaks[wstr] = np.array(peak_list)
         peaks_sd[wstr] = np.array(peaks_sd_list)

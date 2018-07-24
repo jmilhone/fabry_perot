@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing as mp
@@ -238,8 +238,8 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
         line3 = None
         line4 = None
 
-    print "Center finding:"
-    print "start x0: {0} y0: {1}".format(xguess, yguess)
+    print( "Center finding:")
+    print( "start x0: {0} y0: {1}".format(xguess, yguess))
     for ii in range(maxiter):
         #print(xguess, yguess)
         #binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = smAng_ringsum(data, xguess, yguess, binsize=binsize,quadrants=True)
@@ -310,7 +310,7 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
         else:
             yguess += UBcent * binsize
         
-        print "{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii)
+        print("{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii))
         if plotit:
             if line1 is not None:
                 line1.set_data(sarr, UB)
