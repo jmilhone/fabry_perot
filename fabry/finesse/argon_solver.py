@@ -209,7 +209,7 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=75,
+                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=200,
                 outputfiles_basename=join(folder, 'full_'))
 
 
