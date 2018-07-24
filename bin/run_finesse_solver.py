@@ -42,9 +42,12 @@ if __name__ == "__main__":
         data_filename = join(folder, 'finesse_input.h5')
 
         # Lpost, dpost = read_Ld_results(abspath(args.ld_folder))
-        Ldpost = np.loadtxt(join(abspath(args.ld_folder), 'full_post_equal_weights.dat'), ndmin=2)
-        Lpost = Ldpost[:, 0]
-        dpost = Ldpost[:, 1]
+        Lpost = 0.0
+        dpost = 0.0
+        # Ldpost = np.loadtxt(join(abspath(args.ld_folder), 'full_post_equal_weights.dat'), ndmin=2)
+        # Lpost = Ldpost[:, 0]
+        # dpost = Ldpost[:, 1]
+
         restart = args.restart
         if restart:
             a = input("Are you sure you want to restart? ")
@@ -90,15 +93,15 @@ if __name__ == "__main__":
 
     if rank == 0:
         end_time = time.time()
-        print("Total Time Elasped: {} minutes".format((end_time - start_time)/60.0))
-        if solver_in['filter'] == 'argon':
-            from fabry.finesse.check_argon_solver import check_solver, check_full_solver
-        else:
-            print("No idea how you got here...")
-            sys.exit(1)
+        #print("Total Time Elasped: {} minutes".format((end_time - start_time)/60.0))
+        #if solver_in['filter'] == 'argon':
+        #    from fabry.finesse.check_argon_solver import check_solver, check_full_solver
+        #else:
+        #    print("No idea how you got here...")
+        #    sys.exit(1)
 
         #check_solver(solver_in['out_folder'], solver_in['Lpost'], solver_in['dpost'])
-        check_full_solver(solver_in['out_folder'])
+        #check_full_solver(solver_in['out_folder'])
 
     #folder = "../Data/2018_04_23/Argon3"
 
