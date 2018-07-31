@@ -1,16 +1,13 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Core &#8212; Fabry Perot 0.1.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -24,20 +21,32 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Tools" href="tools.html" />
-    <link rel="prev" title="Welcome to Fabry Perot’s documentation!" href="index.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Welcome to Fabry Perot’s documentation!" href="index.html" /> 
   </head>
-  <body role="document">
-  
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Fabry Perot’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Fabry Perot 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -57,8 +66,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) &#8211; data array</li>
-<li><strong>error</strong> (<em>np.ndarray</em>) &#8211; standard deviation error bar for data</li>
+<li><strong>data</strong> (<em>np.ndarray</em>) – data array</li>
+<li><strong>error</strong> (<em>np.ndarray</em>) – standard deviation error bar for data</li>
 </ul>
 </td>
 </tr>
@@ -82,9 +91,9 @@ given a center and binsize</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dat</strong> (<em>np.ndarray</em>) &#8211; pixel values for the camera image</li>
-<li><strong>x0</strong> (<em>numbers.Real</em>) &#8211; x location (pixels) of the center of the image</li>
-<li><strong>y0</strong> (<em>numbers.Real</em>) &#8211; y location (pixels) of the center of the image</li>
+<li><strong>dat</strong> (<em>np.ndarray</em>) – pixel values for the camera image</li>
+<li><strong>x0</strong> (<em>numbers.Real</em>) – x location (pixels) of the center of the image</li>
+<li><strong>y0</strong> (<em>numbers.Real</em>) – y location (pixels) of the center of the image</li>
 </ul>
 </td>
 </tr>
@@ -108,20 +117,20 @@ given a center and binsize</p>
 
 <dl class="function">
 <dt id="fabry.core.ringsum.locate_center">
-<code class="descclassname">fabry.core.ringsum.</code><code class="descname">locate_center</code><span class="sig-paren">(</span><em>data_in</em>, <em>xguess=None</em>, <em>yguess=None</em>, <em>maxiter=25</em>, <em>binsize=0.1</em>, <em>plotit=False</em>, <em>block_center=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.locate_center" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fabry.core.ringsum.</code><code class="descname">locate_center</code><span class="sig-paren">(</span><em>data_in</em>, <em>xguess=None</em>, <em>yguess=None</em>, <em>maxiter=25</em>, <em>binsize=0.1</em>, <em>plotit=False</em>, <em>block_center=False</em>, <em>printit=True</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.locate_center" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds the center of a ring pattern image by preforming ringsums.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) &#8211; pixel values for the camera image</li>
-<li><strong>xguess</strong> (<em>numbers.Real</em>) &#8211; guess of x location of center, if None, takes data center</li>
-<li><strong>yguess</strong> (<em>numbers.Real</em>) &#8211; guess of y location of center, if None, takes data center</li>
-<li><strong>maxiter</strong> (<em>numbers.Integral</em>) &#8211; maximum number of center finding iterations</li>
-<li><strong>binsize</strong> (<em>numbers.Real</em>) &#8211; smallest radial binsize (occurs at the largest bin)</li>
-<li><strong>plotit</strong> (<em>bool</em>) &#8211; plot fitting curves</li>
-<li><strong>block_center</strong> (<em>bool</em>) &#8211; block center of image (600x600 on xguess,yguess) when           finding center. This helps when there is a ring at the center of the image.</li>
+<li><strong>data</strong> (<em>np.ndarray</em>) – pixel values for the camera image</li>
+<li><strong>xguess</strong> (<em>numbers.Real</em>) – guess of x location of center, if None, takes data center</li>
+<li><strong>yguess</strong> (<em>numbers.Real</em>) – guess of y location of center, if None, takes data center</li>
+<li><strong>maxiter</strong> (<em>numbers.Integral</em>) – maximum number of center finding iterations</li>
+<li><strong>binsize</strong> (<em>numbers.Real</em>) – smallest radial binsize (occurs at the largest bin)</li>
+<li><strong>plotit</strong> (<em>bool</em>) – plot fitting curves</li>
+<li><strong>block_center</strong> (<em>bool</em>) – block center of image (600x600 on xguess,yguess) when           finding center. This helps when there is a ring at the center of the image.</li>
 </ul>
 </td>
 </tr>
@@ -144,9 +153,9 @@ given a center and binsize</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) &#8211; 2d image data</li>
-<li><strong>x0</strong> (<em>numbers.Real</em>) &#8211; center location in x</li>
-<li><strong>y0</strong> (<em>numbers.Real</em>) &#8211; center location in y</li>
+<li><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</li>
+<li><strong>x0</strong> (<em>numbers.Real</em>) – center location in x</li>
+<li><strong>y0</strong> (<em>numbers.Real</em>) – center location in y</li>
 </ul>
 </td>
 </tr>
@@ -178,7 +187,7 @@ use_weighted (bool): use a weighted mean, default=False</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>np.ndarray</em>) &#8211; 2d image data</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</td>
 </tr>
 </tbody>
 </table>
@@ -213,10 +222,10 @@ as a function of wavelength and cos(theta) with parameters d and F</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>wavelength</strong> (<em>np.ndarray</em>) &#8211; wavelength array in nm</li>
-<li><strong>cos_th</strong> (<em>np.ndarray</em>) &#8211; cos(theta) array</li>
-<li><strong>d</strong> (<em>numbers.Real</em>) &#8211; etalon spacing in mm</li>
-<li><strong>F</strong> (<em>numbers.Real</em>) &#8211; etalon finesse</li>
+<li><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array in nm</li>
+<li><strong>cos_th</strong> (<em>np.ndarray</em>) – cos(theta) array</li>
+<li><strong>d</strong> (<em>numbers.Real</em>) – etalon spacing in mm</li>
+<li><strong>F</strong> (<em>numbers.Real</em>) – etalon finesse</li>
 </ul>
 </td>
 </tr>
@@ -242,10 +251,10 @@ from the doppler shift</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>w0</strong> (<em>numbers.Real</em>) &#8211; unshifted wavelength in nm</li>
-<li><strong>mu</strong> (<em>numbers.Real</em>) &#8211; atomic mass in amu</li>
-<li><strong>temp</strong> (<em>numbers.Real</em>) &#8211; temperature in eV</li>
-<li><strong>v</strong> (<em>numbers.Real</em>) &#8211; velocity in m/s</li>
+<li><strong>w0</strong> (<em>numbers.Real</em>) – unshifted wavelength in nm</li>
+<li><strong>mu</strong> (<em>numbers.Real</em>) – atomic mass in amu</li>
+<li><strong>temp</strong> (<em>numbers.Real</em>) – temperature in eV</li>
+<li><strong>v</strong> (<em>numbers.Real</em>) – velocity in m/s</li>
 </ul>
 </td>
 </tr>
@@ -268,14 +277,14 @@ from the doppler shift</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) &#8211; array of r values to compute model on</li>
-<li><strong>L</strong> (<em>numbers.Real</em>) &#8211; camera lens focal length, same units as r (pixels or mm)</li>
-<li><strong>d</strong> (<em>numbers.Real</em>) &#8211; etalon spacing (mm)</li>
-<li><strong>F</strong> (<em>numbers.Real</em>) &#8211; etalon finesse</li>
-<li><strong>w0</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em><em></em>) &#8211; central wavelength(s) in nm</li>
-<li><strong>mu</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em><em></em>) &#8211; mass(es) in amu</li>
-<li><strong>temp</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em><em></em>) &#8211; temperature(s) in eV</li>
-<li><strong>v</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em><em></em>) &#8211; velocities in m/s</li>
+<li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute model on</li>
+<li><strong>L</strong> (<em>numbers.Real</em>) – camera lens focal length, same units as r (pixels or mm)</li>
+<li><strong>d</strong> (<em>numbers.Real</em>) – etalon spacing (mm)</li>
+<li><strong>F</strong> (<em>numbers.Real</em>) – etalon finesse</li>
+<li><strong>w0</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – central wavelength(s) in nm</li>
+<li><strong>mu</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – mass(es) in amu</li>
+<li><strong>temp</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – temperature(s) in eV</li>
+<li><strong>v</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</li>
 </ul>
 </td>
 </tr>
@@ -308,11 +317,11 @@ sm_ang (bool): use the small angle approx or not, default=True</dd>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>wavelength</strong> (<em>np.ndarray</em>) &#8211; wavelength array to calculate spec on</li>
-<li><strong>w</strong> (<em>numbers.Real</em>) &#8211; central wavelength (same units as wavelength array)</li>
-<li><strong>sigma</strong> (<em>numbers.Real</em>) &#8211; sigma for gaussian (same units as w)</li>
-<li><strong>amp</strong> (<em>numbers.Real</em>) &#8211; amplitude of spectrum, default=1.0</li>
-<li><strong>norm</strong> (<em>bool</em>) &#8211; if true, the gaussian will be normalized, default=True
+<li><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array to calculate spec on</li>
+<li><strong>w</strong> (<em>numbers.Real</em>) – central wavelength (same units as wavelength array)</li>
+<li><strong>sigma</strong> (<em>numbers.Real</em>) – sigma for gaussian (same units as w)</li>
+<li><strong>amp</strong> (<em>numbers.Real</em>) – amplitude of spectrum, default=1.0</li>
+<li><strong>norm</strong> (<em>bool</em>) – if true, the gaussian will be normalized, default=True
 to integrate to 1 over infinity then the amp factor will be multiplied</li>
 </ul>
 </td>
@@ -337,10 +346,10 @@ to integrate to 1 over infinity then the amp factor will be multiplied</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>wavelength</strong> (<em>np.array</em>) &#8211; wavelength array to calculate spec on</li>
-<li><strong>w</strong> (<em>numbers.Real</em>) &#8211; central wavelength (same units as wavelength array)</li>
-<li><strong>gamma</strong> (<em>numbers.Real</em>) &#8211; lorentzian gamma parameter</li>
-<li><strong>amp</strong> (<em>numbers.Real</em><em>, </em><em>default=1.</em>) &#8211; amplitude in addition to one that integrates
+<li><strong>wavelength</strong> (<em>np.array</em>) – wavelength array to calculate spec on</li>
+<li><strong>w</strong> (<em>numbers.Real</em>) – central wavelength (same units as wavelength array)</li>
+<li><strong>gamma</strong> (<em>numbers.Real</em>) – lorentzian gamma parameter</li>
+<li><strong>amp</strong> (<em>numbers.Real</em><em>, </em><em>default=1.</em>) – amplitude in addition to one that integrates
 spec to 1 over infinity</li>
 </ul>
 </td>
@@ -358,20 +367,20 @@ spec to 1 over infinity</li>
 <dl class="function">
 <dt id="fabry.core.models.offset_forward_model">
 <code class="descclassname">fabry.core.models.</code><code class="descname">offset_forward_model</code><span class="sig-paren">(</span><em>r</em>, <em>L</em>, <em>d</em>, <em>F</em>, <em>w0</em>, <em>mu</em>, <em>amp</em>, <em>temp</em>, <em>v</em>, <em>nlambda=1024</em>, <em>sm_ang=False</em>, <em>coeff=0.15</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.models.offset_forward_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward model with an attempt to model the &#8216;offset&#8217; from nuissance lines</p>
+<dd><p>Forward model with an attempt to model the ‘offset’ from nuissance lines</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) &#8211; array of r values to compute model on</li>
-<li><strong>L</strong> (<em>numbers.Real</em>) &#8211; camera lens focal length, same units as r (pixels or mm)</li>
-<li><strong>d</strong> (<em>numbers.Real</em>) &#8211; etalon spacing (mm)</li>
-<li><strong>F</strong> (<em>numbers.Real</em>) &#8211; etalon finesse</li>
-<li><strong>w0</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em><em></em>) &#8211; central wavelength(s) in nm</li>
-<li><strong>mu</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em><em></em>) &#8211; mass(es) in amu</li>
-<li><strong>temp</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em><em></em>) &#8211; temperature(s) in eV</li>
-<li><strong>v</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em><em></em>) &#8211; velocities in m/s</li>
+<li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute model on</li>
+<li><strong>L</strong> (<em>numbers.Real</em>) – camera lens focal length, same units as r (pixels or mm)</li>
+<li><strong>d</strong> (<em>numbers.Real</em>) – etalon spacing (mm)</li>
+<li><strong>F</strong> (<em>numbers.Real</em>) – etalon finesse</li>
+<li><strong>w0</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – central wavelength(s) in nm</li>
+<li><strong>mu</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – mass(es) in amu</li>
+<li><strong>temp</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – temperature(s) in eV</li>
+<li><strong>v</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</li>
 </ul>
 </td>
 </tr>
@@ -405,10 +414,10 @@ coeff (numbers.Real): coefficient to model the relative amplitude of all the nui
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>L</strong> (<em>numbers.Real</em>) &#8211; L value, units will set return units (pixels or mm)</li>
-<li><strong>d</strong> (<em>numbers.Real</em>) &#8211; etalon spacing in mm</li>
-<li><strong>w</strong> (<em>numbers.Real</em>) &#8211; peak wavelength in nm</li>
-<li><strong>order</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>,</em><em>numbers.Integral</em><em>]</em><em></em>) &#8211; j order number. 0 gives order nearest center
+<li><strong>L</strong> (<em>numbers.Real</em>) – L value, units will set return units (pixels or mm)</li>
+<li><strong>d</strong> (<em>numbers.Real</em>) – etalon spacing in mm</li>
+<li><strong>w</strong> (<em>numbers.Real</em>) – peak wavelength in nm</li>
+<li><strong>order</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>,</em><em>numbers.Integral</em><em>]</em>) – j order number. 0 gives order nearest center
 of rings, increasing j as you move out.</li>
 </ul>
 </td>
@@ -437,8 +446,8 @@ of rings, increasing j as you move out.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>y</strong> (<em>Union</em><em>[</em><em>list</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; y data points</li>
-<li><strong>x</strong> (<em>Union</em><em>[</em><em>list</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; x data points</li>
+<li><strong>y</strong> (<em>Union</em><em>[</em><em>list</em><em>, </em><em>np.ndarray</em><em>]</em>) – y data points</li>
+<li><strong>x</strong> (<em>Union</em><em>[</em><em>list</em><em>, </em><em>np.ndarray</em><em>]</em>) – x data points</li>
 </ul>
 </td>
 </tr>
@@ -464,9 +473,9 @@ of rings, increasing j as you move out.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) &#8211; r data</li>
-<li><strong>sig</strong> (<em>np.ndarray</em>) &#8211; ringsum data</li>
-<li><strong>pkr</strong> (<em>numbers.Real</em>) &#8211; guess for peak location</li>
+<li><strong>r</strong> (<em>np.ndarray</em>) – r data</li>
+<li><strong>sig</strong> (<em>np.ndarray</em>) – ringsum data</li>
+<li><strong>pkr</strong> (<em>numbers.Real</em>) – guess for peak location</li>
 </ul>
 </td>
 </tr>
@@ -501,8 +510,8 @@ plotit (bools): plots the determined range for checking, default=False</dd>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>np.ndarray</em>) &#8211; x array of values</li>
-<li><strong>y</strong> (<em>np.ndarray</em>) &#8211; y array of values</li>
+<li><strong>x</strong> (<em>np.ndarray</em>) – x array of values</li>
+<li><strong>y</strong> (<em>np.ndarray</em>) – y array of values</li>
 </ul>
 </td>
 </tr>
@@ -547,10 +556,10 @@ plotit (bools): plots the determined range for checking, default=False</dd>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>np.ndarray</em>) &#8211; x values for fit</li>
-<li><strong>y</strong> (<em>np.ndarray</em>) &#8211; y values for fit</li>
-<li><strong>x_sd</strong> (<em>np.ndarray</em>) &#8211; standard deviation in x values (typically binsize)</li>
-<li><strong>y_sd</strong> (<em>np.ndarray</em>) &#8211; standard deviation in y values</li>
+<li><strong>x</strong> (<em>np.ndarray</em>) – x values for fit</li>
+<li><strong>y</strong> (<em>np.ndarray</em>) – y values for fit</li>
+<li><strong>x_sd</strong> (<em>np.ndarray</em>) – standard deviation in x values (typically binsize)</li>
+<li><strong>y_sd</strong> (<em>np.ndarray</em>) – standard deviation in y values</li>
 </ul>
 </td>
 </tr>
@@ -583,19 +592,19 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Etalon.L">
 <code class="descname">L</code><a class="headerlink" href="#fabry.core.synthetic.Etalon.L" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; focal length of lens for the camera</p>
+<dd><p><em>numbers.Real</em> – focal length of lens for the camera</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Etalon.d">
 <code class="descname">d</code><a class="headerlink" href="#fabry.core.synthetic.Etalon.d" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; etalon spacing</p>
+<dd><p><em>numbers.Real</em> – etalon spacing</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Etalon.F">
 <code class="descname">F</code><a class="headerlink" href="#fabry.core.synthetic.Etalon.F" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; finesse of etalon</p>
+<dd><p><em>numbers.Real</em> – finesse of etalon</p>
 </dd></dl>
 
 <dl class="method">
@@ -611,8 +620,8 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>sensor</strong> (<a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor"><em>Sensor</em></a>) &#8211; represents a camera sensor</li>
-<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) &#8211; represents a light source for the Fabry Perot</li>
+<li><strong>sensor</strong> (<a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor"><em>Sensor</em></a>) – represents a camera sensor</li>
+<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – represents a light source for the Fabry Perot</li>
 </ul>
 </td>
 </tr>
@@ -642,7 +651,7 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>etalon</strong> (<em>dict</em>) &#8211; dictionary representing a etalon</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>etalon</strong> (<em>dict</em>) – dictionary representing a etalon</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an new instance of a Etalon</td>
 </tr>
@@ -677,31 +686,31 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.temperature">
 <code class="descname">temperature</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.temperature" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; temperature of the emitting ion in eV</p>
+<dd><p><em>numbers.Real</em> – temperature of the emitting ion in eV</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.wavelength">
 <code class="descname">wavelength</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.wavelength" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; wavelength of the light emitted in nm</p>
+<dd><p><em>numbers.Real</em> – wavelength of the light emitted in nm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.mu">
 <code class="descname">mu</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.mu" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; relative mass of the ion</p>
+<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.amplitude">
 <code class="descname">amplitude</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.amplitude" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; amplitude of the light emitted (you can choose your units here...)</p>
+<dd><p><em>numbers.Real</em> – amplitude of the light emitted (you can choose your units here…)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.velocity">
 <code class="descname">velocity</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.velocity" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>VelocityProfile or numbers.Real</em> &#8211; velocity of the emitting ion in m/s</p>
+<dd><p><em>VelocityProfile or numbers.Real</em> – velocity of the emitting ion in m/s</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -712,7 +721,7 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>light_source</strong> (<em>dict</em>) &#8211; dictionary representing a light source</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>light_source</strong> (<em>dict</em>) – dictionary representing a light source</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">LightSource</td>
 </tr>
@@ -735,44 +744,44 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.nx">
 <code class="descname">nx</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.nx" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Integral</em> &#8211; number of pixels in the x direction</p>
+<dd><p><em>numbers.Integral</em> – number of pixels in the x direction</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.ny">
 <code class="descname">ny</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.ny" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Integral</em> &#8211; number of pixels in the y direction</p>
+<dd><p><em>numbers.Integral</em> – number of pixels in the y direction</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.px_size">
 <code class="descname">px_size</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.px_size" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; Pixel size in mm</p>
+<dd><p><em>numbers.Real</em> – Pixel size in mm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.x0">
 <code class="descname">x0</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.x0" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; x location of the center</p>
+<dd><p><em>numbers.Real</em> – x location of the center</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.y0">
 <code class="descname">y0</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.y0" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; y location of th center</p>
+<dd><p><em>numbers.Real</em> – y location of th center</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.sensor">
 <code class="descname">sensor</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.sensor" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>np.ndarray</em> &#8211; 2D array representing the sensors where each
+<dd><p><em>np.ndarray</em> – 2D array representing the sensors where each
 element is the count value for that pixel</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.R">
 <code class="descname">R</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.R" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>np.ndarray</em> &#8211; 2D array of radii values for each pixel</p>
+<dd><p><em>np.ndarray</em> – 2D array of radii values for each pixel</p>
 </dd></dl>
 
 <dl class="method">
@@ -784,8 +793,8 @@ element is the count value for that pixel</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>etalon</strong> (<a class="reference internal" href="#fabry.core.synthetic.Etalon" title="fabry.core.synthetic.Etalon"><em>Etalon</em></a>) &#8211; representation of the etalon</li>
-<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) &#8211; representation of the light source</li>
+<li><strong>etalon</strong> (<a class="reference internal" href="#fabry.core.synthetic.Etalon" title="fabry.core.synthetic.Etalon"><em>Etalon</em></a>) – representation of the etalon</li>
+<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – representation of the light source</li>
 </ul>
 </td>
 </tr>
@@ -815,7 +824,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sensor</strong> (<em>dict</em>) &#8211; dictionary representing a sensor</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sensor</strong> (<em>dict</em>) – dictionary representing a sensor</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a new instance of a Sensor</td>
 </tr>
@@ -853,49 +862,49 @@ element is the count value for that pixel</p>
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.temperature">
 <code class="descname">temperature</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.temperature" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; temperature of the emitting ion in eV</p>
+<dd><p><em>numbers.Real</em> – temperature of the emitting ion in eV</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.wavelength">
 <code class="descname">wavelength</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.wavelength" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; wavelength of the light emitted in nm</p>
+<dd><p><em>numbers.Real</em> – wavelength of the light emitted in nm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.mu">
 <code class="descname">mu</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.mu" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; relative mass of the ion</p>
+<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.amplitude">
 <code class="descname">amplitude</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.amplitude" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; amplitude of the light emitted (you can choose your units here...)</p>
+<dd><p><em>numbers.Real</em> – amplitude of the light emitted (you can choose your units here…)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.velocity">
 <code class="descname">velocity</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.velocity" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Union[VelocityProfile,numbers.Real]</em> &#8211; velocity of the emitting ion in m/s</p>
+<dd><p><em>Union[VelocityProfile,numbers.Real]</em> – velocity of the emitting ion in m/s</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.ne">
 <code class="descname">ne</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.ne" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; electron density in cm^-3</p>
+<dd><p><em>numbers.Real</em> – electron density in cm^-3</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.pec">
 <code class="descname">pec</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.pec" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; photon emissivity coefficient (need to decide on units here)</p>
+<dd><p><em>numbers.Real</em> – photon emissivity coefficient (need to decide on units here)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">mu</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; relative mass of the ion</p>
+<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="method">
@@ -906,7 +915,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; velocity in m/s</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity in m/s</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -922,7 +931,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>plasma</strong> (<em>dict</em>) &#8211; dictionary representation of a UniformPlasma</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>plasma</strong> (<em>dict</em>) – dictionary representation of a UniformPlasma</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">UniformPlasma</td>
 </tr>
@@ -939,8 +948,8 @@ element is the count value for that pixel</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; wavelength to calculate emission line profile</li>
-<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; velocity of ion for doppler shift</li>
+<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line profile</li>
+<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity of ion for doppler shift</li>
 </ul>
 </td>
 </tr>
@@ -957,8 +966,8 @@ element is the count value for that pixel</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; radii to calculate ion emission at</li>
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; wavelength to calculate emission line
+<li><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to calculate ion emission at</li>
+<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line
 profile</li>
 </ul>
 </td>
@@ -1010,37 +1019,37 @@ profile</li>
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.Vmax">
 <code class="descname">Vmax</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.Vmax" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; maximum velocity</p>
+<dd><p><em>numbers.Real</em> – maximum velocity</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.max_radius">
 <code class="descname">max_radius</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.max_radius" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; radial location of the maximum velocity</p>
+<dd><p><em>numbers.Real</em> – radial location of the maximum velocity</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.length_scale">
 <code class="descname">length_scale</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.length_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; scale for the velocity gradient inward radially</p>
+<dd><p><em>numbers.Real</em> – scale for the velocity gradient inward radially</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.edge_scale">
 <code class="descname">edge_scale</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.edge_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; scale for the velocity edge gradient</p>
+<dd><p><em>numbers.Real</em> – scale for the velocity edge gradient</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.R0">
 <code class="descname">R0</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.R0" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; location of the edge</p>
+<dd><p><em>numbers.Real</em> – location of the edge</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.offset">
 <code class="descname">offset</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.offset" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> &#8211; offset velocity in the center</p>
+<dd><p><em>numbers.Real</em> – offset velocity in the center</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -1051,7 +1060,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>dict</em>) &#8211; dict reprsentation of a VelocityProfile</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>dict</em>) – dict reprsentation of a VelocityProfile</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">VelocityProfile</td>
 </tr>
@@ -1067,7 +1076,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>]</em><em></em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; radii to evaluate at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1083,7 +1092,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; radii to evaulate at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaulate at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1113,7 +1122,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; radii to evaluate vphi at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate vphi at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1130,44 +1139,44 @@ profile</li>
 <dl class="attribute">
 <dt>
 <code class="descname">nx</code></dt>
-<dd><p><em>numbers.Integral</em> &#8211; number of pixels in the x direction</p>
+<dd><p><em>numbers.Integral</em> – number of pixels in the x direction</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">ny</code></dt>
-<dd><p><em>numbers.Integral</em> &#8211; number of pixels in the y direction</p>
+<dd><p><em>numbers.Integral</em> – number of pixels in the y direction</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">px_size</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; Pixel size in mm</p>
+<dd><p><em>numbers.Real</em> – Pixel size in mm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">x0</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; x location of the center</p>
+<dd><p><em>numbers.Real</em> – x location of the center</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">y0</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; y location of th center</p>
+<dd><p><em>numbers.Real</em> – y location of th center</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">sensor</code></dt>
-<dd><p><em>np.ndarray</em> &#8211; 2D array representing the sensors where each
+<dd><p><em>np.ndarray</em> – 2D array representing the sensors where each
 element is the count value for that pixel</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">R</code></dt>
-<dd><p><em>np.ndarray</em> &#8211; 2D array of radii values for each pixel</p>
+<dd><p><em>np.ndarray</em> – 2D array of radii values for each pixel</p>
 </dd></dl>
 
 <dl class="method">
@@ -1179,8 +1188,8 @@ element is the count value for that pixel</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>etalon</strong> (<a class="reference internal" href="#fabry.core.synthetic.Etalon" title="fabry.core.synthetic.Etalon"><em>Etalon</em></a>) &#8211; representation of the etalon</li>
-<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) &#8211; representation of the light source</li>
+<li><strong>etalon</strong> (<a class="reference internal" href="#fabry.core.synthetic.Etalon" title="fabry.core.synthetic.Etalon"><em>Etalon</em></a>) – representation of the etalon</li>
+<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – representation of the light source</li>
 </ul>
 </td>
 </tr>
@@ -1210,7 +1219,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sensor</strong> (<em>dict</em>) &#8211; dictionary representing a sensor</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sensor</strong> (<em>dict</em>) – dictionary representing a sensor</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a new instance of a Sensor</td>
 </tr>
@@ -1245,19 +1254,19 @@ element is the count value for that pixel</p>
 <dl class="attribute">
 <dt>
 <code class="descname">L</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; focal length of lens for the camera</p>
+<dd><p><em>numbers.Real</em> – focal length of lens for the camera</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">d</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; etalon spacing</p>
+<dd><p><em>numbers.Real</em> – etalon spacing</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">F</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; finesse of etalon</p>
+<dd><p><em>numbers.Real</em> – finesse of etalon</p>
 </dd></dl>
 
 <dl class="method">
@@ -1273,8 +1282,8 @@ element is the count value for that pixel</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>sensor</strong> (<a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor"><em>Sensor</em></a>) &#8211; represents a camera sensor</li>
-<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) &#8211; represents a light source for the Fabry Perot</li>
+<li><strong>sensor</strong> (<a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor"><em>Sensor</em></a>) – represents a camera sensor</li>
+<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – represents a light source for the Fabry Perot</li>
 </ul>
 </td>
 </tr>
@@ -1304,7 +1313,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>etalon</strong> (<em>dict</em>) &#8211; dictionary representing a etalon</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>etalon</strong> (<em>dict</em>) – dictionary representing a etalon</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an new instance of a Etalon</td>
 </tr>
@@ -1339,31 +1348,31 @@ element is the count value for that pixel</p>
 <dl class="attribute">
 <dt>
 <code class="descname">temperature</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; temperature of the emitting ion in eV</p>
+<dd><p><em>numbers.Real</em> – temperature of the emitting ion in eV</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">wavelength</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; wavelength of the light emitted in nm</p>
+<dd><p><em>numbers.Real</em> – wavelength of the light emitted in nm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">mu</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; relative mass of the ion</p>
+<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">amplitude</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; amplitude of the light emitted (you can choose your units here...)</p>
+<dd><p><em>numbers.Real</em> – amplitude of the light emitted (you can choose your units here…)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">velocity</code></dt>
-<dd><p><em>VelocityProfile or numbers.Real</em> &#8211; velocity of the emitting ion in m/s</p>
+<dd><p><em>VelocityProfile or numbers.Real</em> – velocity of the emitting ion in m/s</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -1374,7 +1383,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>light_source</strong> (<em>dict</em>) &#8211; dictionary representing a light source</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>light_source</strong> (<em>dict</em>) – dictionary representing a light source</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">LightSource</td>
 </tr>
@@ -1400,49 +1409,49 @@ element is the count value for that pixel</p>
 <dl class="attribute">
 <dt>
 <code class="descname">temperature</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; temperature of the emitting ion in eV</p>
+<dd><p><em>numbers.Real</em> – temperature of the emitting ion in eV</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">wavelength</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; wavelength of the light emitted in nm</p>
+<dd><p><em>numbers.Real</em> – wavelength of the light emitted in nm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">mu</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; relative mass of the ion</p>
+<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">amplitude</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; amplitude of the light emitted (you can choose your units here...)</p>
+<dd><p><em>numbers.Real</em> – amplitude of the light emitted (you can choose your units here…)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">velocity</code></dt>
-<dd><p><em>Union[VelocityProfile,numbers.Real]</em> &#8211; velocity of the emitting ion in m/s</p>
+<dd><p><em>Union[VelocityProfile,numbers.Real]</em> – velocity of the emitting ion in m/s</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">ne</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; electron density in cm^-3</p>
+<dd><p><em>numbers.Real</em> – electron density in cm^-3</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">pec</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; photon emissivity coefficient (need to decide on units here)</p>
+<dd><p><em>numbers.Real</em> – photon emissivity coefficient (need to decide on units here)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">mu</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; relative mass of the ion</p>
+<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="method">
@@ -1453,7 +1462,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; velocity in m/s</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity in m/s</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1469,7 +1478,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>plasma</strong> (<em>dict</em>) &#8211; dictionary representation of a UniformPlasma</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>plasma</strong> (<em>dict</em>) – dictionary representation of a UniformPlasma</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">UniformPlasma</td>
 </tr>
@@ -1486,8 +1495,8 @@ element is the count value for that pixel</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; wavelength to calculate emission line profile</li>
-<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; velocity of ion for doppler shift</li>
+<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line profile</li>
+<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity of ion for doppler shift</li>
 </ul>
 </td>
 </tr>
@@ -1504,8 +1513,8 @@ element is the count value for that pixel</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; radii to calculate ion emission at</li>
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; wavelength to calculate emission line
+<li><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to calculate ion emission at</li>
+<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line
 profile</li>
 </ul>
 </td>
@@ -1557,37 +1566,37 @@ profile</li>
 <dl class="attribute">
 <dt>
 <code class="descname">Vmax</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; maximum velocity</p>
+<dd><p><em>numbers.Real</em> – maximum velocity</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">max_radius</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; radial location of the maximum velocity</p>
+<dd><p><em>numbers.Real</em> – radial location of the maximum velocity</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">length_scale</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; scale for the velocity gradient inward radially</p>
+<dd><p><em>numbers.Real</em> – scale for the velocity gradient inward radially</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">edge_scale</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; scale for the velocity edge gradient</p>
+<dd><p><em>numbers.Real</em> – scale for the velocity edge gradient</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">R0</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; location of the edge</p>
+<dd><p><em>numbers.Real</em> – location of the edge</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">offset</code></dt>
-<dd><p><em>numbers.Real</em> &#8211; offset velocity in the center</p>
+<dd><p><em>numbers.Real</em> – offset velocity in the center</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -1598,7 +1607,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>dict</em>) &#8211; dict reprsentation of a VelocityProfile</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>dict</em>) – dict reprsentation of a VelocityProfile</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">VelocityProfile</td>
 </tr>
@@ -1614,7 +1623,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>]</em><em></em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; radii to evaluate at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1630,7 +1639,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; radii to evaulate at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaulate at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1660,7 +1669,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em><em></em>) &#8211; radii to evaluate vphi at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate vphi at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1689,15 +1698,13 @@ profile</li>
 </ul>
 </li>
 </ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Fabry Perot&#8217;s documentation!</a></li>
-      <li>Next: <a href="tools.html" title="next chapter">Tools</a></li>
-  </ul></li>
-</ul>
-</div>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Fabry Perot’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">Tools</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -1719,20 +1726,27 @@ profile</li>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2018, Jason Milhone.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
-      
-      |
-      <a href="_sources/core.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Fabry Perot’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Fabry Perot 0.1.0 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Jason Milhone.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
   </body>
 </html>

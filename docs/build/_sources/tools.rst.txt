@@ -12,4 +12,3 @@ Images
 
 .. automodule:: fabry.tools.images
     :members:
-.. autofunction:: fabry.tools.images.read_nef
