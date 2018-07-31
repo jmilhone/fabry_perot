@@ -3,14 +3,19 @@ import rawpy
 import exifread
 import numpy as np
 import os.path as path
+import collections
 
 image_readers = []
 
+
 def register_reader(reader_func):
-    """
-    Decorator for registering functions as image readers
+    """Decorator for registering functions as image readers
+
+    Args:
+        reader_func (collections.Callable): callable function for reading in image files
     """
     image_readers.append(reader_func)
+
 
 def check_nef(filename):
     if filename[-4:].lower() != '.nef':
@@ -24,8 +29,13 @@ def check_nef(filename):
 
 @register_reader
 def read_nef(fname):
-    """
-    Reads .nef image files
+    """Reads .nef image files
+
+    Args:
+        fname (str): filename to read
+
+    Returns:
+        np.ndarray: 2d image data
     """
     if path.splitext(fname)[-1].lower() == '.nef':
         image = rawpy.imread(fname)
@@ -39,8 +49,13 @@ def read_nef(fname):
 
 @register_reader
 def read_npy(fname):
-    """
-    Reads numpy binary files
+    """Reads numpy binary files
+
+    Args:
+        fname (str): filename to read
+    
+    Returns: 
+        np.ndarray: 2d image data
     """
     if path.splitext(fname)[-1].lower() == ".npy":
         data = np.load(fname)
@@ -49,7 +64,17 @@ def read_npy(fname):
         return None
 
 def get_data(filename, color=None):
+    """Reads image data from filename
 
+    Args:
+        fname (str): filename to read
+
+    Kwargs:
+        color (Union[numbers.Integral, str]): [0,2] for rgb, or a letter from rgb
+
+    Returns: 
+        np.ndarray: 2d image data
+    """
     for reader in image_readers:
         image = reader(filename)
         if image is not None:
@@ -71,6 +96,14 @@ def get_data(filename, color=None):
     return a
 
 def get_metadata(filename):
+    """Returns metadata from image filename
+
+    Args:
+        filename (str): file to get metadata from
+
+    Returns:
+        dict: dictionary containing metadata
+    """
     filename = check_nef(filename)
     with open(filename, 'rb') as f:
         tags = exifread.process_file(f, details=False)
@@ -78,3 +111,5 @@ def get_metadata(filename):
     time = str(tags['Image DateTime'].values.split(' ')[1])
     model = str(tags['Image Model'].values)
     return {'date':date, 'time':time, 'model':model}
+
+

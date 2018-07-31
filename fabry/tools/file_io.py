@@ -4,15 +4,13 @@ import numpy as np
 import h5py
 
 def dict_2_h5(fname, dic, append=False):
-    '''
-    Writes a dictionary to a hdf5 file with given filename
-    It will use lzf compression for all numpy arrays
-    
+    '''Writes a dictionary to a hdf5 file with given filename
+        It will use lzf compression for all numpy arrays
+
     Args:
         fname (str): filename to write to
-        dic (dictionary): dictionary to write
-        append (bool, default=False): if true, will
-            append to file instead of overwriting
+        dic (dict): dictionary to write
+        append (bool): if true, will append to file instead of overwriting, default=False
     '''
     if append:
         method = 'r+'
@@ -22,21 +20,20 @@ def dict_2_h5(fname, dic, append=False):
         recursive_save_dict_to_h5(h5, '/', dic)
 
 def h5_2_dict(fname):
-    '''
-    Reads a dictionary from a hdf5 file with given filename
+    '''Reads a dictionary from a hdf5 file with given filename
 
     Args:
         fname (str): hdf5 filename to read
+
     Returns:
-        dic (dictionary): dictionary of hdf5 keys
+        dict: dictionary of hdf5 keys
     '''
     with h5py.File(fname, 'r') as h5:
         return recursive_load_dict_from_h5(h5, '/')
 
 def prep_folder(path):
-    '''
-    Checks if folder exists and recursively creates folders
-    to ensure the path is valid
+    '''Checks if folder exists and recursively creates folders
+        to ensure the path is valid
 
     Args:
         path (str): path to folder
@@ -74,14 +71,13 @@ def recursive_load_dict_from_h5(h5, path):
     return out_dict
 
 def read_Ld_results(Ld_directory):
-    '''
-    reads L and d histogram data from multinest run
-    
+    '''Reads L and d histogram data from multinest run
+
     Args:
         Ld_directory (str): path to multinest save directory
+
     Returns:
-        L (np.ndarray): L histogram values (in pixels)
-        d (np.ndarray): d histogram values (in mm)
+        Tuple (np.ndarray, np.ndarray) L histogram values (in pixels), d histogram values (in mm)
     '''
     try:
         fname = os.path.join(Ld_directory,"Ld_post_equal_weights.dat")

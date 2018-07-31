@@ -3,9 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing as mp
 from numba import jit
+import numbers
+
 '''
 Core module contains ringsum codes that are the basis of this
-analysis. 
+analysis.
 
 Functions:
     get_binarr: returns binarr for ringsums
@@ -16,28 +18,28 @@ Functions:
 '''
 
 
-def _histogram(bins, R, weights, out=None, label=None):
-        '''
-        Helper function to perform a histogram using multiprocessing
-
-        Args:
-            bins (np.array): bins in radius pixel space (does not include origin)
-            R (np.ndarray): radius matrix for the camera
-            weights (np.ndarray): pixel values for the camera
-            out (mp.Queue): mulitprocessing.Queue to write data to
-            label (str): label for the quadrant being ringsummed
-
-        Returns:
-            None if used with an output Queue
-            sig (np.array): ringsum array
-            label (str): label for the quadrant
-        '''
-        sig, _ = np.histogram(R, bins=np.concatenate((np.array([0.]),
-                                bins)),weights=weights)
-        if out and label:
-            out.put((label, sig))
-        else:
-            return sig, label
+#def _histogram(bins, R, weights, out=None, label=None):
+#        '''
+#        Helper function to perform a histogram using multiprocessing
+#
+#        Args:
+#            bins (np.array): bins in radius pixel space (does not include origin)
+#            R (np.ndarray): radius matrix for the camera
+#            weights (np.ndarray): pixel values for the camera
+#            out (mp.Queue): mulitprocessing.Queue to write data to
+#            label (str): label for the quadrant being ringsummed
+#
+#        Returns:
+#            None if used with an output Queue
+#            sig (np.array): ringsum array
+#            label (str): label for the quadrant
+#        '''
+#        sig, _ = np.histogram(R, bins=np.concatenate((np.array([0.]),
+#                                bins)),weights=weights)
+#        if out and label:
+#            out.put((label, sig))
+#        else:
+#            return sig, label
 
 def get_bin_edges(dat, x0, y0, binsize=0.1):
     '''
@@ -46,13 +48,14 @@ def get_bin_edges(dat, x0, y0, binsize=0.1):
 
     Args:
         dat (np.ndarray): pixel values for the camera image
-        x0 (float): x location (pixels) of the center of the image
-        y0 (float): y location (pixels) of the center of the image
-        binsize (float, default=0.1): smallest radial bin size 
-                (occurs at the largest bin)
+        x0 (numbers.Real): x location (pixels) of the center of the image
+        y0 (numbers.Real): y location (pixels) of the center of the image
+
+    Kwargs:
+        binsize (numbers.Real): smallest radial bin size (occurs at the largest bin)
 
     Returns:
-        binarr (np.array): bins for the ring sum in pixels
+        np.ndarray: bins for the ring sum in pixels
     '''
     # ny, nx = dat.shape
     # x = np.arange(0, nx, 1)
@@ -84,122 +87,122 @@ def get_bin_edges(dat, x0, y0, binsize=0.1):
     return redges
 
 
-def smAng_ringsum(dat, x0, y0, binsize=0.1, quadrants=False):
-    '''
-    Performs a constant area ring sum in pixel space. This is valid
-    when the small angle approximation is taken for Cos(Theta). 
+#def smAng_ringsum(dat, x0, y0, binsize=0.1, quadrants=False):
+#    '''
+#    Performs a constant area ring sum in pixel space. This is valid
+#    when the small angle approximation is taken for Cos(Theta). 
+#
+#    Args:
+#        dat (np.ndarray): pixel values for the camera image
+#        x0 (float): x location (pixels) of the center of the image
+#        y0 (float): y location (pixels) of the center of the image
+#        binsize (float, default=0.1): smallest radial bin size 
+#                (occurs at the largest bin)
+#        quadrants (bool, default=False): if True, returns separate
+#                ringsums for each quadrant (used for center finding)
+#
+#    Returns:
+#        binarr (np.array): bins for the ring sum in pixels
+#        ringsum (np.array): ringsum(s) If quadrants is True, there
+#                will be 4 separate ringsums in order: UL UR BL BR
+#    '''
+#    ny, nx = dat.shape
+#    x = np.arange(0, nx, 1)
+#    y = np.arange(0, ny, 1)
+#
+#    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+#    R = np.sqrt(xx**2 + yy**2)
+#
+#    xmin = xx[0, 0]
+#    xmax = xx[0, -1]
+#    ymin = yy[0, 0]
+#    ymax = yy[-1, 0]
+#    #print(xmin, xmax, ymin, ymax)
+#    ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
+#    imax = int((ri ** 2. - 2. * ri - 1.) / (1. + 2. * ri) / binsize)
+#
+#    norm_radius = np.sqrt(2*binsize*ri + binsize**2)
+#    binarr = np.sqrt(range(1, imax))*norm_radius
+#    
+#    xi0 = int(x0)
+#    yi0 = int(y0)
+#
+#    i1 = [yi0-ri, yi0-ri, yi0, yi0]
+#    i2 = [yi0+1, yi0+1, yi0+ri+1, yi0+ri+1]
+#    j1 = [xi0-ri, xi0, xi0-ri, xi0]
+#    j2 = [xi0+1, xi0+ri+1, xi0+1, xi0+ri+1]
+#
+#    procs = []
+#    nprocs = 4
+#    sigs = {}
+#    out = mp.Queue()
+#    labels = ['UL', 'UR', 'BL', 'BR']
+#    for k in range(nprocs):
+#        p = mp.Process(target=_histogram, args=(binarr, 
+#            R[i1[k]:i2[k], j1[k]:j2[k]], dat[i1[k]:i2[k], j1[k]:j2[k]]),
+#            kwargs={'out': out, 'label': labels[k]})
+#        procs.append(p)
+#        p.start()
+#
+#    for i in range(nprocs):
+#        tup = out.get()
+#        sigs[tup[0]] = tup[1]
+#
+#    for p in procs:
+#        p.join()
+#
+#    # Return all 4 quadrant rings sums or sum them into one
+#    if quadrants:
+#        return binarr, sigs['UL'], sigs['UR'], sigs['BL'], sigs['BR']
+#    else:
+#        return binarr, sigs['UL']+sigs['UR']+sigs['BL']+sigs['BR']
 
-    Args:
-        dat (np.ndarray): pixel values for the camera image
-        x0 (float): x location (pixels) of the center of the image
-        y0 (float): y location (pixels) of the center of the image
-        binsize (float, default=0.1): smallest radial bin size 
-                (occurs at the largest bin)
-        quadrants (bool, default=False): if True, returns separate
-                ringsums for each quadrant (used for center finding)
 
-    Returns:
-        binarr (np.array): bins for the ring sum in pixels
-        ringsum (np.array): ringsum(s) If quadrants is True, there
-                will be 4 separate ringsums in order: UL UR BL BR
-    '''
-    ny, nx = dat.shape
-    x = np.arange(0, nx, 1)
-    y = np.arange(0, ny, 1)
-
-    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
-    R = np.sqrt(xx**2 + yy**2)
-
-    xmin = xx[0, 0]
-    xmax = xx[0, -1]
-    ymin = yy[0, 0]
-    ymax = yy[-1, 0]
-    #print(xmin, xmax, ymin, ymax)
-    ri = int(np.min(np.abs([xmin, xmax, ymin, ymax])))
-    imax = int((ri ** 2. - 2. * ri - 1.) / (1. + 2. * ri) / binsize)
-
-    norm_radius = np.sqrt(2*binsize*ri + binsize**2)
-    binarr = np.sqrt(range(1, imax))*norm_radius
-    
-    xi0 = int(x0)
-    yi0 = int(y0)
-
-    i1 = [yi0-ri, yi0-ri, yi0, yi0]
-    i2 = [yi0+1, yi0+1, yi0+ri+1, yi0+ri+1]
-    j1 = [xi0-ri, xi0, xi0-ri, xi0]
-    j2 = [xi0+1, xi0+ri+1, xi0+1, xi0+ri+1]
-
-    procs = []
-    nprocs = 4
-    sigs = {}
-    out = mp.Queue()
-    labels = ['UL', 'UR', 'BL', 'BR']
-    for k in range(nprocs):
-        p = mp.Process(target=_histogram, args=(binarr, 
-            R[i1[k]:i2[k], j1[k]:j2[k]], dat[i1[k]:i2[k], j1[k]:j2[k]]),
-            kwargs={'out': out, 'label': labels[k]})
-        procs.append(p)
-        p.start()
-
-    for i in range(nprocs):
-        tup = out.get()
-        sigs[tup[0]] = tup[1]
-
-    for p in procs:
-        p.join()
-
-    # Return all 4 quadrant rings sums or sum them into one
-    if quadrants:
-        return binarr, sigs['UL'], sigs['UR'], sigs['BL'], sigs['BR']
-    else:
-        return binarr, sigs['UL']+sigs['UR']+sigs['BL']+sigs['BR']
-
-
-def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda, ndl=512):
-    """
-    Performs a proper ringsum with constant lambda spacing for each peak.
-    This is quite slow and not implemented anywhere in the code currently,
-    but has been included for completeness.
-
-    Args:
-        R (np.array): flattened array matrix from camera
-        weights: flattened pixel value matrix from camera
-        m (float): highest order number (not an integer value)
-        L (float): camera focal length in pixels
-        d (float): etalon spacing in mm
-        peaks (list): location of peaks in pixels
-        lambda_min (float): minimum wavelength in array
-        lambda_max (float): maximum wavelength in array
-        delta_lambda (float): delta wavelength spacing
-
-    Returns:
-        ringsum (list): a list of ringsums for each peak (order) in peaks
-    """
-    ringsum = []
-    for idx, peak in enumerate(peaks):
-        if isinstance(m, list):
-            mm = m[idx]
-        else:
-            mm = m - idx
-        rmin = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_max)) ** 2 - L ** 2)
-        rmax = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_min)) ** 2 - L ** 2)
-        inds = np.where(np.logical_and(R > rmin, R < rmax))[0]
-
-        r0 = 2.*d*1.e6*L / mm / delta_lambda
-        dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rmin ** 2) - 1. / r0)) ** 2 - L ** 2) - rmin
-        rR = [rmin, rmin + dr]
-        j = 0
-        while len(rR) <= ndl: #rR[-1] <= rmax:
-            j += 1
-            dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rR[-1] ** 2) - 1. / r0)) ** 2 
-                    - L ** 2) - rR[-1]
-            rR += [rR[-1] + dr]
-
-        sig, _ = np.histogram(R[inds], bins=rR, weights=weights[inds])
-        # to correspond to my calibration wavelength array, sig is actually backwards...
-        sig = sig[::-1]
-        ringsum += [sig]
-    return ringsum
+#def proper_ringsum(R, weights, m, L, d, peaks, lambda_min, lambda_max, delta_lambda, ndl=512):
+#    """
+#    Performs a proper ringsum with constant lambda spacing for each peak.
+#    This is quite slow and not implemented anywhere in the code currently,
+#    but has been included for completeness.
+#
+#    Args:
+#        R (np.array): flattened array matrix from camera
+#        weights: flattened pixel value matrix from camera
+#        m (float): highest order number (not an integer value)
+#        L (float): camera focal length in pixels
+#        d (float): etalon spacing in mm
+#        peaks (list): location of peaks in pixels
+#        lambda_min (float): minimum wavelength in array
+#        lambda_max (float): maximum wavelength in array
+#        delta_lambda (float): delta wavelength spacing
+#
+#    Returns:
+#        ringsum (list): a list of ringsums for each peak (order) in peaks
+#    """
+#    ringsum = []
+#    for idx, peak in enumerate(peaks):
+#        if isinstance(m, list):
+#            mm = m[idx]
+#        else:
+#            mm = m - idx
+#        rmin = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_max)) ** 2 - L ** 2)
+#        rmax = np.sqrt((2 * d * L * 1.e6 / (mm * lambda_min)) ** 2 - L ** 2)
+#        inds = np.where(np.logical_and(R > rmin, R < rmax))[0]
+#
+#        r0 = 2.*d*1.e6*L / mm / delta_lambda
+#        dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rmin ** 2) - 1. / r0)) ** 2 - L ** 2) - rmin
+#        rR = [rmin, rmin + dr]
+#        j = 0
+#        while len(rR) <= ndl: #rR[-1] <= rmax:
+#            j += 1
+#            dr = np.sqrt((1. / (1. / np.sqrt(L ** 2 + rR[-1] ** 2) - 1. / r0)) ** 2 
+#                    - L ** 2) - rR[-1]
+#            rR += [rR[-1] + dr]
+#
+#        sig, _ = np.histogram(R[inds], bins=rR, weights=weights[inds])
+#        # to correspond to my calibration wavelength array, sig is actually backwards...
+#        sig = sig[::-1]
+#        ringsum += [sig]
+#    return ringsum
 
 
 def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, plotit=False, block_center=False):
@@ -208,16 +211,15 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
 
     Args:
         data (np.ndarray): pixel values for the camera image
-        xguess (float, default=None): guess of x location of center, if None, takes data center
-        yguess (float, default=None): guess of y location of center, if None, takes data center
-        maxiter (int, default=25): maximum number of center finding iterations
-        binsize (float, default=0.1): smallest radial binsize (occurs at the largest bin)
-        plotit (bool, default=False): plot fitting curves
-        block_center (bool, default=False): block center of image (600x600 on xguess,yguess) when           finding center. This helps when there is a ring at the center of the image.
+        xguess (numbers.Real): guess of x location of center, if None, takes data center
+        yguess (numbers.Real): guess of y location of center, if None, takes data center
+        maxiter (numbers.Integral): maximum number of center finding iterations
+        binsize (numbers.Real): smallest radial binsize (occurs at the largest bin)
+        plotit (bool): plot fitting curves
+        block_center (bool): block center of image (600x600 on xguess,yguess) when           finding center. This helps when there is a ring at the center of the image.
 
     Returns:
-        x0 (float): x location of center
-        y0 (float): y location of center
+        tuple (numbers.Real, numbers.Real): x and y location of the center
     '''
     if xguess is None:
         xguess = data.shape[1]/2.
@@ -337,62 +339,71 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
     return xguess, yguess
 
 
-def new_ringsum(data, redges, x0, y0, use_weighted=False):
-    """
-    redges are all of the right edges (the first left edge is zero)
-    """
-    ny, nx = data.shape
-    x = np.arange(0, nx, 1)
-    y = np.arange(0, ny, 1)
-
-    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
-    R = np.sqrt(xx**2 + yy**2)
-
-    R = R.flatten()
-    d = data.flatten()
-
-    indsort = np.argsort(R)
-    R = R[indsort]
-    d = d[indsort]
-
-    n = len(redges)
-    means = np.zeros(n)
-    sigmas = np.zeros(n)
-    lengths = np.zeros(n)
-    start = 0
-    for idx, edge in enumerate(redges):
-        iedge = np.searchsorted(R[start:], edge, side='right')
-        portion = slice(start,start+iedge)
-        #if idx == 5000:
-        #    fig, ax = plt.subplots()
-        #    ax.hist(R[portion])
-        #    plt.show()
-        if use_weighted:
-            means[idx], sigmas[idx] = calculate_weighted_mean(d[portion], np.sqrt(1.8*d[portion]))
-        else:
-            means[idx] = np.mean(d[portion])
-            sigmas[idx] = np.std(d[portion]) / np.sqrt(len(d[portion]))
-
-        lengths[idx] = len(d[portion])
-        start += iedge
-    #print(redges[-1] - redges[-2])
-    #fig, ax = plt.subplots()
-    #plt.plot(redges[0:-1]**2, np.diff(redges**2))
-    #plt.show(block=False)
-
-    #fig, ax = plt.subplots()
-    #plt.plot(np.diff(redges))
-    #plt.show()
-    # fig, ax =plt.subplots()
-    # ax.hist(lengths, bins='auto', density='True')
-    # ax.set_xlabel('Number of Points in a Ring')
-    # ax.set_title("{0:d} +/- {1:d}".format(int(np.mean(lengths)), int(np.std(lengths))))
-    # plt.show()
-    return means, sigmas
+#def new_ringsum(data, redges, x0, y0, use_weighted=False):
+#    """
+#    redges are all of the right edges (the first left edge is zero)
+#    """
+#    ny, nx = data.shape
+#    x = np.arange(0, nx, 1)
+#    y = np.arange(0, ny, 1)
+#
+#    xx, yy = np.meshgrid(1.*x-x0, 1.*y-y0)
+#    R = np.sqrt(xx**2 + yy**2)
+#
+#    R = R.flatten()
+#    d = data.flatten()
+#
+#    indsort = np.argsort(R)
+#    R = R[indsort]
+#    d = d[indsort]
+#
+#    n = len(redges)
+#    means = np.zeros(n)
+#    sigmas = np.zeros(n)
+#    lengths = np.zeros(n)
+#    start = 0
+#    for idx, edge in enumerate(redges):
+#        iedge = np.searchsorted(R[start:], edge, side='right')
+#        portion = slice(start,start+iedge)
+#        #if idx == 5000:
+#        #    fig, ax = plt.subplots()
+#        #    ax.hist(R[portion])
+#        #    plt.show()
+#        if use_weighted:
+#            means[idx], sigmas[idx] = calculate_weighted_mean(d[portion], np.sqrt(1.8*d[portion]))
+#        else:
+#            means[idx] = np.mean(d[portion])
+#            sigmas[idx] = np.std(d[portion]) / np.sqrt(len(d[portion]))
+#
+#        lengths[idx] = len(d[portion])
+#        start += iedge
+#    #print(redges[-1] - redges[-2])
+#    #fig, ax = plt.subplots()
+#    #plt.plot(redges[0:-1]**2, np.diff(redges**2))
+#    #plt.show(block=False)
+#
+#    #fig, ax = plt.subplots()
+#    #plt.plot(np.diff(redges))
+#    #plt.show()
+#    # fig, ax =plt.subplots()
+#    # ax.hist(lengths, bins='auto', density='True')
+#    # ax.set_xlabel('Number of Points in a Ring')
+#    # ax.set_title("{0:d} +/- {1:d}".format(int(np.mean(lengths)), int(np.std(lengths))))
+#    # plt.show()
+#    return means, sigmas
 
 
 @jit(nopython=True)
 def calculate_weighted_mean(data, error):
+    """Calculates the weighted mean of data with standard deviation error
+
+    Args:
+        data (np.ndarray): data array
+        error (np.ndarray): standard deviation error bar for data
+
+    Returns:
+        tuple (numbers.Real, numbers.Real): weighted mean and weighted standard deviation
+    """    
     idx = np.where(error > 0.0)
     err = error[idx]
     d = data[idx]
@@ -412,6 +423,17 @@ def calculate_weighted_mean(data, error):
 
 @jit(nopython=True)
 def super_pixelate(data, npix=2):
+    """Creates super pixels for image data
+
+    Args:
+        data (np.ndarray): 2d image data
+
+    Kwargs: 
+        npix (numbers.Integral): integer number of pixels to create an npix x npix super pixel
+
+    Returns:
+        np.ndarray: New image made from the super pixels
+    """
     n, m = data.shape
 
     n_new = n // npix
@@ -429,7 +451,21 @@ def super_pixelate(data, npix=2):
 
 
 def ringsum(data, x0, y0, binsize=0.1, quadrants=False, use_weighted=False):
+    """Returns a equal annulus area ringsum centered at (x0, y0) from data
 
+    Args:
+        data (np.ndarray): 2d image data
+        x0 (numbers.Real): center location in x
+        y0 (numbers.Real): center location in y
+
+    Kwargs:
+        binsize (numbers.Real): the delta r of the last annulus, default=0.1
+        quadrants (bool): split the ringsum into 4 quadrants to use multiprocessing, default=False
+        use_weighted (bool): use a weighted mean, default=False
+
+    Returns:
+        tuple (np.ndarray, np.ndarray, np.ndarray): r bins, ring sum, ring sum error
+    """
     ny, nx = data.shape
     x = np.arange(0, nx, 1)
     y = np.arange(0, ny, 1)
@@ -496,6 +532,22 @@ def ringsum(data, x0, y0, binsize=0.1, quadrants=False, use_weighted=False):
 
 
 def _ringsum(redges, radii, data, out=None, label=None, use_weighted=False):
+    """Helper function for ringsumming
+
+    Args:
+        redges (np.ndarray): bin edges (does not include origin)
+        radii (np.ndarray): radii to bin
+        data (np.ndarray): image weights for the radii to be binned with
+
+    Kwargs: 
+        out (mp.Queue): multiprocessing queue to place results in if needed
+        label (list): label to put with results when placing in out
+        use_weighted (bool): use weighted mean if True, default=False
+
+    Returns:
+        None if use_weighted
+        tuple (np.ndarray, np.ndarray): ring sum, ring sum standard deviations
+    """
     # redges does not include zero!
     n = len(redges) 
 

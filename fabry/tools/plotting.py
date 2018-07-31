@@ -7,7 +7,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 def tableau20_colors():
     '''
     good set of colors for plotting
-    
+
     Returns:
         tableau20 (list): list of r,g,b color values
     '''

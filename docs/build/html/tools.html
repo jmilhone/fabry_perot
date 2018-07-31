@@ -1,0 +1,260 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tools &#8212; Fabry Perot 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Core" href="core.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tools">
+<h1>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-fabry.tools.file_io">
+<span id="file-io"></span><h2>File_IO<a class="headerlink" href="#module-fabry.tools.file_io" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fabry.tools.file_io.dict_2_h5">
+<code class="descclassname">fabry.tools.file_io.</code><code class="descname">dict_2_h5</code><span class="sig-paren">(</span><em>fname</em>, <em>dic</em>, <em>append=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.dict_2_h5" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Writes a dictionary to a hdf5 file with given filename</dt>
+<dd>It will use lzf compression for all numpy arrays</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fname</strong> (<em>str</em>) &#8211; filename to write to</li>
+<li><strong>dic</strong> (<em>dict</em>) &#8211; dictionary to write</li>
+<li><strong>append</strong> (<em>bool</em>) &#8211; if true, will append to file instead of overwriting, default=False</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.tools.file_io.h5_2_dict">
+<code class="descclassname">fabry.tools.file_io.</code><code class="descname">h5_2_dict</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.h5_2_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a dictionary from a hdf5 file with given filename</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<em>str</em>) &#8211; hdf5 filename to read</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary of hdf5 keys</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.tools.file_io.prep_folder">
+<code class="descclassname">fabry.tools.file_io.</code><code class="descname">prep_folder</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.prep_folder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Checks if folder exists and recursively creates folders</dt>
+<dd>to ensure the path is valid</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) &#8211; path to folder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.tools.file_io.read_Ld_results">
+<code class="descclassname">fabry.tools.file_io.</code><code class="descname">read_Ld_results</code><span class="sig-paren">(</span><em>Ld_directory</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.read_Ld_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads L and d histogram data from multinest run</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Ld_directory</strong> (<em>str</em>) &#8211; path to multinest save directory</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Tuple (np.ndarray, np.ndarray) L histogram values (in pixels), d histogram values (in mm)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.tools.file_io.recursive_load_dict_from_h5">
+<code class="descclassname">fabry.tools.file_io.</code><code class="descname">recursive_load_dict_from_h5</code><span class="sig-paren">(</span><em>h5</em>, <em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.recursive_load_dict_from_h5" title="Permalink to this definition">¶</a></dt>
+<dd><p>function used in load_h5_to_dict in order to get recursion</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.tools.file_io.recursive_save_dict_to_h5">
+<code class="descclassname">fabry.tools.file_io.</code><code class="descname">recursive_save_dict_to_h5</code><span class="sig-paren">(</span><em>h5</em>, <em>path</em>, <em>dic</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.recursive_save_dict_to_h5" title="Permalink to this definition">¶</a></dt>
+<dd><p>function used in save_dict_to_h5 in order to get recursion</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-fabry.tools.images">
+<span id="images"></span><h2>Images<a class="headerlink" href="#module-fabry.tools.images" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fabry.tools.images.get_data">
+<code class="descclassname">fabry.tools.images.</code><code class="descname">get_data</code><span class="sig-paren">(</span><em>filename</em>, <em>color=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.images.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads image data from filename</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<em>str</em>) &#8211; filename to read</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Kwargs:</dt>
+<dd>color (Union[numbers.Integral, str]): [0,2] for rgb, or a letter from rgb</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">2d image data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.tools.images.get_metadata">
+<code class="descclassname">fabry.tools.images.</code><code class="descname">get_metadata</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.images.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns metadata from image filename</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; file to get metadata from</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary containing metadata</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.tools.images.register_reader">
+<code class="descclassname">fabry.tools.images.</code><code class="descname">register_reader</code><span class="sig-paren">(</span><em>reader_func</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.images.register_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for registering functions as image readers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>reader_func</strong> (<em>collections.Callable</em>) &#8211; callable function for reading in image files</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tools</a><ul>
+<li><a class="reference internal" href="#module-fabry.tools.file_io">File_IO</a></li>
+<li><a class="reference internal" href="#module-fabry.tools.images">Images</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="core.html" title="previous chapter">Core</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Jason Milhone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/tools.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

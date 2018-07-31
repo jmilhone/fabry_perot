@@ -4,9 +4,19 @@ import numpy as np
 from scipy.integrate import trapz
 from .zeeman import zeeman_lambda
 from numba import jit
+import numbers
 
 @jit(nopython=True)
 def trapezoidal_integration(y, x):
+    """Performs trapezoidal intergration
+
+    Args:
+        y (Union[list, np.ndarray]): y data points
+        x (Union[list, np.ndarray]): x data points
+
+    Returns:
+        numbers.Real: area under the curve y(x)
+    """
     n = len(x)
     area = 0.0
     for i in xrange(n-1):
@@ -18,18 +28,18 @@ def trapezoidal_integration(y, x):
 def peak_calculator(L, d, w, order):
     '''
     Simple peak calculator for ideal Fabry-Perot.
-    
+
     r_j = L * Sqrt[ ((2d/w)/(floor(2d/w)-j))^2 - 1]
 
     Args:
-        L (float): L value, units will set return units (pixels or mm)
-        d (float): etalon spacing in mm
-        w (float): peak wavelength in nm
-        order (np.ndarray or int): j order number. 0 gives order nearest center
+        L (numbers.Real): L value, units will set return units (pixels or mm)
+        d (numbers.Real): etalon spacing in mm
+        w (numbers.Real): peak wavelength in nm
+        order (Union[np.ndarray,numbers.Integral]): j order number. 0 gives order nearest center
             of rings, increasing j as you move out.
 
     Returns:
-        peaks (np.ndarray or float): the location of the peak(s)
+        Union[np.ndarray, numbers.Real]: the location of the peak(s)
             in the same units as L with the same length as order
     '''
     m = 2.e6 * d / w
@@ -42,17 +52,18 @@ def airy_func(wavelength, cos_th, d, F):
     Computes the Airy function (ideal Fabry-Perot instument function)
     as a function of wavelength and cos(theta) with parameters d and F
 
-    Airy = [1. + Q * sin(pi * (2d/w) * cos_th)^2]^(-1)
-    Q = (2 * F / pi)^2
+    $Airy = [1. + Q * sin(pi * (2d/w) * cos_th)^2]^(-1)$
+
+    $Q = (2 * F / pi)^2$
 
     Args:
         wavelength (np.ndarray): wavelength array in nm
         cos_th (np.ndarray): cos(theta) array
-        d (float): etalon spacing in mm
-        F (float): etalon finesse
+        d (numbers.Real): etalon spacing in mm
+        F (numbers.Real): etalon finesse
 
     Returns:
-        airy (np.ndarray): evaluated airy function
+        np.ndarray: evaluated airy function
     '''
     Q = (2. * F / np.pi)**2
     airy = 1.0 / (1.0 + Q * np.sin(np.pi * 2.e6 * d * cos_th / wavelength)**2)
@@ -63,19 +74,19 @@ def doppler_calc(w0, mu, temp, v):
     '''
     Computes the doppler broadening sigma and the new central wavelength
     from the doppler shift
-    
-    sigma = w0 * Sqrt[kT / mc^2]
-    w = w0 * (1 - v/c)
-    
+
+    $sigma = w0 * Sqrt[kT / mc^2]$
+
+    $w = w0 * (1 - v/c)$
+
     Args: 
-        w0 (float): unshifted wavelength in nm
-        mu (float): atomic mass in amu
-        temp (float): temperature in eV
-        v (float): velocity in m/s
+        w0 (numbers.Real): unshifted wavelength in nm
+        mu (numbers.Real): atomic mass in amu
+        temp (numbers.Real): temperature in eV
+        v (numbers.Real): velocity in m/s
 
     Returns:
-        sigma (float): sigma in nm
-        w (float): shifted wavelength in nm
+        (numbers.Real, numbers.Real)): sigma in nm, shifted wavelength in nm
     '''
     sigma = w0 * 3.2765e-5 * np.sqrt(temp / mu)
     w = w0 * (1.0 - 3.336e-9 * v)
@@ -86,18 +97,18 @@ def gaussian(wavelength, w, sigma, amp=1., norm=True):
     '''
     Computes a gaussian for a given central wavelength, sigma and amp
 
-    spec = amp/(sigma*Sqrt[2*pi]) * Exp[ -0.5 * (wavelength - w)^2 / sigma^2 ]
-        
+    $spec = amp/(sigma*Sqrt[2*pi]) * Exp[ -0.5 * (wavelength - w)^2 / sigma^2 ]$
+
     Args:
         wavelength (np.ndarray): wavelength array to calculate spec on
-        w (float): central wavelength (same units as wavelength array)
-        sigma (float): sigma for gaussian (same units as w)
-        amp (float, default=1.0): amplitude of spectrum
-        norm (bool, default=True): if true, the gaussian will be normalized
+        w (numbers.Real): central wavelength (same units as wavelength array)
+        sigma (numbers.Real): sigma for gaussian (same units as w)
+        amp (numbers.Real): amplitude of spectrum, default=1.0
+        norm (bool): if true, the gaussian will be normalized, default=True
             to integrate to 1 over infinity then the amp factor will be multiplied
 
     Returns:
-        spec (np.ndarray): spectrum evaluated on wavelength array
+        np.ndarray: spectrum evaluated on wavelength array
     '''
     if norm:
         norm = 1. / (sigma * np.sqrt(2.*np.pi))
@@ -114,9 +125,9 @@ def lorentzian(wavelength, w, gamma, amp=1.):
 
     Args:
         wavelength (np.array): wavelength array to calculate spec on
-        w (float): central wavelength (same units as wavelength array)
-        gamma (float): lorentzian gamma parameter
-        amp (float, default=1.): amplitude in addition to one that integrates
+        w (numbers.Real): central wavelength (same units as wavelength array)
+        gamma (numbers.Real): lorentzian gamma parameter
+        amp (numbers.Real, default=1.): amplitude in addition to one that integrates
             spec to 1 over infinity
 
     Returns:
@@ -126,6 +137,27 @@ def lorentzian(wavelength, w, gamma, amp=1.):
     return A / ((wavelength - w)**2 + (0.5 * gamma)**2)
 
 def offset_forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False, coeff=0.15):
+    """Forward model with an attempt to model the 'offset' from nuissance lines
+
+    Args:
+        r (np.ndarray): array of r values to compute model on 
+        L (numbers.Real): camera lens focal length, same units as r (pixels or mm)
+        d (numbers.Real): etalon spacing (mm)
+        F (numbers.Real): etalon finesse
+        w0 (Union[numbers.Real, list]): central wavelength(s) in nm
+        mu (Union[numbers.Real, list]): mass(es) in amu
+        temp (Union[numbers.Real, list]): temperature(s) in eV
+        v (Union[numbers.Real, list]): velocities in m/s 
+
+    Kwargs:
+        nlambda (numbers.Integral): number of points in wavelength array, default=1024
+        sm_ang (bool): use the small angle approx or not, default=True
+        coeff (numbers.Real): coefficient to model the relative amplitude of all the nuissance lines
+
+    Returns:
+        np.ndarray: array length of r of forward model
+
+    """
     #print(L, d, F, w0, mu, amp, temp, v)
     #print(nlambda, sm_ang, coeff)
     vals = forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=nlambda, sm_ang=sm_ang)
@@ -141,18 +173,20 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False):
 
     Args:
         r (np.ndarray): array of r values to compute model on 
-        L (float): camera lens focal length, same units as r (pixels or mm)
-        d (float): etalon spacing (mm)
-        F (float): etalon finesse
-        w0 (float or list): central wavelength(s) in nm
-        mu (float or list): mass(es) in amu
-        temp (float or list): temperature(s) in eV
-        v (float or list): velocities in m/s 
-        nlambda (int, default=1024): number of points in wavelength array
-        sm_ang (bool, default=True): use the small angle approx or not
+        L (numbers.Real): camera lens focal length, same units as r (pixels or mm)
+        d (numbers.Real): etalon spacing (mm)
+        F (numbers.Real): etalon finesse
+        w0 (Union[numbers.Real, list]): central wavelength(s) in nm
+        mu (Union[numbers.Real, list]): mass(es) in amu
+        temp (Union[numbers.Real, list]): temperature(s) in eV
+        v (Union[numbers.Real, list]): velocities in m/s 
+
+    Kwargs:
+        nlambda (numbers.Integral): number of points in wavelength array, default=1024
+        sm_ang (bool): use the small angle approx or not, default=True
 
     Returns:
-        model (np.ndarray): array length of r of forward model
+        np.ndarray: array length of r of forward model
     '''
     #if type(w0) in [list, tuple]:
     #    if not all([type(x) in [list,tuple] for x in [mu, amp, temp, v]]):

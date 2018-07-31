@@ -8,24 +8,22 @@ import pymultinest
 import sys
 #sys.path.append('../')
 from ..tools.plotting import my_hist
+import numbers
 
 def determine_fit_range(r, signal, pkr, thres=0.15, plotit=False):
-    '''
-    helper function to pick fitting
-    range using peak guess and a threshold
+    '''Helper function to pick fitting range using peak guess and a threshold
 
     Args:
         r (np.ndarray): r data
         sig (np.ndarray): ringsum data
-        pkr (float): guess for peak location
-        thresh (float, default=0.15): threshold
-            from peak that is included
-        plotit (bools, default=False): plots
-            the determined range for checking
+        pkr (numbers.Real): guess for peak location
+
+    Kwargs:
+        thresh (numbers.Real): threshold from peak that is included, default=0.15
+        plotit (bools): plots the determined range for checking, default=False
 
     Returns:
-        idxs (list): list of indexes within threshold
-            of peak guess
+        list: list of indexes within threshold of peak guess
     '''
     pkix = np.abs(pkr-r).argmin()
     sig = signal - signal.min()
@@ -52,17 +50,18 @@ def determine_fit_range(r, signal, pkr, thres=0.15, plotit=False):
     return range(Lix-1, Rix+1) 
 
 def find_maximum(x, y, returnval=False):
-    '''
-    finds maximum location of a single peak using
-    simple derivative method. Assumes only one
-    peak is in given data range.
+    '''Finds maximum location of a single peak using simple derivative method. Assumes only one
+        peak is in given data range.
 
     Args:
         x (np.ndarray): x array of values
         y (np.ndarray): y array of values
 
+    Kwargs:
+        returnval (bool): Returns the value at the maximum if True, default=False
+
     Returns:
-        pk (float): x position of peak
+        pk (numbers.Real): x position of peak
             if a minimum is detected, returns None
     '''
     dy = np.diff(y)
@@ -89,9 +88,16 @@ def find_maximum(x, y, returnval=False):
         return None
 
 def _gauss(beta, x):
-    '''
-    gaussian fitting function modified to fit in x^2 space
+    '''Gaussian fitting function modified to fit in x^2 space
+
     y = A*Exp(-0.5*(x^2-x0^2)^2/sigma^4)
+
+    Args:
+        beta (Union[list, np.ndarray]): Gaussian parameters
+        x (np.ndarray): x points
+
+    Returns:
+        np.ndarray: gaussian evaluated at x with parameters beta
     '''
     return beta[0]*np.exp(-0.5*(x**2-beta[1]**2)**2/beta[2]**4)
 
@@ -116,10 +122,8 @@ def _gauss_fjacd(beta, x):
     return (2.*x*(beta[1]**2-x**2)*_gauss(beta,x))/beta[2]**4
 
 def find_peak(x,y,x_sd,y_sd,returnval=False,plotit=False):
-    '''
-    uses a gaussian fit to find maximum via scipy.odr
-    fit is performed in x^2 space, but all conversions
-    are taken care of inside this function
+    '''Uses a gaussian fit to find maximum via scipy.odr fit is performed in x^2 space, but all conversions
+        are taken care of inside this function
 
     y = A*Exp(-0.5*(x^2-x0^2)^2/sigma^4)
 
@@ -128,18 +132,15 @@ def find_peak(x,y,x_sd,y_sd,returnval=False,plotit=False):
         y (np.ndarray): y values for fit
         x_sd (np.ndarray): standard deviation in x values (typically binsize)
         y_sd (np.ndarray): standard deviation in y values
-        returnval (bool, optional, default=False): flag for returning
-            fit value at peak location
-        plotit (bool, optional, default=False): flag for plotting fit
-    
+
+    Kwargs:
+        returnval (bool): flag for returning fit value at peak location, default=False
+        plotit (bool): flag for plotting fit, default=False
+
     Returns:
-        pk (float): location of peak in units of x array
-        pk_err (float): standard deviation from fit of peak location
-            also in units of x array
-        val (float, conditional on returnval arg): value of fit 
-            function at peak location in units of y array
+        Tuple (numbers.Real, numbers.Real, numbers.Real): peak location, peak location error, peak value
     '''
-    
+
     # beta0 = [y.max(),x.mean(),5*(x.max()-x.min())]
     beta0 = [y.max(), np.sqrt(np.mean(x**2)), 5.0*(x.max() - x.min())]
     print(beta0[1])

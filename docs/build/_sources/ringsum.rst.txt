@@ -1,0 +1,5 @@
+Ringsum
+==========
+
+.. automodule:: fabry.core.ringsum
+    :members:

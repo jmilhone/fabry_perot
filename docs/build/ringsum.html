@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Ringsum &#8212; Fabry Perot 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-fabry.core.ringsum">
+<span id="ringsum"></span><h1>Ringsum<a class="headerlink" href="#module-fabry.core.ringsum" title="Permalink to this headline">¶</a></h1>
+<dl class="attribute">
+<dt id="fabry.core.ringsum.calculate_weighted_mean">
+<code class="descclassname">fabry.core.ringsum.</code><code class="descname">calculate_weighted_mean</code><a class="headerlink" href="#fabry.core.ringsum.calculate_weighted_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the weighted mean of data with standard deviation error</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.ndarray</em>) &#8211; data array</li>
+<li><strong>error</strong> (<em>np.ndarray</em>) &#8211; standard deviation error bar for data</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">weighted mean and weighted standard deviation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (numbers.Real, numbers.Real)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.core.ringsum.get_bin_edges">
+<code class="descclassname">fabry.core.ringsum.</code><code class="descname">get_bin_edges</code><span class="sig-paren">(</span><em>dat</em>, <em>x0</em>, <em>y0</em>, <em>binsize=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.get_bin_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns equal area annuli bins for a ring image
+given a center and binsize</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dat</strong> (<em>np.ndarray</em>) &#8211; pixel values for the camera image</li>
+<li><strong>x0</strong> (<em>numbers.Real</em>) &#8211; x location (pixels) of the center of the image</li>
+<li><strong>y0</strong> (<em>numbers.Real</em>) &#8211; y location (pixels) of the center of the image</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Kwargs:</dt>
+<dd>binsize (numbers.Real): smallest radial bin size (occurs at the largest bin)</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bins for the ring sum in pixels</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.core.ringsum.locate_center">
+<code class="descclassname">fabry.core.ringsum.</code><code class="descname">locate_center</code><span class="sig-paren">(</span><em>data_in</em>, <em>xguess=None</em>, <em>yguess=None</em>, <em>maxiter=25</em>, <em>binsize=0.1</em>, <em>plotit=False</em>, <em>block_center=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.locate_center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the center of a ring pattern image by preforming ringsums.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.ndarray</em>) &#8211; pixel values for the camera image</li>
+<li><strong>xguess</strong> (<em>numbers.Real</em>) &#8211; guess of x location of center, if None, takes data center</li>
+<li><strong>yguess</strong> (<em>numbers.Real</em>) &#8211; guess of y location of center, if None, takes data center</li>
+<li><strong>maxiter</strong> (<em>numbers.Integral</em>) &#8211; maximum number of center finding iterations</li>
+<li><strong>binsize</strong> (<em>numbers.Real</em>) &#8211; smallest radial binsize (occurs at the largest bin)</li>
+<li><strong>plotit</strong> (<em>bool</em>) &#8211; plot fitting curves</li>
+<li><strong>block_center</strong> (<em>bool</em>) &#8211; block center of image (600x600 on xguess,yguess) when           finding center. This helps when there is a ring at the center of the image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">x and y location of the center</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (numbers.Real, numbers.Real)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.core.ringsum.ringsum">
+<code class="descclassname">fabry.core.ringsum.</code><code class="descname">ringsum</code><span class="sig-paren">(</span><em>data</em>, <em>x0</em>, <em>y0</em>, <em>binsize=0.1</em>, <em>quadrants=False</em>, <em>use_weighted=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.ringsum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a equal annulus area ringsum centered at (x0, y0) from data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<em>np.ndarray</em>) &#8211; 2d image data</li>
+<li><strong>x0</strong> (<em>numbers.Real</em>) &#8211; center location in x</li>
+<li><strong>y0</strong> (<em>numbers.Real</em>) &#8211; center location in y</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Kwargs:</dt>
+<dd>binsize (numbers.Real): the delta r of the last annulus, default=0.1
+quadrants (bool): split the ringsum into 4 quadrants to use multiprocessing, default=False
+use_weighted (bool): use a weighted mean, default=False</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">r bins, ring sum, ring sum error<dl class="docutils">
+<dt>if use_weighted:</dt>
+<dd>tuple (np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray): r bins and the 4 quadrants</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple (np.ndarray, np.ndarray, np.ndarray)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.core.ringsum.super_pixelate">
+<code class="descclassname">fabry.core.ringsum.</code><code class="descname">super_pixelate</code><a class="headerlink" href="#fabry.core.ringsum.super_pixelate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates super pixels for image data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>np.ndarray</em>) &#8211; 2d image data</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Kwargs:</dt>
+<dd>npix (numbers.Integral): integer number of pixels to create an npix x npix super pixel</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">New image made from the super pixels</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ringsum.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Jason Milhone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/ringsum.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

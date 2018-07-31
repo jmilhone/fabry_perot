@@ -56,7 +56,7 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
         #vals = forward_model(r, L, d, cube[0], w, mass, amps, Ti,
         #        V, sm_ang=False, nlambda=2000)
         vals = offset_forward_model(r, L, d, cube[0], w, mass, amps, Ti,
-                V, sm_ang=False, nlambda=2000)
+                V, sm_ang=False, nlambda=2000, coeff=0.4)
         # trying to model offset here
         #vals += cube[1] * 0.15 / (1.0 + cube[0])
 

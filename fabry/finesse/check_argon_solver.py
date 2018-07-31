@@ -226,10 +226,11 @@ def check_full_solver(finesse_folder):
 
     labels = ["L", "d", "F", "A", "Arel", "Ti"]
     fac = [0.004, 1.0, 1.0, 1.0, 1.0, 1.0]
+    bins = ['auto', 50, 'auto', 'auto', 'auto', 'auto']
     for idx, label in enumerate(labels):
         print(label, ": ", np.nanmean(post[:, idx]*fac[idx]))
         fig, ax = plt.subplots()
-        plotting.my_hist(ax, post[:, idx]*fac[idx], bins='auto')
+        plotting.my_hist(ax, post[:, idx]*fac[idx], bins=bins[idx])
         ax.set_xlabel(label)
         plt.show(block=False)
     plt.show(block=True)
