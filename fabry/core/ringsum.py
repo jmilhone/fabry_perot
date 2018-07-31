@@ -205,7 +205,7 @@ def get_bin_edges(dat, x0, y0, binsize=0.1):
 #    return ringsum
 
 
-def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, plotit=False, block_center=False):
+def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, plotit=False, block_center=False, printit=True):
     '''
     Finds the center of a ring pattern image by preforming ringsums.
 
@@ -225,7 +225,8 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
         xguess = data.shape[1]/2.
     if yguess is None:
         yguess = data.shape[0]/2.
-    print(xguess, yguess)    
+    if printit:
+        print(xguess, yguess)    
     if block_center:
         data = np.copy(data_in)
         data[int(yguess-300):int(yguess+301),int(xguess-300):int(xguess+301)] = 0.0
@@ -239,9 +240,10 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
         line2 = None
         line3 = None
         line4 = None
+    if printit:
+        print( "Center finding:")
+        print( "start x0: {0} y0: {1}".format(xguess, yguess))
 
-    print( "Center finding:")
-    print( "start x0: {0} y0: {1}".format(xguess, yguess))
     for ii in range(maxiter):
         #print(xguess, yguess)
         #binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = smAng_ringsum(data, xguess, yguess, binsize=binsize,quadrants=True)
@@ -311,8 +313,8 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
             yguess += binsize
         else:
             yguess += UBcent * binsize
-        
-        print("{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii))
+        if printit: 
+            print("{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii))
         if plotit:
             if line1 is not None:
                 line1.set_data(sarr, UB)
