@@ -12,3 +12,8 @@ Images
 
 .. automodule:: fabry.tools.images
     :members:
+
+Plotting
+-----------
+.. automodule:: fabry.tools.plotting
+    :members:

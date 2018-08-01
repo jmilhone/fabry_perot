@@ -1,57 +1,144 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Core &#8212; Fabry Perot 0.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/javascript" src="_static/sidebar.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tools" href="tools.html" />
-    <link rel="prev" title="Welcome to Fabry Perot’s documentation!" href="index.html" /> 
-  </head>
-  <body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="tools.html" title="Tools"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Welcome to Fabry Perot’s documentation!"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fabry Perot 0.1.0 documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Core &mdash; Fabry Perot 0.1.0 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Fabry Perot 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Tools" href="tools.html"/>
+        <link rel="prev" title="Welcome to Fabry Perot’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Fabry Perot
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.ringsum">RingSum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.fitting">Fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.synthetic">Synthetic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.zeeman">Zeeman</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finesse.html">Finesse</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Fabry Perot</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Core</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/core.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="core">
 <h1>Core<a class="headerlink" href="#core" title="Permalink to this headline">¶</a></h1>
@@ -74,7 +161,7 @@
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">weighted mean and weighted standard deviation</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (numbers.Real, numbers.Real)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (float, float)</p>
 </td>
 </tr>
 </tbody>
@@ -84,32 +171,28 @@
 <dl class="function">
 <dt id="fabry.core.ringsum.get_bin_edges">
 <code class="descclassname">fabry.core.ringsum.</code><code class="descname">get_bin_edges</code><span class="sig-paren">(</span><em>dat</em>, <em>x0</em>, <em>y0</em>, <em>binsize=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.get_bin_edges" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns equal area annuli bins for a ring image
-given a center and binsize</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dd><p>Returns equal area annuli bins for a ring image given a center and binsize</p>
+<div class="math">
+<p><img src="_images/math/d25f8a0e609277acea1c2490dfa44da27731201a.svg" alt="r_n = \sqrt{n \left(2 r_N - \Delta  \right) \Delta } \quad n \in 0,...,N"/></p>
+</div><div class="math">
+<p><img src="_images/math/b62c18587178e81bdf3f764894370e125290c3d1.svg" alt="\Delta = \text{ binsize}"/></p>
+</div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dat</strong> (<em>np.ndarray</em>) – pixel values for the camera image</li>
-<li><strong>x0</strong> (<em>numbers.Real</em>) – x location (pixels) of the center of the image</li>
-<li><strong>y0</strong> (<em>numbers.Real</em>) – y location (pixels) of the center of the image</li>
+<li><strong>x0</strong> (<em>float</em>) – x location (pixels) of the center of the image</li>
+<li><strong>y0</strong> (<em>float</em>) – y location (pixels) of the center of the image</li>
+<li><strong>binsize</strong> (<em>float</em><em>, </em><em>optional</em>) – smallest radial bin size (occurs at the largest bin)</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd>binsize (numbers.Real): smallest radial bin size (occurs at the largest bin)</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bins for the ring sum in pixels</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bins for the ring sum in pixels</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -124,20 +207,22 @@ given a center and binsize</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) – pixel values for the camera image</li>
-<li><strong>xguess</strong> (<em>numbers.Real</em>) – guess of x location of center, if None, takes data center</li>
-<li><strong>yguess</strong> (<em>numbers.Real</em>) – guess of y location of center, if None, takes data center</li>
-<li><strong>maxiter</strong> (<em>numbers.Integral</em>) – maximum number of center finding iterations</li>
-<li><strong>binsize</strong> (<em>numbers.Real</em>) – smallest radial binsize (occurs at the largest bin)</li>
+<li><strong>data_in</strong> (<em>np.ndarray</em>) – pixel values for the camera image</li>
+<li><strong>xguess</strong> (<em>float</em>) – guess of x location of center, if None, takes data center</li>
+<li><strong>yguess</strong> (<em>float</em>) – guess of y location of center, if None, takes data center</li>
+<li><strong>maxiter</strong> (<em>int</em>) – maximum number of center finding iterations</li>
+<li><strong>binsize</strong> (<em>float</em>) – smallest radial binsize (occurs at the largest bin)</li>
 <li><strong>plotit</strong> (<em>bool</em>) – plot fitting curves</li>
-<li><strong>block_center</strong> (<em>bool</em>) – block center of image (600x600 on xguess,yguess) when           finding center. This helps when there is a ring at the center of the image.</li>
+<li><strong>block_center</strong> (<em>bool</em>) – block center of image (600x600 on xguess,yguess) when finding center. This helps when
+there is a ring at the center of the image.</li>
+<li><strong>printit</strong> (<em>bool</em>) – print center find progress if True</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">x and y location of the center</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (numbers.Real, numbers.Real)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (float, float)</p>
 </td>
 </tr>
 </tbody>
@@ -152,28 +237,18 @@ given a center and binsize</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</li>
-<li><strong>x0</strong> (<em>numbers.Real</em>) – center location in x</li>
-<li><strong>y0</strong> (<em>numbers.Real</em>) – center location in y</li>
+<li><strong>x0</strong> (<em>float</em>) – center location in x</li>
+<li><strong>y0</strong> (<em>float</em>) – center location in y</li>
+<li><strong>binsize</strong> (<em>float</em><em>, </em><em>optional</em>) – the delta r of the last annulus, default=0.1</li>
+<li><strong>quadrants</strong> (<em>bool</em>) – split the ringsum into 4 quadrants to use multiprocessing, default=False</li>
+<li><strong>use_weighted</strong> (<em>bool</em>) – use a weighted mean, default=False</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd>binsize (numbers.Real): the delta r of the last annulus, default=0.1
-quadrants (bool): split the ringsum into 4 quadrants to use multiprocessing, default=False
-use_weighted (bool): use a weighted mean, default=False</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">r bins, ring sum, ring sum error</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple (np.ndarray, np.ndarray, np.ndarray)</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">tuple</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -187,21 +262,17 @@ use_weighted (bool): use a weighted mean, default=False</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</li>
+<li><strong>npix</strong> (<em>int</em><em>, </em><em>optional</em>) – integer number of pixels to create an npix x npix super pixel</li>
+</ul>
+</td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd>npix (numbers.Integral): integer number of pixels to create an npix x npix super pixel</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">New image made from the super pixels</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New image made from the super pixels</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -215,17 +286,19 @@ use_weighted (bool): use a weighted mean, default=False</dd>
 <code class="descclassname">fabry.core.models.</code><code class="descname">airy_func</code><a class="headerlink" href="#fabry.core.models.airy_func" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Airy function (ideal Fabry-Perot instument function)
 as a function of wavelength and cos(theta) with parameters d and F</p>
-<p>$Airy = [1. + Q * sin(pi * (2d/w) * cos_th)^2]^(-1)$</p>
-<p>$Q = (2 * F / pi)^2$</p>
-<table class="docutils field-list" frame="void" rules="none">
+<div class="math">
+<p><img src="_images/math/8a80af2b9c3bda230bb8be930154b9536001d6d1.svg" alt="A = \left(1 + Q  \sin^2(\pi \frac{2d}{w} \cos\theta)\right)^{-1}"/></p>
+</div><div class="math">
+<p><img src="_images/math/9b9e001bb28e9dee6656e4c5855b845b8f917afc.svg" alt="Q = \left(\frac{2  \mathcal{F} }{ \pi } \right)^2"/></p>
+</div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array in nm</li>
 <li><strong>cos_th</strong> (<em>np.ndarray</em>) – cos(theta) array</li>
-<li><strong>d</strong> (<em>numbers.Real</em>) – etalon spacing in mm</li>
-<li><strong>F</strong> (<em>numbers.Real</em>) – etalon finesse</li>
+<li><strong>d</strong> (<em>float</em>) – etalon spacing in mm</li>
+<li><strong>F</strong> (<em>float</em>) – etalon finesse</li>
 </ul>
 </td>
 </tr>
@@ -244,24 +317,26 @@ as a function of wavelength and cos(theta) with parameters d and F</p>
 <code class="descclassname">fabry.core.models.</code><code class="descname">doppler_calc</code><a class="headerlink" href="#fabry.core.models.doppler_calc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the doppler broadening sigma and the new central wavelength
 from the doppler shift</p>
-<p>$sigma = w0 * Sqrt[kT / mc^2]$</p>
-<p>$w = w0 * (1 - v/c)$</p>
-<table class="docutils field-list" frame="void" rules="none">
+<div class="math">
+<p><img src="_images/math/9a1425f5104dd7ac4c52d51a1ecb0ae09708883a.svg" alt="\sigma = w_0  \sqrt{\frac{k_B T }{ mc^2}}"/></p>
+</div><div class="math">
+<p><img src="_images/math/6411b353d9cd9e2e015dfc16959445fcc4dcc0f3.svg" alt="w = w_0 (1 - v/c)"/></p>
+</div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>w0</strong> (<em>numbers.Real</em>) – unshifted wavelength in nm</li>
-<li><strong>mu</strong> (<em>numbers.Real</em>) – atomic mass in amu</li>
-<li><strong>temp</strong> (<em>numbers.Real</em>) – temperature in eV</li>
-<li><strong>v</strong> (<em>numbers.Real</em>) – velocity in m/s</li>
+<li><strong>w0</strong> (<em>float</em>) – unshifted wavelength in nm</li>
+<li><strong>mu</strong> (<em>float</em>) – atomic mass in amu</li>
+<li><strong>temp</strong> (<em>float</em>) – temperature in eV</li>
+<li><strong>v</strong> (<em>float</em>) – velocity in m/s</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">sigma in nm, shifted wavelength in nm</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(numbers.Real, numbers.Real))</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(float, float))</p>
 </td>
 </tr>
 </tbody>
@@ -276,32 +351,25 @@ from the doppler shift</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute model on</li>
-<li><strong>L</strong> (<em>numbers.Real</em>) – camera lens focal length, same units as r (pixels or mm)</li>
-<li><strong>d</strong> (<em>numbers.Real</em>) – etalon spacing (mm)</li>
-<li><strong>F</strong> (<em>numbers.Real</em>) – etalon finesse</li>
-<li><strong>w0</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – central wavelength(s) in nm</li>
-<li><strong>mu</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – mass(es) in amu</li>
-<li><strong>temp</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – temperature(s) in eV</li>
-<li><strong>v</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</li>
+<li><strong>L</strong> (<em>float</em>) – camera lens focal length, same units as r (pixels or mm)</li>
+<li><strong>d</strong> (<em>float</em>) – etalon spacing (mm)</li>
+<li><strong>F</strong> (<em>float</em>) – etalon finesse</li>
+<li><strong>w0</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – central wavelength(s) in nm</li>
+<li><strong>mu</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – mass(es) in amu</li>
+<li><strong>amp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – amplitude(s) for the lines</li>
+<li><strong>temp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – temperature(s) in eV</li>
+<li><strong>v</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</li>
+<li><strong>nlambda</strong> (<em>int</em>) – number of points in wavelength array, default=1024</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd>nlambda (numbers.Integral): number of points in wavelength array, default=1024
-sm_ang (bool): use the small angle approx or not, default=True</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">array length of r of forward model</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array length of r of forward model</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -311,16 +379,17 @@ sm_ang (bool): use the small angle approx or not, default=True</dd>
 <dt id="fabry.core.models.gaussian">
 <code class="descclassname">fabry.core.models.</code><code class="descname">gaussian</code><a class="headerlink" href="#fabry.core.models.gaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes a gaussian for a given central wavelength, sigma and amp</p>
-<p>$spec = amp/(sigma*Sqrt[2*pi]) * Exp[ -0.5 * (wavelength - w)^2 / sigma^2 ]$</p>
-<table class="docutils field-list" frame="void" rules="none">
+<div class="math">
+<p><img src="_images/math/6fad84066ddafac0768a988a994962ebaa1d79b3.svg" alt="G = \frac{A}{\sigma \sqrt{2 \pi}} \exp{\left( \frac{ (w - w_0)^2 }{2 \sigma^2 } \right) }"/></p>
+</div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array to calculate spec on</li>
-<li><strong>w</strong> (<em>numbers.Real</em>) – central wavelength (same units as wavelength array)</li>
-<li><strong>sigma</strong> (<em>numbers.Real</em>) – sigma for gaussian (same units as w)</li>
-<li><strong>amp</strong> (<em>numbers.Real</em>) – amplitude of spectrum, default=1.0</li>
+<li><strong>w</strong> (<em>float</em>) – central wavelength (same units as wavelength array)</li>
+<li><strong>sigma</strong> (<em>float</em>) – sigma for gaussian (same units as w)</li>
+<li><strong>amp</strong> (<em>float</em>) – amplitude of spectrum, default=1.0</li>
 <li><strong>norm</strong> (<em>bool</em>) – if true, the gaussian will be normalized, default=True
 to integrate to 1 over infinity then the amp factor will be multiplied</li>
 </ul>
@@ -340,16 +409,17 @@ to integrate to 1 over infinity then the amp factor will be multiplied</li>
 <dt id="fabry.core.models.lorentzian">
 <code class="descclassname">fabry.core.models.</code><code class="descname">lorentzian</code><span class="sig-paren">(</span><em>wavelength</em>, <em>w</em>, <em>gamma</em>, <em>amp=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.models.lorentzian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes a lorentzian for a given central wavelength, gamma and amp</p>
-<p>spec = (amp/(2*pi))  * [gamma / ((wavelength-w)**2 + (0.5*gamma)**2)]</p>
-<table class="docutils field-list" frame="void" rules="none">
+<div class="math">
+<p><img src="_images/math/558f2d62dbce401f22d72603f06e916f51cdb6a2.svg" alt="L = \frac{A}{2 \pi} \frac{\gamma }{ (w-w_0)^2 + (\gamma/2)^2}"/></p>
+</div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>wavelength</strong> (<em>np.array</em>) – wavelength array to calculate spec on</li>
-<li><strong>w</strong> (<em>numbers.Real</em>) – central wavelength (same units as wavelength array)</li>
-<li><strong>gamma</strong> (<em>numbers.Real</em>) – lorentzian gamma parameter</li>
-<li><strong>amp</strong> (<em>numbers.Real</em><em>, </em><em>default=1.</em>) – amplitude in addition to one that integrates
+<li><strong>w</strong> (<em>float</em>) – central wavelength (same units as wavelength array)</li>
+<li><strong>gamma</strong> (<em>float</em>) – lorentzian gamma parameter</li>
+<li><strong>amp</strong> (<em>float</em><em>, </em><em>default=1.</em>) – amplitude in addition to one that integrates
 spec to 1 over infinity</li>
 </ul>
 </td>
@@ -372,33 +442,27 @@ spec to 1 over infinity</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute model on</li>
-<li><strong>L</strong> (<em>numbers.Real</em>) – camera lens focal length, same units as r (pixels or mm)</li>
-<li><strong>d</strong> (<em>numbers.Real</em>) – etalon spacing (mm)</li>
-<li><strong>F</strong> (<em>numbers.Real</em>) – etalon finesse</li>
-<li><strong>w0</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – central wavelength(s) in nm</li>
-<li><strong>mu</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – mass(es) in amu</li>
-<li><strong>temp</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – temperature(s) in eV</li>
-<li><strong>v</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</li>
+<li><strong>L</strong> (<em>float</em>) – camera lens focal length, same units as r (pixels or mm)</li>
+<li><strong>d</strong> (<em>float</em>) – etalon spacing (mm)</li>
+<li><strong>F</strong> (<em>float</em>) – etalon finesse</li>
+<li><strong>w0</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – central wavelength(s) in nm</li>
+<li><strong>mu</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – mass(es) in amu</li>
+<li><strong>amp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – amplitude(s) for the lines</li>
+<li><strong>temp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – temperature(s) in eV</li>
+<li><strong>v</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</li>
+<li><strong>nlambda</strong> (<em>int</em>) – number of points in wavelength array, default=1024</li>
+<li><strong>sm_ang</strong> (<em>bool</em>) – use the small angle approx or not, default=True</li>
+<li><strong>coeff</strong> (<em>float</em>) – coefficient to model the relative amplitude of all the nuissance lines</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd>nlambda (numbers.Integral): number of points in wavelength array, default=1024
-sm_ang (bool): use the small angle approx or not, default=True
-coeff (numbers.Real): coefficient to model the relative amplitude of all the nuissance lines</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">array length of r of forward model</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array length of r of forward model</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -408,16 +472,17 @@ coeff (numbers.Real): coefficient to model the relative amplitude of all the nui
 <dt id="fabry.core.models.peak_calculator">
 <code class="descclassname">fabry.core.models.</code><code class="descname">peak_calculator</code><a class="headerlink" href="#fabry.core.models.peak_calculator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple peak calculator for ideal Fabry-Perot.</p>
-<p>r_j = L * Sqrt[ ((2d/w)/(floor(2d/w)-j))^2 - 1]</p>
-<table class="docutils field-list" frame="void" rules="none">
+<div class="math">
+<p><img src="_images/math/e22a9cfcc872d50dd2e555f2dd845b440e3e7895.svg" alt="r_j = L  \sqrt{ \left( \frac{2d/w}{\rm{Floor}(2d/w)-j}\right)^2 - 1}"/></p>
+</div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>L</strong> (<em>numbers.Real</em>) – L value, units will set return units (pixels or mm)</li>
-<li><strong>d</strong> (<em>numbers.Real</em>) – etalon spacing in mm</li>
-<li><strong>w</strong> (<em>numbers.Real</em>) – peak wavelength in nm</li>
-<li><strong>order</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>,</em><em>numbers.Integral</em><em>]</em>) – j order number. 0 gives order nearest center
+<li><strong>L</strong> (<em>float</em>) – L value, units will set return units (pixels or mm)</li>
+<li><strong>d</strong> (<em>float</em>) – etalon spacing in mm</li>
+<li><strong>w</strong> (<em>float</em>) – peak wavelength in nm</li>
+<li><strong>order</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>,</em><em>int</em><em>]</em>) – j order number. 0 gives order nearest center
 of rings, increasing j as you move out.</li>
 </ul>
 </td>
@@ -430,7 +495,7 @@ of rings, increasing j as you move out.</li>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Union[np.ndarray, numbers.Real]</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Union[np.ndarray, float]</p>
 </td>
 </tr>
 </tbody>
@@ -454,7 +519,7 @@ of rings, increasing j as you move out.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">area under the curve y(x)</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numbers.Real</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
 </td>
 </tr>
 </tbody>
@@ -472,27 +537,20 @@ of rings, increasing j as you move out.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>r</strong> (<em>np.ndarray</em>) – r data</li>
-<li><strong>sig</strong> (<em>np.ndarray</em>) – ringsum data</li>
-<li><strong>pkr</strong> (<em>numbers.Real</em>) – guess for peak location</li>
+<li><strong>signal</strong> (<em>np.ndarray</em>) – ringsum data</li>
+<li><strong>pkr</strong> (<em>float</em>) – guess for peak location</li>
+<li><strong>thres</strong> (<em>float</em>) – threshold from peak that is included, default=0.15</li>
+<li><strong>plotit</strong> (<em>bools</em>) – plots the determined range for checking, default=False</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd>thresh (numbers.Real): threshold from peak that is included, default=0.15
-plotit (bools): plots the determined range for checking, default=False</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of indexes within threshold of peak guess</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of indexes within threshold of peak guess</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -509,29 +567,23 @@ plotit (bools): plots the determined range for checking, default=False</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>x</strong> (<em>np.ndarray</em>) – x array of values</li>
 <li><strong>y</strong> (<em>np.ndarray</em>) – y array of values</li>
+<li><strong>returnval</strong> (<em>bool</em>) – Returns the value at the maximum if True, default=False</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd>returnval (bool): Returns the value at the maximum if True, default=False</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
 <dt>x position of peak</dt>
-<dd>if a minimum is detected, returns None</dd>
+<dd><p class="first last">if a minimum is detected, returns None</p>
+</dd>
 </dl>
+</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">pk (numbers.Real)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pk (float)</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -555,28 +607,21 @@ plotit (bools): plots the determined range for checking, default=False</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>x</strong> (<em>np.ndarray</em>) – x values for fit</li>
 <li><strong>y</strong> (<em>np.ndarray</em>) – y values for fit</li>
 <li><strong>x_sd</strong> (<em>np.ndarray</em>) – standard deviation in x values (typically binsize)</li>
 <li><strong>y_sd</strong> (<em>np.ndarray</em>) – standard deviation in y values</li>
+<li><strong>returnval</strong> (<em>bool</em>) – flag for returning fit value at peak location, default=False</li>
+<li><strong>plotit</strong> (<em>bool</em>) – flag for plotting fit, default=False</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd>returnval (bool): flag for returning fit value at peak location, default=False
-plotit (bool): flag for plotting fit, default=False</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">peak location, peak location error, peak value</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">peak location, peak location error, peak value</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Tuple (numbers.Real, numbers.Real, numbers.Real)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Tuple (float, float, float)</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -592,19 +637,19 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Etalon.L">
 <code class="descname">L</code><a class="headerlink" href="#fabry.core.synthetic.Etalon.L" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – focal length of lens for the camera</p>
+<dd><p><em>float</em> – focal length of lens for the camera</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Etalon.d">
 <code class="descname">d</code><a class="headerlink" href="#fabry.core.synthetic.Etalon.d" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – etalon spacing</p>
+<dd><p><em>float</em> – etalon spacing</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Etalon.F">
 <code class="descname">F</code><a class="headerlink" href="#fabry.core.synthetic.Etalon.F" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – finesse of etalon</p>
+<dd><p><em>float</em> – finesse of etalon</p>
 </dd></dl>
 
 <dl class="method">
@@ -619,25 +664,18 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>sensor</strong> (<a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor"><em>Sensor</em></a>) – represents a camera sensor</li>
 <li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – represents a light source for the Fabry Perot</li>
+<li><strong>nprocs</strong> (<em>int</em>) – number of processes to use</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>kwargs:</dt>
-<dd>nprocs (numbers.Integral): number of processes to use</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">shape matches sensor.sensor.shape</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">shape matches sensor.sensor.shape</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -686,31 +724,31 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.temperature">
 <code class="descname">temperature</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.temperature" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – temperature of the emitting ion in eV</p>
+<dd><p><em>float</em> – temperature of the emitting ion in eV</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.wavelength">
 <code class="descname">wavelength</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.wavelength" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – wavelength of the light emitted in nm</p>
+<dd><p><em>float</em> – wavelength of the light emitted in nm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.mu">
 <code class="descname">mu</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.mu" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
+<dd><p><em>float</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.amplitude">
 <code class="descname">amplitude</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.amplitude" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – amplitude of the light emitted (you can choose your units here…)</p>
+<dd><p><em>float</em> – amplitude of the light emitted (you can choose your units here…)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.LightSource.velocity">
 <code class="descname">velocity</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.velocity" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>VelocityProfile or numbers.Real</em> – velocity of the emitting ion in m/s</p>
+<dd><p><em>VelocityProfile or float</em> – velocity of the emitting ion in m/s</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -744,31 +782,31 @@ plotit (bool): flag for plotting fit, default=False</dd>
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.nx">
 <code class="descname">nx</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.nx" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Integral</em> – number of pixels in the x direction</p>
+<dd><p><em>int</em> – number of pixels in the x direction</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.ny">
 <code class="descname">ny</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.ny" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Integral</em> – number of pixels in the y direction</p>
+<dd><p><em>int</em> – number of pixels in the y direction</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.px_size">
 <code class="descname">px_size</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.px_size" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – Pixel size in mm</p>
+<dd><p><em>float</em> – Pixel size in mm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.x0">
 <code class="descname">x0</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.x0" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – x location of the center</p>
+<dd><p><em>float</em> – x location of the center</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.Sensor.y0">
 <code class="descname">y0</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.y0" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – y location of th center</p>
+<dd><p><em>float</em> – y location of th center</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -860,51 +898,33 @@ element is the count value for that pixel</p>
 <dd>species mu emitting light for a Fabry-Perot spectrometer</dd>
 </dl>
 <dl class="attribute">
-<dt id="fabry.core.synthetic.UniformPlasma.temperature">
-<code class="descname">temperature</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.temperature" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – temperature of the emitting ion in eV</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.UniformPlasma.wavelength">
-<code class="descname">wavelength</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.wavelength" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – wavelength of the light emitted in nm</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.mu">
 <code class="descname">mu</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.mu" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.UniformPlasma.amplitude">
-<code class="descname">amplitude</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.amplitude" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – amplitude of the light emitted (you can choose your units here…)</p>
+<dd><p><em>float</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.velocity">
 <code class="descname">velocity</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.velocity" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Union[VelocityProfile,numbers.Real]</em> – velocity of the emitting ion in m/s</p>
+<dd><p><em>Union[VelocityProfile,float]</em> – velocity of the emitting ion in m/s</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.ne">
 <code class="descname">ne</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.ne" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – electron density in cm^-3</p>
+<dd><p><em>float</em> – electron density in cm^-3</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.UniformPlasma.pec">
 <code class="descname">pec</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.pec" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – photon emissivity coefficient (need to decide on units here)</p>
+<dd><p><em>float</em> – photon emissivity coefficient (need to decide on units here)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">mu</code></dt>
-<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
+<dd><p><em>float</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="method">
@@ -915,7 +935,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity in m/s</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity in m/s</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -948,8 +968,8 @@ element is the count value for that pixel</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line profile</li>
-<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity of ion for doppler shift</li>
+<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line profile</li>
+<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity of ion for doppler shift</li>
 </ul>
 </td>
 </tr>
@@ -965,28 +985,17 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to calculate ion emission at</li>
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to calculate ion emission at</li>
+<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line
 profile</li>
+<li><strong>cos_theta</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – cos(theta) to project velocity onto a unit
+vector an angle theta from the toroidal direction</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd><dl class="first last docutils">
-<dt>cos_theta (Union[numbers.Real, np.ndarray]): cos(theta) to project velocity onto a unit</dt>
-<dd>vector an angle theta from the toroidal direction</dd>
-</dl>
-</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1019,37 +1028,37 @@ profile</li>
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.Vmax">
 <code class="descname">Vmax</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.Vmax" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – maximum velocity</p>
+<dd><p><em>float</em> – maximum velocity</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.max_radius">
 <code class="descname">max_radius</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.max_radius" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – radial location of the maximum velocity</p>
+<dd><p><em>float</em> – radial location of the maximum velocity</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.length_scale">
 <code class="descname">length_scale</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.length_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – scale for the velocity gradient inward radially</p>
+<dd><p><em>float</em> – scale for the velocity gradient inward radially</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.edge_scale">
 <code class="descname">edge_scale</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.edge_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – scale for the velocity edge gradient</p>
+<dd><p><em>float</em> – scale for the velocity edge gradient</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.R0">
 <code class="descname">R0</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.R0" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – location of the edge</p>
+<dd><p><em>float</em> – location of the edge</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.synthetic.VelocityProfile.offset">
 <code class="descname">offset</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.offset" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>numbers.Real</em> – offset velocity in the center</p>
+<dd><p><em>float</em> – offset velocity in the center</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -1076,7 +1085,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1092,7 +1101,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaulate at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaulate at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1122,7 +1131,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate vphi at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate vphi at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1139,31 +1148,31 @@ profile</li>
 <dl class="attribute">
 <dt>
 <code class="descname">nx</code></dt>
-<dd><p><em>numbers.Integral</em> – number of pixels in the x direction</p>
+<dd><p><em>int</em> – number of pixels in the x direction</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">ny</code></dt>
-<dd><p><em>numbers.Integral</em> – number of pixels in the y direction</p>
+<dd><p><em>int</em> – number of pixels in the y direction</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">px_size</code></dt>
-<dd><p><em>numbers.Real</em> – Pixel size in mm</p>
+<dd><p><em>float</em> – Pixel size in mm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">x0</code></dt>
-<dd><p><em>numbers.Real</em> – x location of the center</p>
+<dd><p><em>float</em> – x location of the center</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">y0</code></dt>
-<dd><p><em>numbers.Real</em> – y location of th center</p>
+<dd><p><em>float</em> – y location of th center</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1254,19 +1263,19 @@ element is the count value for that pixel</p>
 <dl class="attribute">
 <dt>
 <code class="descname">L</code></dt>
-<dd><p><em>numbers.Real</em> – focal length of lens for the camera</p>
+<dd><p><em>float</em> – focal length of lens for the camera</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">d</code></dt>
-<dd><p><em>numbers.Real</em> – etalon spacing</p>
+<dd><p><em>float</em> – etalon spacing</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">F</code></dt>
-<dd><p><em>numbers.Real</em> – finesse of etalon</p>
+<dd><p><em>float</em> – finesse of etalon</p>
 </dd></dl>
 
 <dl class="method">
@@ -1281,25 +1290,18 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>sensor</strong> (<a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor"><em>Sensor</em></a>) – represents a camera sensor</li>
 <li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – represents a light source for the Fabry Perot</li>
+<li><strong>nprocs</strong> (<em>int</em>) – number of processes to use</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>kwargs:</dt>
-<dd>nprocs (numbers.Integral): number of processes to use</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">shape matches sensor.sensor.shape</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">shape matches sensor.sensor.shape</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1348,31 +1350,31 @@ element is the count value for that pixel</p>
 <dl class="attribute">
 <dt>
 <code class="descname">temperature</code></dt>
-<dd><p><em>numbers.Real</em> – temperature of the emitting ion in eV</p>
+<dd><p><em>float</em> – temperature of the emitting ion in eV</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">wavelength</code></dt>
-<dd><p><em>numbers.Real</em> – wavelength of the light emitted in nm</p>
+<dd><p><em>float</em> – wavelength of the light emitted in nm</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">mu</code></dt>
-<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
+<dd><p><em>float</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">amplitude</code></dt>
-<dd><p><em>numbers.Real</em> – amplitude of the light emitted (you can choose your units here…)</p>
+<dd><p><em>float</em> – amplitude of the light emitted (you can choose your units here…)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">velocity</code></dt>
-<dd><p><em>VelocityProfile or numbers.Real</em> – velocity of the emitting ion in m/s</p>
+<dd><p><em>VelocityProfile or float</em> – velocity of the emitting ion in m/s</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -1408,50 +1410,32 @@ element is the count value for that pixel</p>
 </dl>
 <dl class="attribute">
 <dt>
-<code class="descname">temperature</code></dt>
-<dd><p><em>numbers.Real</em> – temperature of the emitting ion in eV</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">wavelength</code></dt>
-<dd><p><em>numbers.Real</em> – wavelength of the light emitted in nm</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
 <code class="descname">mu</code></dt>
-<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">amplitude</code></dt>
-<dd><p><em>numbers.Real</em> – amplitude of the light emitted (you can choose your units here…)</p>
+<dd><p><em>float</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">velocity</code></dt>
-<dd><p><em>Union[VelocityProfile,numbers.Real]</em> – velocity of the emitting ion in m/s</p>
+<dd><p><em>Union[VelocityProfile,float]</em> – velocity of the emitting ion in m/s</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">ne</code></dt>
-<dd><p><em>numbers.Real</em> – electron density in cm^-3</p>
+<dd><p><em>float</em> – electron density in cm^-3</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">pec</code></dt>
-<dd><p><em>numbers.Real</em> – photon emissivity coefficient (need to decide on units here)</p>
+<dd><p><em>float</em> – photon emissivity coefficient (need to decide on units here)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">mu</code></dt>
-<dd><p><em>numbers.Real</em> – relative mass of the ion</p>
+<dd><p><em>float</em> – relative mass of the ion</p>
 </dd></dl>
 
 <dl class="method">
@@ -1462,7 +1446,7 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity in m/s</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity in m/s</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1495,8 +1479,8 @@ element is the count value for that pixel</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line profile</li>
-<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity of ion for doppler shift</li>
+<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line profile</li>
+<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity of ion for doppler shift</li>
 </ul>
 </td>
 </tr>
@@ -1512,28 +1496,17 @@ element is the count value for that pixel</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to calculate ion emission at</li>
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to calculate ion emission at</li>
+<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line
 profile</li>
+<li><strong>cos_theta</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – cos(theta) to project velocity onto a unit
+vector an angle theta from the toroidal direction</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd><dl class="first last docutils">
-<dt>cos_theta (Union[numbers.Real, np.ndarray]): cos(theta) to project velocity onto a unit</dt>
-<dd>vector an angle theta from the toroidal direction</dd>
-</dl>
-</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1566,37 +1539,37 @@ profile</li>
 <dl class="attribute">
 <dt>
 <code class="descname">Vmax</code></dt>
-<dd><p><em>numbers.Real</em> – maximum velocity</p>
+<dd><p><em>float</em> – maximum velocity</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">max_radius</code></dt>
-<dd><p><em>numbers.Real</em> – radial location of the maximum velocity</p>
+<dd><p><em>float</em> – radial location of the maximum velocity</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">length_scale</code></dt>
-<dd><p><em>numbers.Real</em> – scale for the velocity gradient inward radially</p>
+<dd><p><em>float</em> – scale for the velocity gradient inward radially</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">edge_scale</code></dt>
-<dd><p><em>numbers.Real</em> – scale for the velocity edge gradient</p>
+<dd><p><em>float</em> – scale for the velocity edge gradient</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">R0</code></dt>
-<dd><p><em>numbers.Real</em> – location of the edge</p>
+<dd><p><em>float</em> – location of the edge</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">offset</code></dt>
-<dd><p><em>numbers.Real</em> – offset velocity in the center</p>
+<dd><p><em>float</em> – offset velocity in the center</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -1623,7 +1596,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1639,7 +1612,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaulate at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaulate at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1669,7 +1642,7 @@ profile</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>numbers.Real</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate vphi at</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate vphi at</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
 </tr>
@@ -1680,73 +1653,191 @@ profile</li>
 </dd></dl>
 
 </div>
+<div class="section" id="module-fabry.core.zeeman">
+<span id="zeeman"></span><h2>Zeeman<a class="headerlink" href="#module-fabry.core.zeeman" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fabry.core.zeeman.lande_g">
+<code class="descclassname">fabry.core.zeeman.</code><code class="descname">lande_g</code><span class="sig-paren">(</span><em>L</em>, <em>S</em>, <em>J</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.zeeman.lande_g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the lande g factor given L, S and J</p>
+<div class="math">
+<p><img src="_images/math/d4c3df56eb53d8f3df3198dd1dfe266288a039f0.svg" alt="g = 1 + \frac{J(J+1) + S(S+1) - L(L+1)}{2J(J+1)}"/></p>
+</div><dl class="docutils">
+<dt>Reference: Sobel’man, I.I. Introduction to the</dt>
+<dd>Theory of Atomic Spectra. 1972. pp. 277</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>L</strong> (<em>float</em>) – L number</li>
+<li><strong>S</strong> (<em>float</em>) – S number</li>
+<li><strong>J</strong> (<em>float</em>) – J number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">lande g factor</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.core.zeeman.zeeman_factors">
+<code class="descclassname">fabry.core.zeeman.</code><code class="descname">zeeman_factors</code><span class="sig-paren">(</span><em>L_up</em>, <em>S_up</em>, <em>J_up</em>, <em>L_lo</em>, <em>S_lo</em>, <em>J_lo</em>, <em>parallel=True</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.zeeman.zeeman_factors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the Zeeman factors and relative amplitudes for a given
+line transition from (L,S,J)_upper to (L,S,J)_lower</p>
+<p>assumes LS-coupling (not jj) therefore Z&lt;=30 and that this will
+be used for a weak-field (B &lt; 10T) Zeeman calculation</p>
+<dl class="docutils">
+<dt>Reference: Sobel’man, I.I. Introduction the Theory of</dt>
+<dd>Atomic Spectra. 1972. pp. 277-280</dd>
+</dl>
+<p>Notes on getting L,S,J for a given spectral line:
+NIST spectral database will return the upper and lower level
+electron configuration information for a given line. The term
+will be of the form:</p>
+<blockquote>
+<div>(#){S,P,D,F}</div></blockquote>
+<p>where #==(2S+1), and {S,P,D,F} correspond to L=0,1,2,3
+Also, NIST will return the value of J for the upper and lower level</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>L_up</strong> (<em>float</em>) – the upper state L number</li>
+<li><strong>S_up</strong> (<em>float</em>) – the upper state S number</li>
+<li><strong>J_up</strong> (<em>float</em>) – the upper state J number</li>
+<li><strong>L_lo</strong> (<em>float</em>) – the lower state L number</li>
+<li><strong>S_lo</strong> (<em>float</em>) – the lower state S number</li>
+<li><strong>J_lo</strong> (<em>float</em>) – the lower state J number</li>
+<li><strong>parallel</strong> (<em>bool</em><em>, </em><em>default=True</em>) – a boolean flag for the direction
+of observation wrt the magnetic field. If true, the spectrum
+is observed on a line of sight parallel with the magnetic
+field and there are no pi-components of the Zeeman split. If
+false the observation is perpendicular to the field and there
+will be pi-components of the Zeeman split.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a dictionary with the following items
+sp_fac (list) -&gt; sigma plus components zeeman factors
+sp_amp (list) -&gt; relative amplitudes of sigma plus components
+sm_fac (list) -&gt; sigma minus components zeeman factors
+sm_amp (list) -&gt; relative amplitudes of sigma minus components
+if parallel is False:
+pi_fac (list) -&gt; pi components zeeman factors
+pi_amp (list) -&gt; relative amplitudes of pi components</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">out (dict)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.core.zeeman.zeeman_lambda">
+<code class="descclassname">fabry.core.zeeman.</code><code class="descname">zeeman_lambda</code><span class="sig-paren">(</span><em>w0</em>, <em>B</em>, <em>factors</em>, <em>amps=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.zeeman.zeeman_lambda" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the zeeman split shifts from a central wavelength for
+a given magnetic field strength</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>w0</strong> (<em>float</em>) – central wavelength in nm</li>
+<li><strong>B</strong> (<em>float</em>) – magnetic field strength in T</li>
+<li><strong>factors</strong> (<em>list</em>) – list of zeeman factors (from zeeman_factors dictionary)</li>
+<li><strong>amps</strong> (<em>list</em><em>, </em><em>default=None</em>) – optional list of amplitudes to renormalize</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of zeeman splitting peak locations based on factors, if amps is not None: amps (list): list of normalized amplitudes</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Tuple (list, list)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 </div>
 
 
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Core</a><ul>
-<li><a class="reference internal" href="#module-fabry.core.ringsum">RingSum</a></li>
-<li><a class="reference internal" href="#module-fabry.core.models">Models</a></li>
-<li><a class="reference internal" href="#module-fabry.core.fitting">Fitting</a></li>
-<li><a class="reference internal" href="#module-fabry.core.synthetic">Synthetic</a></li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tools.html" class="btn btn-neutral float-right" title="Tools" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to Fabry Perot’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to Fabry Perot’s documentation!</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="tools.html"
-                        title="next chapter">Tools</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/core.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Jason Milhone.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="tools.html" title="Tools"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Welcome to Fabry Perot’s documentation!"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fabry Perot 0.1.0 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Jason Milhone.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

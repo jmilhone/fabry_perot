@@ -1,11 +1,11 @@
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 def lande_g(L,S,J):
-    '''
-    calculates the lande g factor given L, S and J
+    '''Calculates the lande g factor given L, S and J
     
-    g = 1 + {J(J+1) + S(S+1) - L(L+1)} / {2J(J+1)}
+    .. math::
+        g = 1 + \\frac{J(J+1) + S(S+1) - L(L+1)}{2J(J+1)}
     
     Reference: Sobel'man, I.I. Introduction to the 
         Theory of Atomic Spectra. 1972. pp. 277
@@ -14,14 +14,15 @@ def lande_g(L,S,J):
         L (float): L number
         S (float): S number
         J (float): J number
+
     Returns:
-        g (float): lande g factor
+        float: lande g factor
     '''
     return 1. + (J*(J+1.) + S*(S+1.) - L*(L+1.)) / (2.*J*(J+1.))
 
+
 def zeeman_factors(L_up, S_up, J_up, L_lo, S_lo, J_lo, parallel=True):
-    '''
-    calculates the Zeeman factors and relative amplitudes for a given
+    '''Calculates the Zeeman factors and relative amplitudes for a given
     line transition from (L,S,J)_upper to (L,S,J)_lower
     
     assumes LS-coupling (not jj) therefore Z<=30 and that this will
@@ -54,13 +55,14 @@ def zeeman_factors(L_up, S_up, J_up, L_lo, S_lo, J_lo, parallel=True):
 
     Returns:
         out (dict): a dictionary with the following items
-            sp_fac (list) -> sigma plus components zeeman factors
-            sp_amp (list) -> relative amplitudes of sigma plus components
-            sm_fac (list) -> sigma minus components zeeman factors
-            sm_amp (list) -> relative amplitudes of sigma minus components
-            if parallel is False:
-            pi_fac (list) -> pi components zeeman factors
-            pi_amp (list) -> relative amplitudes of pi components
+        sp_fac (list) -> sigma plus components zeeman factors
+        sp_amp (list) -> relative amplitudes of sigma plus components
+        sm_fac (list) -> sigma minus components zeeman factors
+        sm_amp (list) -> relative amplitudes of sigma minus components
+        if parallel is False:
+        pi_fac (list) -> pi components zeeman factors
+        pi_amp (list) -> relative amplitudes of pi components
+
     '''
     g_up = lande_g(L_up,S_up,J_up)
     g_lo = lande_g(L_lo,S_lo,J_lo)
@@ -133,8 +135,7 @@ def zeeman_factors(L_up, S_up, J_up, L_lo, S_lo, J_lo, parallel=True):
         return {'pi_fac':pi_fac, 'pi_amp':pi_amp, 'sp_fac':sp_fac, 'sp_amp':sp_amp, 'sm_fac':sm_fac, 'sm_amp':sm_amp}
 
 def zeeman_lambda(w0, B, factors, amps=None):
-    '''
-    calculates the zeeman split shifts from a central wavelength for
+    '''Calculates the zeeman split shifts from a central wavelength for
     a given magnetic field strength
 
     Args:
@@ -142,10 +143,9 @@ def zeeman_lambda(w0, B, factors, amps=None):
         B (float): magnetic field strength in T
         factors (list): list of zeeman factors (from zeeman_factors dictionary)
         amps (list, default=None): optional list of amplitudes to renormalize
+
     Returns:
-        lambdas (list): list of zeeman splitting peak locations based on factors
-        if amps is not None:
-        amps (list): list of normalized amplitudes
+        Tuple (list, list): list of zeeman splitting peak locations based on factors, if amps is not None: amps (list): list of normalized amplitudes
     '''
     beta = 9.274e-24 #Bohr magnetron J/Tesla
     lam_hc = 5.034117e15 * w0**2 #lambda^2/hc in nm/J
@@ -155,5 +155,5 @@ def zeeman_lambda(w0, B, factors, amps=None):
     else:
         return lambdas, [x/sum(amps) for x in amps]
 
-if __name__ == "__main__":
-    print(zeeman_factors(2,0.5,2.5,1,0.5,1.5))
+# if __name__ == "__main__":
+#     print(zeeman_factors(2,0.5,2.5,1,0.5,1.5))

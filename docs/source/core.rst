@@ -35,4 +35,9 @@ Synthetic
 .. autoclass:: VelocityProfile
     :members:
 
+Zeeman
+----------
+
+.. automodule:: fabry.core.zeeman
+    :members:
 

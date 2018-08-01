@@ -19,13 +19,14 @@ def register_reader(reader_func):
 
 def check_nef(filename):
     if filename[-4:].lower() != '.nef':
-        if path.isfile(filename+'.NEF'):
+        if path.isfile(filename + '.NEF'):
             filename += '.NEF'
-        elif path.isfile(filename+'.nef'):
+        elif path.isfile(filename + '.nef'):
             filename += '.nef'
         else:
             raise Exception('{0} does not exist!'.format(filename))
     return filename
+
 
 @register_reader
 def read_nef(fname):
@@ -40,12 +41,12 @@ def read_nef(fname):
     if path.splitext(fname)[-1].lower() == '.nef':
         image = rawpy.imread(fname)
         data = image.postprocess(demosaic_algorithm=rawpy.DemosaicAlgorithm.LINEAR,
-            output_color=rawpy.ColorSpace.raw, output_bps=16, no_auto_bright=True, 
-            adjust_maximum_thr=0., gamma=(1, 1)).astype('float64')
-
-        return data 
+                                 output_color=rawpy.ColorSpace.raw, output_bps=16, no_auto_bright=True,
+                                 adjust_maximum_thr=0., gamma=(1, 1)).astype('float64')
+        return data
     else:
         return None
+
 
 @register_reader
 def read_npy(fname):
@@ -63,14 +64,13 @@ def read_npy(fname):
     else:
         return None
 
+
 def get_data(filename, color=None):
     """Reads image data from filename
 
     Args:
-        fname (str): filename to read
-
-    Kwargs:
-        color (Union[numbers.Integral, str]): [0,2] for rgb, or a letter from rgb
+        filename (str): filename to read
+        color (Union[int, str]): [0,2] for rgb, or a letter from rgb
 
     Returns: 
         np.ndarray: 2d image data
@@ -85,15 +85,16 @@ def get_data(filename, color=None):
     if color is None or len(image.shape) == 2:
         a = image
     elif color.lower() in ['r', 'red']:
-        a = image[:,:,0]
+        a = image[:, :, 0]
     elif color.lower() in ['g', 'green']:
-        a = image[:,:,1]
+        a = image[:, :, 1]
     elif color.lower() in ['b', 'blue']:
-        a = image[:,:,2]
+        a = image[:, :, 2]
     else:
         raise ValueError('not a valid color choice')
 
     return a
+
 
 def get_metadata(filename):
     """Returns metadata from image filename
@@ -107,9 +108,7 @@ def get_metadata(filename):
     filename = check_nef(filename)
     with open(filename, 'rb') as f:
         tags = exifread.process_file(f, details=False)
-    date = str(tags['Image DateTime'].values.replace(':','_').split(' ')[0])
+    date = str(tags['Image DateTime'].values.replace(':', '_').split(' ')[0])
     time = str(tags['Image DateTime'].values.split(' ')[1])
     model = str(tags['Image Model'].values)
-    return {'date':date, 'time':time, 'model':model}
-
-
+    return {'date': date, 'time': time, 'model': model}

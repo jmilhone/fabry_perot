@@ -20,7 +20,7 @@ def check_solver(finesse_folder, Lpost, dpost):
     """
     Verfies the output of the point spread function solver.  Makes many plots.
 
-    Arguments:
+    Args:
         finesse_folder (str): path to folder containing output files from the finesse solver
         Lpost (np.ndarray): array of equally weighted marginal posterior L values
         dpost(np.ndarray): array of equally weighted marginal posterior d values
@@ -167,6 +167,13 @@ def check_solver(finesse_folder, Lpost, dpost):
     # plt.show()
 
 def check_full_solver(finesse_folder):
+    """
+    Verfies the output of the full point spread function solver.  Makes many plots.
+
+    Args:
+        finesse_folder (str): path to folder containing output files from the finesse solver
+    """
+
     data_filename = join(finesse_folder, 'finesse_input.h5')
 
     data = io.h5_2_dict(data_filename)

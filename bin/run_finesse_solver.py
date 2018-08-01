@@ -2,13 +2,14 @@ from __future__ import print_function, division, absolute_import
 from future.builtins import input
 from distutils.util import strtobool
 import sys
+import time
+import argparse
+
 sys.path.append("../")
 import numpy as np
 from fabry.tools.file_io import read_Ld_results
 from os.path import abspath, join
-import argparse
 from mpi4py import MPI
-import time
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -17,13 +18,13 @@ if __name__ == "__main__":
     if rank == 0:
         parser = argparse.ArgumentParser(description='Runs a finesse solver')
         parser.add_argument('folder', type=str,
-                help='folder containing finesse input files')
+                            help='folder containing finesse input files')
         parser.add_argument('ld_folder', type=str,
-                help='folder containing L d wavelength calibration results')
+                            help='folder containing L d wavelength calibration results')
         parser.add_argument('filter_type', type=str,
-                help='Name of filter (Ar, He, ar, he, ...)')
+                            help='Name of filter (Ar, He, ar, he, ...)')
         parser.add_argument('--restart', action='store_true', default=False,
-                help="Set to True if you want MultiNest to start over instead of resuming")
+                            help="Set to True if you want MultiNest to start over instead of resuming")
         args = parser.parse_args()
 
         if args.filter_type.lower() in ['ar', 'argon', '488']:
@@ -34,7 +35,6 @@ if __name__ == "__main__":
         else:
             print('Filter {0:s} not recognized.'.format(args.filter_type))
             sys.exit(1)
-
 
         folder = abspath(args.folder)
 
@@ -88,12 +88,12 @@ if __name__ == "__main__":
         solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
                solver_in['Lpost'], solver_in['dpost'], resume=resume, test_plot=False)
 
-        #full_solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
+        # full_solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
         #        resume=resume, test_plot=False)
 
     if rank == 0:
         end_time = time.time()
-        print("Total Time Elasped: {} minutes".format((end_time - start_time)/60.0))
+        print("Total Time Elasped: {} minutes".format((end_time - start_time) / 60.0))
         if solver_in['filter'] == 'argon':
             from fabry.finesse.check_argon_solver import check_solver, check_full_solver
         else:
@@ -101,13 +101,13 @@ if __name__ == "__main__":
             sys.exit(1)
 
         check_solver(solver_in['out_folder'], solver_in['Lpost'], solver_in['dpost'])
-        #check_full_solver(solver_in['out_folder'])
+        # check_full_solver(solver_in['out_folder'])
 
-    #folder = "../Data/2018_04_23/Argon3"
+    # folder = "../Data/2018_04_23/Argon3"
 
-    #prior_filename = join(folder, 'finesse_prior_info.json')
-    #data_filename = join(folder, 'finesse_input.h5')
+    # prior_filename = join(folder, 'finesse_prior_info.json')
+    # data_filename = join(folder, 'finesse_input.h5')
 
-    #Lpost, dpost = read_Ld_results(folder)
+    # Lpost, dpost = read_Ld_results(folder)
 
-    #ar_solver.solver(prior_filename, data_filename, Lpost, dpost)
+    # ar_solver.solver(prior_filename, data_filename, Lpost, dpost)

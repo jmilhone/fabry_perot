@@ -1,11 +1,15 @@
+"""This module contains a few different MultiNest calibration solvers for the Th lamp with the 488
+    nm central wavelength 1 nm fwhm filter. 
+
+    Attributes:
+        mu (tuple): relative mass for Th and then Ar
+        w0 (tuple): Th I and Ar II wavelengths used for calibration
+"""
 from __future__ import print_function, division, absolute_import
 import pymultinest
 import numpy as np
 from ..core.models import forward_model, offset_forward_model
 import json
-import argparse
-import h5py
-#import matplotlib.pyplot as plt # For testing purposes only
 from ..tools import file_io as io
 import random
 from os.path import abspath, join
@@ -124,11 +128,11 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
     if test_plot:
         npts = 30
         test_sig = np.zeros((npts, len(r)))
-        for i in xrange(npts):
+        for i in range(npts):
             j = random.randint(0, nL-1)
             L = Lpost[j]
             d = dpost[j]
-            cube = [random.random() for _ in xrange(n_params)] 
+            cube = [random.random() for _ in range(n_params)]
             log_prior(cube, None, None)
             amps, w, mass, V, Ti = build_function_parameters(cube, n_params)
             test_sig[i, :] = forward_model(r, L, d, cube[0], w, mass, amps, Ti,
@@ -146,6 +150,20 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
 
 
 def full_solver(output_folder, prior_filename, data_filename, resume=True, test_plot=False):
+    """MultiNest solver for point spread function calibration with the Argon filter. This is a 
+        full solver. L and d will be solved as well!
+
+    Args:
+        output_folder (str): path to folder containing input and output files for finesse solver
+        prior_filename (str): path to file for the MultiNest prior (json format)
+        data_filename (str): path to file for the input data 
+
+    Kwargs:
+        resume (bool, optional): MultiNest will resume the calculation if True
+        test_plot (bool, optional): for debugging purposes, allows the user to sample the prior and compare to input data
+    """
+
+
     def log_prior(cube, ndim, nparams):
         cube[0] = cube[0]*(L_lim[1] - L_lim[0]) + L_lim[0]
         cube[1] = cube[1]*(d_lim[1] - d_lim[0]) + d_lim[0]

@@ -1,13 +1,8 @@
 from __future__ import print_function, division, absolute_import
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import norm
-import argparse
 from . import models
 import multiprocessing as multi
 from collections import MutableMapping
-import numbers
-
 
 ########################################
 # Physical constants, DO NOT OVERWRITE #
@@ -21,14 +16,15 @@ class Sensor(object):
     """A representation for a camera sensor for the Fabry Perot
 
     Attributes:
-        nx (numbers.Integral): number of pixels in the x direction
-        ny (numbers.Integral): number of pixels in the y direction
-        px_size (numbers.Real): Pixel size in mm
-        x0 (numbers.Real): x location of the center
-        y0 (numbers.Real): y location of th center
+        nx (int): number of pixels in the x direction
+        ny (int): number of pixels in the y direction
+        px_size (float): Pixel size in mm
+        x0 (float): x location of the center
+        y0 (float): y location of th center
         sensor (np.ndarray): 2D array representing the sensors where each 
             element is the count value for that pixel
     """
+
     def __init__(self, nx, ny, px_size=0.004):
         super(Sensor, self).__init__()
 
@@ -36,8 +32,8 @@ class Sensor(object):
         self.ny = int(ny)
         self.sensor = np.zeros((nx, ny))
         self.px_size = px_size
-        self.x0 = nx/2.0
-        self.y0 = ny/2.0
+        self.x0 = nx / 2.0
+        self.y0 = ny / 2.0
         self._R = None  # Delay the creation of the R matrix until it is actually needed
 
     def create_Rgrid(self):
@@ -49,12 +45,12 @@ class Sensor(object):
         nx = self.nx
         ny = self.ny
 
-        x = np.arange(1, nx+1, 1)
-        y = np.arange(1, ny+1, 1)
+        x = np.arange(1, nx + 1, 1)
+        y = np.arange(1, ny + 1, 1)
 
         XX, YY = np.meshgrid(x, y)
 
-        R = np.sqrt( (XX-self.x0)**2 + (YY-self.y0)**2 )
+        R = np.sqrt((XX - self.x0) ** 2 + (YY - self.y0) ** 2)
 
         return R
 
@@ -65,9 +61,9 @@ class Sensor(object):
             self._R = self.create_Rgrid()
         return self._R
 
-    @R.setter
-    def R(self):
-        self._R = self.create_Rgrid()
+    # @R.setter
+    # def R(self):
+    #     self._R = self.create_Rgrid()
 
     def calculate_emission(self, etalon, light_source, nprocs=4):
         """Calculates emission from a light source through an etalon onto the sensor
@@ -111,11 +107,12 @@ class Etalon(object):
     Class that represents an etalon for a Fabry-Perot spectrometer
 
     Attributes:
-        L (numbers.Real): focal length of lens for the camera
-        d (numbers.Real): etalon spacing
-        F (numbers.Real): finesse of etalon
+        L (float): focal length of lens for the camera
+        d (float): etalon spacing
+        F (float): finesse of etalon
 
     """
+
     def __init__(self, L, d, F):
         super(Etalon, self).__init__()
         self.L = L
@@ -131,9 +128,7 @@ class Etalon(object):
         Args:
             sensor (Sensor): represents a camera sensor
             light_source (LightSource): represents a light source for the Fabry Perot
-
-        kwargs:
-            nprocs (numbers.Integral): number of processes to use
+            nprocs (int): number of processes to use
 
         Returns:
             np.ndarray: shape matches sensor.sensor.shape
@@ -153,9 +148,9 @@ class Etalon(object):
         out = multi.Queue()
         labels = ['{0}'.format(x) for x in range(nprocs)]
         for k in range(nprocs):
-            p = multi.Process(target = Etalon._calculate_emission,
-                    args=(split_r[k], self.L / px_size, self.d, self.F, w, mu, amp, temp, vel),
-                    kwargs={'out': out, 'label': labels[k]})
+            p = multi.Process(target=Etalon._calculate_emission,
+                              args=(split_r[k], self.L / px_size, self.d, self.F, w, mu, amp, temp, vel),
+                              kwargs={'out': out, 'label': labels[k]})
             procs.append(p)
             p.start()
 
@@ -182,16 +177,14 @@ class Etalon(object):
 
         Args:
             r (np.ndarray): radii in pixels
-            L (numbers.Real): focal length of camera lens in pixels
-            d (numbers.Real): etalon spacing in mm
-            F (numbers.Real): finesse of etalon
-            w (numbers.Real): wavelength in nm
-            mu (numbers.Real): relative mass
-            amp (numbers.Real): amplitude of line
-            temp (numbers.Real): ion temperature in eV
-            vel (numbers.Real): velocity of ion in m/s
-
-        Kwargs:
+            L (float): focal length of camera lens in pixels
+            d (float): etalon spacing in mm
+            F (float): finesse of etalon
+            w (float): wavelength in nm
+            mu (float): relative mass
+            amp (float): amplitude of line
+            temp (float): ion temperature in eV
+            vel (float): velocity of ion in m/s
             out (multiprocessing.Queue): output queue
             label (str): label for the output being put into the output queue
 
@@ -210,7 +203,7 @@ class Etalon(object):
             npts = len(model)
             for i in xrange(npts):
                 model[i] = model[i] + np.random.normal(scale=np.sqrt(model[i]))
-                if i % 100 ==0:
+                if i % 100 == 0:
                     print(model[i], np.random.normal(scale=np.sqrt(model[i])))
 
         if out and label:
@@ -251,16 +244,16 @@ class LightSource(object):
     """A representation of a light source for a Fabry-Perot spectrometer
 
     Attributes:
-        temperature (numbers.Real): temperature of the emitting ion in eV
-        wavelength (numbers.Real): wavelength of the light emitted in nm
-        mu (numbers.Real): relative mass of the ion
-        amplitude (numbers.Real): amplitude of the light emitted (you can choose your units here...)
-        velocity (VelocityProfile or numbers.Real): velocity of the emitting ion in m/s
+        temperature (float): temperature of the emitting ion in eV
+        wavelength (float): wavelength of the light emitted in nm
+        mu (float): relative mass of the ion
+        amplitude (float): amplitude of the light emitted (you can choose your units here...)
+        velocity (VelocityProfile or float): velocity of the emitting ion in m/s
     """
 
     def __init__(self, Ti, w, mu, velocity, amplitude=1):
         super(LightSource, self).__init__()
-        self.temperature =  Ti
+        self.temperature = Ti
         self.wavelength = w
         self.mu = mu
         self.amplitude = amplitude
@@ -269,8 +262,8 @@ class LightSource(object):
     def __repr__(self):
         class_name = type(self).__name__
         return "{}({!r}, {!r}, {!r}, {!r}, amplitude={!r})".format(
-                class_name, self.temperature, self.wavelength, self.mu, 
-                self.velocity, self.amplitude)
+            class_name, self.temperature, self.wavelength, self.mu,
+            self.velocity, self.amplitude)
 
     @classmethod
     def from_dict(cls, light_source):
@@ -312,13 +305,12 @@ class LightSource(object):
             pass
 
         return {
-                'temperature': self.temperature,
-                'wavelength': self.wavelength,
-                'mu': self.mu,
-                'amplitude': self.amplitude,
-                'velocity': velocity,
-                }
-
+            'temperature': self.temperature,
+            'wavelength': self.wavelength,
+            'mu': self.mu,
+            'amplitude': self.amplitude,
+            'velocity': velocity,
+        }
 
 
 class UniformPlasma(LightSource):
@@ -326,14 +318,11 @@ class UniformPlasma(LightSource):
         species mu emitting light for a Fabry-Perot spectrometer
 
     Attributes:
-        temperature (numbers.Real): temperature of the emitting ion in eV
-        wavelength (numbers.Real): wavelength of the light emitted in nm
-        mu (numbers.Real): relative mass of the ion
-        amplitude (numbers.Real): amplitude of the light emitted (you can choose your units here...)
-        velocity (Union[VelocityProfile,numbers.Real]): velocity of the emitting ion in m/s
-        ne (numbers.Real): electron density in cm^-3
-        pec (numbers.Real): photon emissivity coefficient (need to decide on units here)
-        mu (numbers.Real): relative mass of the ion
+        mu (float): relative mass of the ion
+        velocity (Union[VelocityProfile,float]): velocity of the emitting ion in m/s
+        ne (float): electron density in cm^-3
+        pec (float): photon emissivity coefficient (need to decide on units here)
+        mu (float): relative mass of the ion
     """
 
     def __init__(self, ne, Ti, pec, w, velocity=None, mu=40.0):
@@ -347,12 +336,10 @@ class UniformPlasma(LightSource):
         """Calculates ion emission at a radius r for wavelengths provided
 
         Args:
-            r (Union[numbers.Real, np.ndarray]): radii to calculate ion emission at
-            wavelength (Union[numbers.Real, np.ndarray]): wavelength to calculate emission line 
+            r (Union[float, np.ndarray]): radii to calculate ion emission at
+            wavelength (Union[float, np.ndarray]): wavelength to calculate emission line
                 profile
-
-        Kwargs:
-            cos_theta (Union[numbers.Real, np.ndarray]): cos(theta) to project velocity onto a unit
+            cos_theta (Union[float, np.ndarray]): cos(theta) to project velocity onto a unit
                 vector an angle theta from the toroidal direction
 
         Returns:
@@ -373,7 +360,7 @@ class UniformPlasma(LightSource):
 
         line_profile = self.gaussian(wavelength, velocity)
 
-        emission = self.ne**2 * self.pec * line_profile / (4*np.pi)
+        emission = self.ne ** 2 * self.pec * line_profile / (4 * np.pi)
         return emission
 
     def chord_emission(self, impact_factor, wavelength):
@@ -383,7 +370,7 @@ class UniformPlasma(LightSource):
             raise ValueError('impact_factor must be greater than or equal to zero')
 
         max_radii = 150.0
-        x_max = np.sqrt(max_radii**2 - b**2)
+        x_max = np.sqrt(max_radii ** 2 - b ** 2)
         x_arr = np.linspace(0.0, x_max, 1000)
 
         # I need the x_arr and subsequent arrays to be broadcastable with wavelength array
@@ -391,49 +378,48 @@ class UniformPlasma(LightSource):
         w = wavelength[:, np.newaxis]
 
         # theta_arr = np.arctan2(b, x_arr)
-        cos_theta = b / np.sqrt(b**2 + x_arr**2)
+        cos_theta = b / np.sqrt(b ** 2 + x_arr ** 2)
 
-        rarr = np.sqrt(x_arr**2 + b**2)
+        rarr = np.sqrt(x_arr ** 2 + b ** 2)
         print(rarr.shape)
         print(w.shape)
         emission = self.ion_emission(rarr, w, cos_theta=cos_theta)
 
-        radiance = 2.0*np.trapz(emission, x=x_arr, axis=1)
+        radiance = 2.0 * np.trapz(emission, x=x_arr, axis=1)
         print(emission.shape, x_arr.shape, w.shape, radiance.shape)
-        #fig, ax = plt.subplots()
-        #for i in range(1000):
+        # fig, ax = plt.subplots()
+        # for i in range(1000):
         #    if i % 50 == 0:
         #        ax.plot(wavelength, emission[:, i] / emission.max())
-        #ax.plot(wavelength, radiance / radiance.max(), 'k')
-        #plt.show()
+        # ax.plot(wavelength, radiance / radiance.max(), 'k')
+        # plt.show()
         return radiance
-
 
     def gaussian(self, wavelength, velocity):
         """Calculates doppler broadened and shifted gaussian
 
         Args:
-            wavelength (Union[numbers.Real, np.ndarray]): wavelength to calculate emission line profile
-            velocity (Union[numbers.Real, np.ndarray]): velocity of ion for doppler shift
+            wavelength (Union[float, np.ndarray]): wavelength to calculate emission line profile
+            velocity (Union[float, np.ndarray]): velocity of ion for doppler shift
         """
         w = np.asarray(wavelength)
         v = np.asarray(velocity)
         sigma = self.sigma
         w_shift = self.calculate_shift(v)
-        norm = np.sqrt(2*np.pi) * sigma
+        norm = np.sqrt(2 * np.pi) * sigma
 
-        return np.exp(-0.5*(w-w_shift)**2 / sigma**2) / norm
+        return np.exp(-0.5 * (w - w_shift) ** 2 / sigma ** 2) / norm
 
     @property
     def sigma(self):
         """Thermal doppler broadening"""
-        return np.sqrt(q * self.temperature / (self.mass)) * self.wavelength / c
+        return np.sqrt(q * self.temperature / self.mass) * self.wavelength / c
 
     def calculate_shift(self, velocity):
         """Calculate doppler shift from the ion velocity
 
         Args:
-            velocity (Union[numbers.Real, np.ndarray]): velocity in m/s
+            velocity (Union[float, np.ndarray]): velocity in m/s
 
         Returns:
             np.ndarray
@@ -448,9 +434,8 @@ class UniformPlasma(LightSource):
     def __repr__(self):
         class_name = type(self).__name__
         return "{}({!r}, {!r}, {!r}, {!r}, velocity={!r}, mu={!r})".format(
-                class_name, self.ne, self.temperature, self.pec, self.wavelength,
-                self.velocity, self.mu)
-
+            class_name, self.ne, self.temperature, self.pec, self.wavelength,
+            self.velocity, self.mu)
 
     def to_dict(self):
         """Returns a dict representation
@@ -465,15 +450,13 @@ class UniformPlasma(LightSource):
             pass
 
         return {
-                'temperature': self.temperature,
-                'wavelength': self.wavelength,
-                'mu': self.mu,
-                'velocity': velocity,
-                'pec': self.pec,
-                'ne': self.ne
-                }
-
-
+            'temperature': self.temperature,
+            'wavelength': self.wavelength,
+            'mu': self.mu,
+            'velocity': velocity,
+            'pec': self.pec,
+            'ne': self.ne
+        }
 
     @classmethod
     def from_dict(cls, plasma):
@@ -505,18 +488,18 @@ class UniformPlasma(LightSource):
         return cls(ne, temperature, pec, wavelength, velocity=velocity, mu=mu)
 
 
-
 class VelocityProfile(object):
     """Represents a edge driven velocity profile
 
     Attributes:
-        Vmax (numbers.Real): maximum velocity
-        max_radius (numbers.Real): radial location of the maximum velocity
-        length_scale (numbers.Real): scale for the velocity gradient inward radially
-        edge_scale (numbers.Real): scale for the velocity edge gradient
-        R0 (numbers.Real): location of the edge
-        offset (numbers.Real): offset velocity in the center
+        Vmax (float): maximum velocity
+        max_radius (float): radial location of the maximum velocity
+        length_scale (float): scale for the velocity gradient inward radially
+        edge_scale (float): scale for the velocity edge gradient
+        R0 (float): location of the edge
+        offset (float): offset velocity in the center
     """
+
     def __init__(self, Vmax, max_radius, length_scale, edge_scale, R0=140.0, offset=0.0):
         super(VelocityProfile, self).__init__()
 
@@ -525,13 +508,13 @@ class VelocityProfile(object):
         self.length_scale = length_scale
         self.edge_scale = edge_scale
         self.R0 = R0
-        self.offset=offset
+        self.offset = offset
 
     def vphi(self, r):
         """Returns the Torodial velocity at r
 
         Args:
-            r (Union[numbers.Real, np.ndarray]): radii to evaluate vphi at
+            r (Union[float, np.ndarray]): radii to evaluate vphi at
 
         Returns:
             np.ndarray
@@ -549,28 +532,28 @@ class VelocityProfile(object):
         """Helper function for the edge profile
 
         Args:
-            r (Union[numbers.Real, np.ndarray]): radii to evaulate at
+            r (Union[float, np.ndarray]): radii to evaulate at
 
         Returns:
             np.ndarray
         """
-        return 0.5 * (1.0 - np.tanh((r - self.R0)/self.edge_scale))
+        return 0.5 * (1.0 - np.tanh((r - self.R0) / self.edge_scale))
 
     def gaussian(self, r):
         """Helper function for the inward velocity gradient
 
         Args:
-            r (Union[numbers.Real], np.ndarray]): radii to evaluate at
+            r (Union[float], np.ndarray]): radii to evaluate at
 
         Returns:
             np.ndarray
         """
-        g = (1-self.offset / self.Vmax)*np.exp(-(r - self.max_radius)**2 / self.length_scale**2)
+        g = (1 - self.offset / self.Vmax) * np.exp(-(r - self.max_radius) ** 2 / self.length_scale ** 2)
         g += self.offset / self.Vmax
-        #print(self.offset / self.Vmax, 1 + self.offset / self.Vmax)
-        #fig, ax = plt.subplots()
-        #ax.plot(r, g)
-        #plt.show()
+        # print(self.offset / self.Vmax, 1 + self.offset / self.Vmax)
+        # fig, ax = plt.subplots()
+        # ax.plot(r, g)
+        # plt.show()
         return g
 
     def __call__(self, r):
@@ -578,7 +561,8 @@ class VelocityProfile(object):
 
     def __repr__(self):
         cls = type(self).__name__
-        s = "{}({!r},{!r},{!r},{!r},R0={!r},offset={!r})".format(cls, self.Vmax, self.max_radius, self.length_scale, self.edge_scale, self.R0, self.offset)
+        s = "{}({!r},{!r},{!r},{!r},R0={!r},offset={!r})".format(cls, self.Vmax, self.max_radius, self.length_scale,
+                                                                 self.edge_scale, self.R0, self.offset)
         return s
 
     def to_dict(self):
@@ -615,5 +599,3 @@ class VelocityProfile(object):
         R0 = velocity.get('R0', 140.0)
         offset = velocity.get('offset', 0.0)
         return cls(Vmax, max_radius, length_scale, edge_scale, R0=R0, offset=offset)
-
-
