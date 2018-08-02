@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Finesse &mdash; Fabry Perot 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Fabry Perot 0.1.0 documentation" href="index.html"/>
+        <link rel="prev" title="Tools" href="tools.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Fabry Perot
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Finesse</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#argon-solver">Argon Solver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#check-argon-solver">Check Argon Solver</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Fabry Perot</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Finesse</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/finesse.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="finesse">
+<h1>Finesse<a class="headerlink" href="#finesse" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="argon-solver">
+<h2>Argon Solver<a class="headerlink" href="#argon-solver" title="Permalink to this headline">¶</a></h2>
+<p>This module contains a few different MultiNest calibration solvers for the Th lamp with the 488 nm central wavelength 1 nm fwhm filter.</p>
+<dl class="attribute">
+<dt id="fabry.finesse.argon_solver.mu">
+<code class="descclassname">fabry.finesse.argon_solver.</code><code class="descname">mu</code><a class="headerlink" href="#fabry.finesse.argon_solver.mu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple with the relative masses for Th and  Ar</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.finesse.argon_solver.w0">
+<code class="descclassname">fabry.finesse.argon_solver.</code><code class="descname">w0</code><a class="headerlink" href="#fabry.finesse.argon_solver.w0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple with Th I and Ar II wavelengths used for calibration</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.finesse.argon_solver.solver">
+<code class="descclassname">fabry.finesse.argon_solver.</code><code class="descname">solver</code><span class="sig-paren">(</span><em>output_folder</em>, <em>prior_filename</em>, <em>data_filename</em>, <em>Lpost</em>, <em>dpost</em>, <em>resume=True</em>, <em>test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.argon_solver.solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>MultiNest solver for point spread function calibration with the Argon filter</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files for finesse solver</li>
+<li><strong>prior_filename</strong> (<em>str</em>) – path to file for the MultiNest prior (json format)</li>
+<li><strong>data_filename</strong> (<em>str</em>) – path to file for the input data</li>
+<li><strong>Lpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior L values</li>
+<li><strong>dpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior d values</li>
+<li><strong>(</strong><strong>bool</strong><strong>, </strong><strong>optional</strong><strong>)</strong> (<em>resume</em>) – MultiNest will resume the calculation if True</li>
+<li><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the user to sample the prior and compare to input data</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.finesse.argon_solver.full_solver">
+<code class="descclassname">fabry.finesse.argon_solver.</code><code class="descname">full_solver</code><span class="sig-paren">(</span><em>output_folder</em>, <em>prior_filename</em>, <em>data_filename</em>, <em>resume=True</em>, <em>test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.argon_solver.full_solver" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>MultiNest solver for point spread function calibration with the Argon filter. This is a</dt>
+<dd>full solver. L and d will be solved as well!</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files for finesse solver</li>
+<li><strong>prior_filename</strong> (<em>str</em>) – path to file for the MultiNest prior (json format)</li>
+<li><strong>data_filename</strong> (<em>str</em>) – path to file for the input data</li>
+<li><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</li>
+<li><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the user to sample the prior and compare to input data</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="check-argon-solver">
+<h2>Check Argon Solver<a class="headerlink" href="#check-argon-solver" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="fabry.finesse.check_argon_solver.mu">
+<code class="descclassname">fabry.finesse.check_argon_solver.</code><code class="descname">mu</code><a class="headerlink" href="#fabry.finesse.check_argon_solver.mu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple with the relative masses for Th and  Ar</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.finesse.check_argon_solver.w0">
+<code class="descclassname">fabry.finesse.check_argon_solver.</code><code class="descname">w0</code><a class="headerlink" href="#fabry.finesse.check_argon_solver.w0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple with Th I and Ar II wavelengths used for calibration</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.finesse.check_argon_solver.check_solver">
+<code class="descclassname">fabry.finesse.check_argon_solver.</code><code class="descname">check_solver</code><span class="sig-paren">(</span><em>finesse_folder</em>, <em>Lpost</em>, <em>dpost</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.check_argon_solver.check_solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verfies the output of the point spread function solver.  Makes many plots.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>finesse_folder</strong> (<em>str</em>) – path to folder containing output files from the finesse solver</li>
+<li><strong>Lpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior L values</li>
+<li><strong>dpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior d values</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.finesse.check_argon_solver.check_full_solver">
+<code class="descclassname">fabry.finesse.check_argon_solver.</code><code class="descname">check_full_solver</code><span class="sig-paren">(</span><em>finesse_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.check_argon_solver.check_full_solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verfies the output of the full point spread function solver.  Makes many plots.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>finesse_folder</strong> (<em>str</em>) – path to folder containing output files from the finesse solver</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="tools.html" class="btn btn-neutral" title="Tools" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Jason Milhone.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
