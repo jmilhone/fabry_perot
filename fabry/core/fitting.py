@@ -249,19 +249,19 @@ def gaussian_fit(x, y):
     else:
         fwhm = np.max(x) - np.min(x)
 
-    guess = [x[imax], fwhm / 2 / np.sqrt(2 * np.log(2))]
-    fig, ax = plt.subplots()
-    ax.plot(x, yy, 'o')
-    xx = np.linspace(x.min(), x.max(), 100)
-    ax.plot(xx, _gaussian(xx, *guess))
-    plt.show()
+    guess = [x[imax], fwhm / 2 / np.sqrt(2*np.log(2)) ]
+    #fig, ax = plt.subplots()
+    #ax.plot(x, yy, 'o')
+    #xx = np.linspace(x.min(), x.max(), 100)
+    #ax.plot(xx, _gaussian(xx, *guess))
+    #plt.show()
 
     popt, pcov = curve_fit(_gaussian, x, yy, p0=guess, sigma=0.01 * yy, absolute_sigma=True)
 
-    fig, ax = plt.subplots()
-    ax.plot(x, yy, 'o')
-    ax.plot(xx, _gaussian(xx, *popt))
-    plt.show()
+    #fig, ax = plt.subplots()
+    #ax.plot(x, yy, 'o')
+    #ax.plot(xx, _gaussian(xx, *popt))
+    #plt.show()
 
     print('popt')
     print(popt)

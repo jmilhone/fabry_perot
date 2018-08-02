@@ -164,10 +164,10 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     ax.tick_params(labelsize=16)
     fig.tight_layout()
     plt.show()
-    
-    fig, ax = plt.subplots()
-    ax.plot(r, sig_sd / sig)
-    plt.show()
+    # 
+    # fig, ax = plt.subplots()
+    # ax.plot(r, sig_sd / sig)
+    # plt.show()
     return dic
 
 if __name__ == "__main__":
