@@ -2,7 +2,7 @@ import numpy as np
 
 
 def lande_g(L,S,J):
-    '''Calculates the lande g factor given L, S and J
+    """Calculates the lande g factor given L, S and J
     
     .. math::
         g = 1 + \\frac{J(J+1) + S(S+1) - L(L+1)}{2J(J+1)}
@@ -17,12 +17,12 @@ def lande_g(L,S,J):
 
     Returns:
         float: lande g factor
-    '''
+    """
     return 1. + (J*(J+1.) + S*(S+1.) - L*(L+1.)) / (2.*J*(J+1.))
 
 
 def zeeman_factors(L_up, S_up, J_up, L_lo, S_lo, J_lo, parallel=True):
-    '''Calculates the Zeeman factors and relative amplitudes for a given
+    """Calculates the Zeeman factors and relative amplitudes for a given
     line transition from (L,S,J)_upper to (L,S,J)_lower
     
     assumes LS-coupling (not jj) therefore Z<=30 and that this will
@@ -63,7 +63,7 @@ def zeeman_factors(L_up, S_up, J_up, L_lo, S_lo, J_lo, parallel=True):
         pi_fac (list) -> pi components zeeman factors
         pi_amp (list) -> relative amplitudes of pi components
 
-    '''
+    """
     g_up = lande_g(L_up,S_up,J_up)
     g_lo = lande_g(L_lo,S_lo,J_lo)
     M_up = np.arange(-J_up,J_up+0.1,1.)
@@ -135,7 +135,7 @@ def zeeman_factors(L_up, S_up, J_up, L_lo, S_lo, J_lo, parallel=True):
         return {'pi_fac':pi_fac, 'pi_amp':pi_amp, 'sp_fac':sp_fac, 'sp_amp':sp_amp, 'sm_fac':sm_fac, 'sm_amp':sm_amp}
 
 def zeeman_lambda(w0, B, factors, amps=None):
-    '''Calculates the zeeman split shifts from a central wavelength for
+    """Calculates the zeeman split shifts from a central wavelength for
     a given magnetic field strength
 
     Args:
@@ -146,7 +146,7 @@ def zeeman_lambda(w0, B, factors, amps=None):
 
     Returns:
         Tuple (list, list): list of zeeman splitting peak locations based on factors, if amps is not None: amps (list): list of normalized amplitudes
-    '''
+    """
     beta = 9.274e-24 #Bohr magnetron J/Tesla
     lam_hc = 5.034117e15 * w0**2 #lambda^2/hc in nm/J
     lambdas = [x*beta*lam_hc*B + w0 for x in factors]

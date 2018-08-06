@@ -4,7 +4,7 @@ import numpy as np
 from scipy.integrate import trapz
 from .zeeman import zeeman_lambda
 from numba import jit
-
+import os.path as path
 
 @jit(nopython=True)
 def trapezoidal_integration(y, x):
@@ -101,6 +101,16 @@ def doppler_calc(w0, mu, temp, v):
 
 
 @jit
+def doppler_shift(w0, v):
+    return w0 * (1.0 - 3.336e-9 * v)
+
+
+@jit
+def doppler_broadening(w0, mu, temp):
+    return w0 * 3.2765e-5 * np.sqrt(temp / mu)
+
+
+@jit
 def gaussian(wavelength, w, sigma, amp=1., norm=True):
     """
     Computes a gaussian for a given central wavelength, sigma and amp
@@ -171,7 +181,7 @@ def offset_forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=
     """
     # print(L, d, F, w0, mu, amp, temp, v)
     # print(nlambda, sm_ang, coeff)
-    vals = forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=nlambda, sm_ang=sm_ang)
+    vals = forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=nlambda)
     # vals += max(amp) * coeff / (1.0 + F)
     vals += max(amp) * coeff / (1.0 + (2.0 * F / np.pi) ** 2)
 
@@ -303,6 +313,53 @@ def lyon_temp_forward(r, L, d, F, current, T, V, E=None):
 
 # def lyon_temp_forward_prof(r,L,d,F,current,T,V):
 
+def zeeman_with_lyon_profile(r, L, d, F, current, T, V, E=None):
+    w0 = 487.98634
+    mu = 39.948
+
+    # Victor's calculation ###
+    zeeman_fac = [-1., -17. / 15., -19. / 15., -1.4, 1.4, 19. / 15., 17. / 15., 1.]
+    zeeman_amp = [20., 12., 6., 2., 2., 6., 12., 20.]
+
+    current_dir = path.abspath(path.join(__file__, ".."))
+    b_data = np.genfromtxt(path.join(current_dir, "lyon_magnetic_field.csv"), delimiter=",")
+
+    z = b_data[:, 0]
+    bz = b_data[:, 1]
+
+    # I only want to deal with the array where the plasma is emitting
+    zbounds = [0.0, 80.0]  # Victor says that plasma exists here
+    i_lower = np.abs(z-zbounds[0]).argmin()
+    i_higher = np.abs(z-zbounds[1]).argmin()
+    sl = slice(i_lower, i_higher)
+    z = z[sl]
+    bz = bz[sl]
+
+    # Adjust bz for the current in the coil
+    bz *= current / 80.0
+
+    nz = len(z)
+    nw = 1024
+    spectrum = np.zeros((nz, nw))
+
+    sigma_Ti = doppler_broadening(w0, mu, T)
+    w = doppler_shift(w0, V)
+
+    # Extra broadening from defocusing the camera lens
+    if E:
+        sigma_extra = doppler_broadening(w0, mu, E)
+        sigma_Ti = np.sqrt(sigma_Ti**2 + sigma_extra**2)
+
+    # Need to loop over reach z location
+    for idx, (zz, bb) in enumerate(zip(z, bz)):
+        # calculate the spectrum here
+        spectrum[idx, :] += 0.0
+
+        w_zee, a_zee = zeeman_lambda(w, bb, zeeman_fac, amps=zeeman_amp)
+
+    final_spectrum = np.trapz(spectrum, z, axis=0)
+
+    return final_spectrum
 def general_model(r, L, d, F, wavelength, emission):
     cos_th = L / np.sqrt(L ** 2 + r ** 2)
     cos_th = cos_th.reshape((1, len(r)))

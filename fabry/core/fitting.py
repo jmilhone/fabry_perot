@@ -125,9 +125,7 @@ def _gauss_fjacd(beta, x):
 
 def find_peak(x, y, x_sd, y_sd, returnval=False, plotit=False):
     """Uses a gaussian fit to find maximum via scipy.odr fit is performed in x^2 space, but all conversions
-        are taken care of inside this function
-
-    y = A*Exp(-0.5*(x^2-x0^2)^2/sigma^4)
+    are taken care of inside this function
 
     Args:
         x (np.ndarray): x values for fit
@@ -141,6 +139,7 @@ def find_peak(x, y, x_sd, y_sd, returnval=False, plotit=False):
         Tuple (float, float, float): peak location, peak location error, peak value
     """
 
+    #y = A*Exp(-0.5*(x^2-x0^2)^2/sigma^4)
     # beta0 = [y.max(),x.mean(),5*(x.max()-x.min())]
     beta0 = [y.max(), np.sqrt(np.mean(x ** 2)), 5.0 * (x.max() - x.min())]
     print(beta0[1])
@@ -263,10 +262,10 @@ def gaussian_fit(x, y):
     #ax.plot(xx, _gaussian(xx, *popt))
     #plt.show()
 
-    print('popt')
-    print(popt)
-    print(np.sqrt(popt[0]))
-    print(pcov)
+    # print('popt')
+    # print(popt)
+    # print(np.sqrt(popt[0]))
+    # print(pcov)
     pk = np.sqrt(popt[0])
     pk_sd = 0.5 * np.sqrt(pcov[0, 0]) / pk
     return pk, pk_sd

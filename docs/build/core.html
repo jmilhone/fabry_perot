@@ -144,30 +144,6 @@
 <h1>Core<a class="headerlink" href="#core" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-fabry.core.ringsum">
 <span id="ringsum"></span><h2>RingSum<a class="headerlink" href="#module-fabry.core.ringsum" title="Permalink to this headline">¶</a></h2>
-<dl class="attribute">
-<dt id="fabry.core.ringsum.calculate_weighted_mean">
-<code class="descclassname">fabry.core.ringsum.</code><code class="descname">calculate_weighted_mean</code><a class="headerlink" href="#fabry.core.ringsum.calculate_weighted_mean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the weighted mean of data with standard deviation error</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) – data array</li>
-<li><strong>error</strong> (<em>np.ndarray</em>) – standard deviation error bar for data</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">weighted mean and weighted standard deviation</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (float, float)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="function">
 <dt id="fabry.core.ringsum.get_bin_edges">
 <code class="descclassname">fabry.core.ringsum.</code><code class="descname">get_bin_edges</code><span class="sig-paren">(</span><em>dat</em>, <em>x0</em>, <em>y0</em>, <em>binsize=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.get_bin_edges" title="Permalink to this definition">¶</a></dt>
@@ -254,9 +230,9 @@ there is a ring at the center of the image.</li>
 </table>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="function">
 <dt id="fabry.core.ringsum.super_pixelate">
-<code class="descclassname">fabry.core.ringsum.</code><code class="descname">super_pixelate</code><a class="headerlink" href="#fabry.core.ringsum.super_pixelate" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fabry.core.ringsum.</code><code class="descname">super_pixelate</code><span class="sig-paren">(</span><em>data</em>, <em>npix=2</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.super_pixelate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates super pixels for image data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -264,14 +240,38 @@ there is a ring at the center of the image.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</li>
-<li><strong>npix</strong> (<em>int</em><em>, </em><em>optional</em>) – integer number of pixels to create an npix x npix super pixel</li>
+<li><strong>npix</strong> (<em>int</em>) – integer number of pixels to create an npix x npix super pixel, default=2</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New image made from the super pixels</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">new image made from the super pixels</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.core.ringsum.calculate_weighted_mean">
+<code class="descclassname">fabry.core.ringsum.</code><code class="descname">calculate_weighted_mean</code><span class="sig-paren">(</span><em>data</em>, <em>error</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.calculate_weighted_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the weighted mean of data with standard deviation error</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.ndarray</em>) – some stuff</li>
+<li><strong>error</strong> (<em>np.ndarray</em>) – standard deviation error bar for data</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">weighted mean and weighted standard deviation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (float, float)</p>
 </td>
 </tr>
 </tbody>
@@ -598,11 +598,8 @@ of rings, increasing j as you move out.</li>
 <dl class="function">
 <dt id="fabry.core.fitting.find_peak">
 <code class="descclassname">fabry.core.fitting.</code><code class="descname">find_peak</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>x_sd</em>, <em>y_sd</em>, <em>returnval=False</em>, <em>plotit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.fitting.find_peak" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Uses a gaussian fit to find maximum via scipy.odr fit is performed in x^2 space, but all conversions</dt>
-<dd>are taken care of inside this function</dd>
-</dl>
-<p>y = A*Exp(-0.5*(x^2-x0^2)^2/sigma^4)</p>
+<dd><p>Uses a gaussian fit to find maximum via scipy.odr fit is performed in x^2 space, but all conversions
+are taken care of inside this function</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
