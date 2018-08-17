@@ -82,7 +82,7 @@ def finesse_solver(r, sig, sig_error, Lpost, dpost, basename, F_lim, A_lim,
     nparams = 4
     npost = len(Lpost)
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
+            resume=resume, verbose=True, sampling_efficiency='q', n_live_points=livepoints,
             outputfiles_basename=basename, max_modes=500)
 
 def check_finesse(folder, recover=False):
@@ -127,7 +127,7 @@ def check_finesse(folder, recover=False):
             sig_post = post_dict["signal post"] 
             new_r = post_dict['new_r']
         except IOError, e:
-            print("Can't recover finesse solver model posterior. Calculating from scratch.")
+            print("Can't recover finesse solver q posterior. Calculating from scratch.")
             #sig_post = calculate_signal_post(r[ix], Lpost, dpost, Fpost, Apost, Arelpost, Tipost, offsetpost, w0, mu)
             new_r = np.linspace(0, 900, 1000)
             # sig_post = calculate_signal_post(r[ix], Lpost, dpost, Fpost, Apost, Arelpost, Tipost, w0, mu)
@@ -374,7 +374,7 @@ if __name__ == "__main__":
         parser.add_argument('--livepoints', type=int, default=200, 
                 help='number of livepoints to use in multinest. Default is 200.')
         parser.add_argument('--recover', action='store_true', 
-                help=("Recover finesse solver model posterior written to an h5 file because "
+                help=("Recover finesse solver q posterior written to an h5 file because "
                       "calculation takes a long time"))
         args = parser.parse_args()
 

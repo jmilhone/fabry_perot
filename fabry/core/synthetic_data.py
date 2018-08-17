@@ -131,7 +131,7 @@ def full_pattern(L,d,F,w0,mu,T,V,A=1.,sm_ang=False,nprocs=6,plotit=False,saveit=
             if left to None, the data will not be saved
 
     Outputs:
-        rings (np.ndarray): output of forward forward model
+        rings (np.ndarray): output of forward forward q
     '''
     if type(w0) is list and type(A) is float:
         A = [A]*len(w0)

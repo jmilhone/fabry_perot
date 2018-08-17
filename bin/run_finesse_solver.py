@@ -30,8 +30,7 @@ if __name__ == "__main__":
         if args.filter_type.lower() in ['ar', 'argon', '488']:
             filter_type = 'argon'
         elif args.filter_type.lower() in ['he', 'helium', '468.6']:
-            print('Filter type {0:s} not implemted yet'.format(args.filter_type))
-            sys.exit(1)
+            filter_type = 'helium'
         else:
             print('Filter {0:s} not recognized.'.format(args.filter_type))
             sys.exit(1)
@@ -44,9 +43,9 @@ if __name__ == "__main__":
         # Lpost, dpost = read_Ld_results(abspath(args.ld_folder))
         Lpost = 0.0
         dpost = 0.0
-        Ldpost = np.loadtxt(join(abspath(args.ld_folder), 'full_post_equal_weights.dat'), ndmin=2)
-        Lpost = Ldpost[:, 0]
-        dpost = Ldpost[:, 1]
+        # Ldpost = np.loadtxt(join(abspath(args.ld_folder), 'full_post_equal_weights.dat'), ndmin=2)
+        # Lpost = Ldpost[:, 0]
+        # dpost = Ldpost[:, 1]
 
         restart = args.restart
         if restart:
@@ -81,26 +80,32 @@ if __name__ == "__main__":
     if solver_in is not None:
         if solver_in['filter'] == 'argon':
             from fabry.finesse.argon_solver import solver, full_solver
+        elif solver_in['filter'] == 'helium':
+            from fabry.finesse.helium_solver import full_solver
         else:
             print("No idea how you got here...")
             sys.exit(1)
         resume = not solver_in['restart']
-        solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
-               solver_in['Lpost'], solver_in['dpost'], resume=resume, test_plot=False)
+        #solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
+        #       solver_in['Lpost'], solver_in['dpost'], resume=resume, test_plot=False)
 
         # full_solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
         #        resume=resume, test_plot=False)
 
+        full_solver(solver_in['out_folder'], solver_in['data_fname'],
+                    resume=resume, test_plot=True)
     if rank == 0:
         end_time = time.time()
         print("Total Time Elasped: {} minutes".format((end_time - start_time) / 60.0))
         if solver_in['filter'] == 'argon':
             from fabry.finesse.check_argon_solver import check_solver, check_full_solver
+        elif solver_in['filter'] == 'helium':
+            print("still working on implementing the helium check solver")
         else:
             print("No idea how you got here...")
             sys.exit(1)
 
-        check_solver(solver_in['out_folder'], solver_in['Lpost'], solver_in['dpost'])
+        #check_solver(solver_in['out_folder'], solver_in['Lpost'], solver_in['dpost'])
         # check_full_solver(solver_in['out_folder'])
 
     # folder = "../Data/2018_04_23/Argon3"

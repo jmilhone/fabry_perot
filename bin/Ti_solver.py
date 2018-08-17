@@ -86,7 +86,7 @@ def Ti_solver(r, sig, sig_error, Ld_dir, finesse_dir, Ti_lim, V_lim, A_lim, base
 
 
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
+            resume=resume, verbose=True, sampling_efficiency='q', n_live_points=livepoints,
             outputfiles_basename=basename)
 
 
@@ -128,7 +128,7 @@ def check_solution(folder, Ld_dir, finesse_dir, recover=False, w0=487.98634, mu=
             post_dict = h5_2_dict(join(folder, "Ti_solver_model_post.h5"))
             sig_post = post_dict["signal post"]
         except:
-            print("Can't recover Ti solver model posterior.  Calculating from scratch.")
+            print("Can't recover Ti solver q posterior.  Calculating from scratch.")
             sig_post = calculate_signal_post(r[ix], Lpost[::Lstep], dpost[::Lstep], Fpost[::Fstep],
                 Tipost[::Tistep], Vpost[::Tistep], Apost[::Tistep], w0, mu, nprocs=32)
             dict_2_h5(join(folder, "Ti_solver_model_post.h5"), {"signal post": sig_post})
@@ -286,7 +286,7 @@ if __name__ == "__main__":
                 help='number of livepoints to use in multinest. Default is 500.')
 
         parser.add_argument('--recover', action='store_true',
-                help=("Recover finesse solver model posterior written to an h5 file because "
+                help=("Recover finesse solver q posterior written to an h5 file because "
                       "calculation takes a long time"))
         args = parser.parse_args()
 

@@ -111,4 +111,4 @@ def get_metadata(filename):
     date = str(tags['Image DateTime'].values.replace(':', '_').split(' ')[0])
     time = str(tags['Image DateTime'].values.split(' ')[1])
     model = str(tags['Image Model'].values)
-    return {'date': date, 'time': time, 'model': model}
+    return {'date': date, 'time': time, 'q': model}

@@ -177,7 +177,7 @@ def ld_multinest_solver(peaks, peaks_sd, orders, basename, L_lim, d_lim, livepoi
 
     nparams = 2
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
+            resume=resume, verbose=True, sampling_efficiency='q', n_live_points=livepoints,
             outputfiles_basename=basename, max_modes=500)
 
     Lpost, dpost = read_Ld_results("/home/milhone/Research/python_FabryPerot/Data/2018_06_01/ArgonCalib/")

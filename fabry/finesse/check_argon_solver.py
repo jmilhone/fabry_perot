@@ -145,7 +145,7 @@ def check_solver(finesse_folder, Lpost, dpost):
     # d = dpost[ichoice]
     # vals = forward_model(r, L, d, mode[0], w, mass, amps, Ti, V, sm_ang=False, nlambda=2000)
 
-    # # trying to model offset here
+    # # trying to qmodel offset here
     # vals += mode[1] * 0.15 / (1.0 + mode[0])
 
     # fig, ax = plt.subplots()

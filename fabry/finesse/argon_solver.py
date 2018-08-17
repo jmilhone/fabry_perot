@@ -61,7 +61,7 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
         #        V, sm_ang=False, nlambda=2000)
         vals = offset_forward_model(r, L, d, cube[0], w, mass, amps, Ti,
                 V, sm_ang=False, nlambda=2000, coeff=0.4)
-        # trying to model offset here
+        # trying to q offset here
         #vals += cube[1] * 0.15 / (1.0 + cube[0])
 
         chisq = np.sum((vals - sig)**2 / error**2)
@@ -70,7 +70,7 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
     def build_function_parameters(cube, nparams):
         """
         Helper function for building some intermediate lists of parameters
-        needed for the forward model.
+        needed for the forward q.
 
         Note that you need to be careful with the cube parameter. It is not a
         python list! I believe it is some kind of fortran array. For example,
@@ -145,7 +145,7 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
         # plt.show()
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=100,
+                resume=resume, verbose=True, sampling_efficiency='q', n_live_points=100,
                 outputfiles_basename=join(folder, 'finesse_'))
 
 
@@ -227,7 +227,7 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=200,
+                resume=resume, verbose=True, sampling_efficiency='q', n_live_points=200,
                 outputfiles_basename=join(folder, 'full_'))
 
 

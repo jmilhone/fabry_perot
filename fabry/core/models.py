@@ -5,6 +5,8 @@ from scipy.integrate import trapz
 from .zeeman import zeeman_lambda
 from numba import jit
 import os.path as path
+import matplotlib.pyplot as plt
+
 
 @jit(nopython=True)
 def trapezoidal_integration(y, x):
@@ -159,10 +161,10 @@ def lorentzian(wavelength, w, gamma, amp=1.):
 
 
 def offset_forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False, coeff=0.15):
-    """Forward model with an attempt to model the 'offset' from nuissance lines
+    """Forward q with an attempt to q the 'offset' from nuissance lines
 
     Args:
-        r (np.ndarray): array of r values to compute model on 
+        r (np.ndarray): array of r values to compute q on
         L (float): camera lens focal length, same units as r (pixels or mm)
         d (float): etalon spacing (mm)
         F (float): etalon finesse
@@ -173,17 +175,18 @@ def offset_forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=
         v (Union[float, list]): velocities in m/s
         nlambda (int): number of points in wavelength array, default=1024
         sm_ang (bool): use the small angle approx or not, default=True
-        coeff (float): coefficient to model the relative amplitude of all the nuissance lines
+        coeff (float): coefficient to q the relative amplitude of all the nuissance lines
 
     Returns:
-        np.ndarray: array length of r of forward model
+        np.ndarray: array length of r of forward q
 
     """
     # print(L, d, F, w0, mu, amp, temp, v)
     # print(nlambda, sm_ang, coeff)
     vals = forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=nlambda)
     # vals += max(amp) * coeff / (1.0 + F)
-    vals += max(amp) * coeff / (1.0 + (2.0 * F / np.pi) ** 2)
+
+    vals += np.max(amp) * coeff / (1.0 + (2.0 * F / np.pi) ** 2)
 
     return vals
 
@@ -194,7 +197,7 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024):
     Convolves the Doppler spectrum with the ideal Fabry-Perot Airy function.
 
     Args:
-        r (np.ndarray): array of r values to compute model on 
+        r (np.ndarray): array of r values to compute q on
         L (float): camera lens focal length, same units as r (pixels or mm)
         d (float): etalon spacing (mm)
         F (float): etalon finesse
@@ -206,7 +209,7 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024):
         nlambda (int): number of points in wavelength array, default=1024
 
     Returns:
-        np.ndarray: array length of r of forward model
+        np.ndarray: array length of r of forward q
     """
     # if type(w0) in [list, tuple]:
     #    if not all([type(x) in [list,tuple] for x in [mu, amp, temp, v]]):
@@ -254,12 +257,12 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024):
     # cos_th = cos_th.reshape((1,len(r)))
     # cos_th = cos_th[np.newaxis, :]
 
-    # model = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
+    # q = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
     model = np.zeros_like(cos_th)
 
     for idx, cos in enumerate(cos_th):
         # print(trapz(spec*airy_func(wavelength, cos, d, F), wavelength).shape)
-        # model[idx] = trapz(spec*airy_func(wavelength, cos, d, F), wavelength)
+        # q[idx] = trapz(spec*airy_func(wavelength, cos, d, F), wavelength)
         model[idx] = trapezoidal_integration(spec * airy_func(wavelength, cos, d, F), wavelength)
     return model
 
@@ -312,8 +315,131 @@ def lyon_temp_forward(r, L, d, F, current, T, V, E=None):
 
 
 # def lyon_temp_forward_prof(r,L,d,F,current,T,V):
+def model_with_velocity_profile(r, L, d, F, T, vel_profile, dens_profile=None, zarr=None):
+    w0 = 487.98634
+    mu = 39.948
+    if dens_profile is None:
+        dens_profile = np.ones_like(vel_profile)
+    else:
+        dens_profile = np.asarray(dens_profile)
 
-def zeeman_with_lyon_profile(r, L, d, F, current, T, V, E=None):
+    if len(dens_profile) == 1:
+        dens_profile = np.ones_like(vel_profile)
+
+    nV = len(vel_profile)
+    nW = 2000
+
+    vmax = np.max(vel_profile)
+
+    w_max_shifted = doppler_shift(w0, vmax)
+    sigma_Ti = doppler_broadening(w_max_shifted, mu, T)
+
+    w_arr = np.linspace(w_max_shifted-10*sigma_Ti, w_max_shifted+10*sigma_Ti, nW)
+
+    # fig, ax = plt.subplots()
+    # ax.plot(zarr, dens_profile, label='dens')
+    # ax.plot(zarr, vel_profile / vmax, label='v')
+    # ax.legend()
+    # plt.show()
+
+    spectra = np.zeros((nV, nW))
+    fig, ax = plt.subplots()
+    for idx, vel in enumerate(vel_profile):
+        wshift = doppler_shift(w0, vel)
+        sigma = doppler_broadening(wshift, mu, T)
+        spectra[idx, :] = gaussian(w_arr, wshift, sigma, amp=dens_profile[idx]**2, norm=False)
+        ax.plot(w_arr, spectra[idx, :])
+    plt.show()
+
+    if zarr is None:
+        total_spectra = np.sum(spectra, axis=0)
+    else:
+        total_spectra = np.trapz(spectra, zarr, axis=0)
+
+    new_sigma_Ti = doppler_broadening(w_max_shifted, mu, T)
+    test_spectra = gaussian(w_arr, w_max_shifted, new_sigma_Ti, norm=False)
+    fig, ax = plt.subplots()
+    i = np.argmax(total_spectra)
+    j = np.argmax(test_spectra)
+    ax.plot(w_arr, total_spectra / total_spectra.max(), label='v prof')
+    ax.plot(w_arr-(w_arr[j]-w_arr[i]), test_spectra / test_spectra.max(), label='test')
+    ax.legend()
+    plt.show()
+
+
+def zeeman_with_arb_nv(r, L, d, F, current, temp, vbulk, vincrease, extra_temp=None):
+    w0 = 487.98634
+    mu = 39.948
+
+    # Victor's calculation ###
+    zeeman_fac = [-1., -17. / 15., -19. / 15., -1.4, 1.4, 19. / 15., 17. / 15., 1.]
+    zeeman_amp = [20., 12., 6., 2., 2., 6., 12., 20.]
+
+    current_dir = path.abspath(path.join(__file__, ".."))
+    b_data = np.genfromtxt(path.join(current_dir, "lyon_magnetic_field.csv"), delimiter=",")
+
+    z = b_data[:, 0]
+    bz = b_data[:, 1]
+
+    bz /= 10000.0  # Covert G to T
+
+    # Adjust bz for the current in the coil
+    bz *= current / 80.0
+
+    # I only want to deal with the array where the plasma is emitting
+    zbounds = [-30.0, 80.0]  # Victor says that plasma exists here
+    i_lower = np.abs(z-zbounds[0]).argmin()
+    i_higher = np.abs(z-zbounds[1]).argmin()
+    sl = slice(i_lower, i_higher)
+    z = z[sl]
+    bz = bz[sl]
+
+    density = 0.25 * (np.tanh(0.25*z)+1) + 0.5
+    vel = vbulk * np.ones_like(z)
+    idx = np.where(z<0.0)
+
+    vel[idx] = vbulk - vincrease * z[idx] / 30.0
+
+    nz = len(z)
+    nw = 2048
+
+    spectrum = np.zeros((nz, nw))
+
+    sigma_Ti = doppler_broadening(w0, mu, temp)
+    wshift = doppler_shift(w0, np.max(vel))
+
+    sigma_extra = 0.0
+    if extra_temp is not None:
+        sigma_extra = doppler_broadening(w0, mu, extra_temp)
+        sigma_Ti = np.sqrt(sigma_Ti**2 + sigma_extra**2)
+
+    warr = np.linspace(wshift-10*sigma_Ti, wshift+10*sigma_Ti, nw)
+
+    for idx, (zz, bb, vv, ne) in enumerate(zip(z, bz, vel, density)):
+        w_main_shift = doppler_shift(w0, vv)
+        w_zee, a_zee = zeeman_lambda(w_main_shift, bb, zeeman_fac, amps=zeeman_amp)
+
+        for wz, az in zip(w_zee, a_zee):
+            # calculate sigma_Ti
+            sigma_Ti = doppler_broadening(wz, mu, temp)
+            sigma_Ti = np.sqrt(sigma_Ti**2 + sigma_extra**2)
+
+            spectrum[idx, :] += gaussian(warr, wz, sigma_Ti, amp=az, norm=False) * ne**2
+    final_spectrum = np.trapz(spectrum, z, axis=0)
+    cos_theta = L / np.sqrt(L**2 + r**2)
+    cos_theta.shape = (1, len(r))
+
+    final_spectrum.shape = (nw, 1)
+    warr.shape = (nw, 1)
+
+    airy = airy_func(warr, cos_theta, d, F)
+
+    zee_model = np.trapz(final_spectrum * airy, warr, axis=0)
+
+    return zee_model
+
+
+def zeeman_with_lyon_profile(r, L, d, F, current, temp, vel, extra_temp=None):
     w0 = 487.98634
     mu = 39.948
 
@@ -335,31 +461,48 @@ def zeeman_with_lyon_profile(r, L, d, F, current, T, V, E=None):
     z = z[sl]
     bz = bz[sl]
 
+    bz /= 10000.0  # Covert G to T
+
     # Adjust bz for the current in the coil
     bz *= current / 80.0
 
     nz = len(z)
-    nw = 1024
+    nw = 2048
     spectrum = np.zeros((nz, nw))
 
-    sigma_Ti = doppler_broadening(w0, mu, T)
-    w = doppler_shift(w0, V)
+    sigma_Ti = doppler_broadening(w0, mu, temp)
+    w = doppler_shift(w0, vel)
 
     # Extra broadening from defocusing the camera lens
-    if E:
-        sigma_extra = doppler_broadening(w0, mu, E)
+    if extra_temp:
+        sigma_extra = doppler_broadening(w0, mu, extra_temp)
         sigma_Ti = np.sqrt(sigma_Ti**2 + sigma_extra**2)
+
+    w_arr = np.linspace(w - 10*sigma_Ti, w + 10*sigma_Ti, nw)
 
     # Need to loop over reach z location
     for idx, (zz, bb) in enumerate(zip(z, bz)):
         # calculate the spectrum here
-        spectrum[idx, :] += 0.0
 
         w_zee, a_zee = zeeman_lambda(w, bb, zeeman_fac, amps=zeeman_amp)
+        for wz, az in zip(w_zee, a_zee):
+            spectrum[idx, :] += gaussian(w_arr, wz, sigma_Ti, amp=az, norm=False)
 
     final_spectrum = np.trapz(spectrum, z, axis=0)
 
-    return final_spectrum
+    cos_theta = L / np.sqrt(L**2 + r**2)
+    cos_theta.shape = (1, len(r))
+
+    final_spectrum.shape = (nw, 1)
+    w_arr.shape = (nw, 1)
+
+    airy = airy_func(w_arr, cos_theta, d, F)
+
+    zee_model = np.trapz(final_spectrum * airy, w_arr, axis=0)
+
+    return zee_model
+
+
 def general_model(r, L, d, F, wavelength, emission):
     cos_th = L / np.sqrt(L ** 2 + r ** 2)
     cos_th = cos_th.reshape((1, len(r)))

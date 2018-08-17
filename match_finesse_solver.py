@@ -57,7 +57,7 @@ def temp_match_solver(r, sig, sig_error, temp, temp_sigma, Lpost, dpost, basenam
         return -chisq / 2.0
 
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
+            resume=resume, verbose=True, sampling_efficiency='q', n_live_points=livepoints,
             outputfiles_basename=basename, max_modes=500)
 
 def match_finesse_check(folder, saveit=True, Ld_sub=20, F_sub=20, bins=30):
@@ -194,7 +194,7 @@ if __name__ == "__main__":
         parser.add_argument('--mass','-mu',type=float, default=39.948,help='atomic mass of atom/ion producing the line (for doppler broadening calc) in amu, default is Argon=>39.948 others: Helium=>4.002, Thorium 232.03806')
         parser.add_argument('--error','-er',type=float,default=0.10,help='error percentage to use in fitting. default is 0.10')
         parser.add_argument('--arb_error','-aer',type=float,default=0.0,help='error percentage to arbitrarily add to the chisq calc. default is 0')
-        parser.add_argument('--extra_gauss', '-eg', action='store_true', help='flag to add extra broadening mechinism to forward model')
+        parser.add_argument('--extra_gauss', '-eg', action='store_true', help='flag to add extra broadening mechinism to forward q')
         parser.add_argument('--overwrite',action='store_true',help='allows you to overwrite previously saved finesse region')
         parser.add_argument('--F_lim', '-F', type=float, nargs=2, default=[1.,10.], help='bounds for finesse fit. Default is 1-10')
         parser.add_argument('--V_lim', '-V', type=float, nargs=2, default=[-2.,2.], help='bounds for velocity fit (km/s). Default is -2->2')

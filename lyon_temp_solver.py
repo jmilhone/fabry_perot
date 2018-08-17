@@ -65,7 +65,7 @@ def temp_solver(r, sig, sig_error, current, Lpost, dpost, Fpost, basename, livep
 
     nparams = 2
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
+            resume=resume, verbose=True, sampling_efficiency='q', n_live_points=livepoints,
             outputfiles_basename=basename, max_modes=500)
 
 def lyon_temp_check(folder, saveit=True, LdF_sub=20, T_sub=20, bins=30):
