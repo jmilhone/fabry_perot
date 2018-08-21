@@ -90,3 +90,66 @@ def full_solver(output_folder, data_filename, resume=True, test_plot=False):
             outputfiles_basename=path.join(folder, 'full_'))
 
 
+def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=True, test_plot=True):
+
+    def log_prior(cube, ndim, nparams):
+        cube[0] = cube[0]*(F_lim[1] - F_lim[0]) + F_lim[0]
+        cube[1] = cube[1]*(A_lim[1] - A_lim[0]) + A_lim[0]
+        cube[2] = cube[2]*(Ti_lim[1] - Ti_lim[0]) + Ti_lim[0]
+        cube[3] = cube[3]*(offset_lim[1] - offset_lim[0]) + offset_lim[0]
+
+    def log_likelihood(cube, ndim, nparams):
+        L, d = np.random.choice(Ld_post, size=1)
+
+        vals = models.offset_forward_model(r0, L, d, cube[0], w0, mu, cube[1], cube[2], coeff=cube[3])
+
+        chisq = np.sum((vals - sig0)**2 / sig0_sd**2)
+
+        return -chisq/2.0
+
+    data = io.h5_2_dict(data_filename)
+    Ld_post = np.vstack((Lpost, dpost)).T
+
+    print(Ld_post.shape)
+
+    ix0 = data['fit_ix']['0']
+
+    r0 = data['r'][ix0]
+    sig0 = data['sig'][ix0]
+    sig0_sd = data['sig_sd'][ix0]
+
+    F_lim = [17, 23]
+
+    A_max = np.max(sig0)
+    A_lim = [0.5*A_max, 2.0*A_max]
+
+    Ti_lim = [0.025, 1.0]
+
+    offset_lim = [0.0, 0.3]
+    n_params = 4
+
+    folder = path.abspath(output_folder)
+
+    if test_plot:
+        npts = 100
+        nr = len(r0)
+
+        vals = np.zeros((npts, nr))
+
+        for i in range(npts):
+            L, d = np.random.choice(Ld_post)
+
+            cube = np.random.random(size=6)
+            log_prior(cube, None, None)
+            vals[i, :] = models.offset_forward_model(r0, L, d, cube[0], w0, mu, cube[1], cube[2], coeff=cube[3])
+
+        fig, ax = plt.subplots()
+        for i in range(npts):
+            ax.plot(r0, vals[i, :], 'C0')
+        ax.plot(r0, sig0, 'C1')
+        plt.show()
+
+    else:
+        run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
+            resume=resume, verbose=True, sampling_efficiency='q', n_live_points=75,
+            outputfiles_basename=path.join(folder, 'full_'))
