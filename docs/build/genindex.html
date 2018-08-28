@@ -88,6 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="core.html">Core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="finesse.html">Finesse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plasma.html">Plasma</a></li>
 </ul>
 
             
@@ -179,14 +180,20 @@
         <li><a href="core.html#fabry.core.synthetic.Sensor.calculate_emission">(fabry.core.synthetic.Sensor method)</a>, <a href="core.html#fabry.core.synthetic.Sensor.calculate_emission">[1]</a>
 </li>
       </ul></li>
+      <li><a href="plasma.html#fabry.plasma.plasma.calculate_line_profile">calculate_line_profile() (in module fabry.plasma.plasma)</a>
+</li>
+      <li><a href="plasma.html#fabry.plasma.plasma.calculate_pcx_chord_emission">calculate_pcx_chord_emission() (in module fabry.plasma.plasma)</a>
+</li>
+      <li><a href="plasma.html#fabry.plasma.plasma.calculate_r_theta_x_from_impact_factor">calculate_r_theta_x_from_impact_factor() (in module fabry.plasma.plasma)</a>
+</li>
       <li><a href="core.html#fabry.core.synthetic.UniformPlasma.calculate_shift">calculate_shift() (fabry.core.synthetic.UniformPlasma method)</a>, <a href="core.html#fabry.core.synthetic.UniformPlasma.calculate_shift">[1]</a>
 </li>
       <li><a href="core.html#fabry.core.ringsum.calculate_weighted_mean">calculate_weighted_mean() (in module fabry.core.ringsum)</a>
 </li>
-      <li><a href="tools.html#fabry.tools.plotting.center_plot">center_plot() (in module fabry.tools.plotting)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tools.html#fabry.tools.plotting.center_plot">center_plot() (in module fabry.tools.plotting)</a>
+</li>
       <li><a href="finesse.html#fabry.finesse.check_argon_solver.check_full_solver">check_full_solver() (in module fabry.finesse.check_argon_solver)</a>
 </li>
       <li><a href="finesse.html#fabry.finesse.check_argon_solver.check_solver">check_solver() (in module fabry.finesse.check_argon_solver)</a>
@@ -194,6 +201,8 @@
       <li><a href="tools.html#fabry.tools.plotting.ClickBuilder.cid">cid (fabry.tools.plotting.ClickBuilder attribute)</a>
 </li>
       <li><a href="tools.html#fabry.tools.plotting.ClickBuilder">ClickBuilder (class in fabry.tools.plotting)</a>
+</li>
+      <li><a href="plasma.html#fabry.plasma.argon_plasma_solver.py.const_vel_solver">const_vel_solver() (in module fabry.plasma.argon_plasma_solver.py)</a>
 </li>
       <li><a href="core.html#fabry.core.synthetic.Sensor.create_Rgrid">create_Rgrid() (fabry.core.synthetic.Sensor method)</a>, <a href="core.html#fabry.core.synthetic.Sensor.create_Rgrid">[1]</a>
 </li>
@@ -205,10 +214,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="core.html#fabry.core.synthetic.Etalon.d">d (fabry.core.synthetic.Etalon attribute)</a>, <a href="core.html#fabry.core.synthetic.Etalon.d">[1]</a>
 </li>
-      <li><a href="core.html#fabry.core.fitting.determine_fit_range">determine_fit_range() (in module fabry.core.fitting)</a>
+      <li><a href="plasma.html#fabry.plasma.plasma.density_profile">density_profile() (in module fabry.plasma.plasma)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core.html#fabry.core.fitting.determine_fit_range">determine_fit_range() (in module fabry.core.fitting)</a>
+</li>
       <li><a href="tools.html#fabry.tools.file_io.dict_2_h5">dict_2_h5() (in module fabry.tools.file_io)</a>
 </li>
       <li><a href="core.html#fabry.core.models.doppler_calc">doppler_calc (in module fabry.core.models)</a>
@@ -243,6 +254,8 @@
 </li>
       <li><a href="core.html#module-fabry.core.zeeman">fabry.core.zeeman (module)</a>
 </li>
+      <li><a href="plasma.html#module-fabry.plasma.plasma">fabry.plasma.plasma (module)</a>
+</li>
       <li><a href="tools.html#module-fabry.tools.file_io">fabry.tools.file_io (module)</a>
 </li>
       <li><a href="tools.html#module-fabry.tools.images">fabry.tools.images (module)</a>
@@ -274,7 +287,11 @@
 </li>
       </ul></li>
       <li><a href="finesse.html#fabry.finesse.argon_solver.full_solver">full_solver() (in module fabry.finesse.argon_solver)</a>
+
+      <ul>
+        <li><a href="finesse.html#fabry.finesse.helium_solver.full_solver">(in module fabry.finesse.helium_solver)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -352,6 +369,10 @@
 </li>
         <li><a href="finesse.html#fabry.finesse.check_argon_solver.mu">(in module fabry.finesse.check_argon_solver)</a>
 </li>
+        <li><a href="finesse.html#fabry.finesse.helium_solver.mu">(in module fabry.finesse.helium_solver)</a>
+</li>
+        <li><a href="plasma.html#fabry.plasma.argon_plasma_solver.py.mu">(in module fabry.plasma.argon_plasma_solver.py)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -366,6 +387,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="core.html#fabry.core.synthetic.UniformPlasma.ne">ne (fabry.core.synthetic.UniformPlasma attribute)</a>, <a href="core.html#fabry.core.synthetic.UniformPlasma.ne">[1]</a>
+</li>
+      <li><a href="plasma.html#fabry.plasma.argon_plasma_solver.py.no_vel_solver">no_vel_solver() (in module fabry.plasma.argon_plasma_solver.py)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -393,6 +416,10 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="plasma.html#fabry.plasma.plasma.pcx_couette_velocity_profile">pcx_couette_velocity_profile() (in module fabry.plasma.plasma)</a>
+</li>
+      <li><a href="plasma.html#fabry.plasma.plasma.pcx_velocity_profile">pcx_velocity_profile() (in module fabry.plasma.plasma)</a>
+</li>
       <li><a href="core.html#fabry.core.models.peak_calculator">peak_calculator (in module fabry.core.models)</a>
 </li>
       <li><a href="tools.html#fabry.tools.plotting.peak_plot">peak_plot() (in module fabry.tools.plotting)</a>
@@ -402,6 +429,8 @@
       <li><a href="core.html#fabry.core.synthetic.UniformPlasma.pec">pec (fabry.core.synthetic.UniformPlasma attribute)</a>, <a href="core.html#fabry.core.synthetic.UniformPlasma.pec">[1]</a>
 </li>
       <li><a href="tools.html#fabry.tools.file_io.prep_folder">prep_folder() (in module fabry.tools.file_io)</a>
+</li>
+      <li><a href="plasma.html#fabry.plasma.argon_plasma_solver.py.profile_vel_solver">profile_vel_solver() (in module fabry.plasma.argon_plasma_solver.py)</a>
 </li>
       <li><a href="core.html#fabry.core.synthetic.Sensor.px_size">px_size (fabry.core.synthetic.Sensor attribute)</a>, <a href="core.html#fabry.core.synthetic.Sensor.px_size">[1]</a>
 </li>
@@ -443,12 +472,16 @@
 </li>
       <li><a href="core.html#fabry.core.synthetic.Sensor.sensor">sensor (fabry.core.synthetic.Sensor attribute)</a>, <a href="core.html#fabry.core.synthetic.Sensor.sensor">[1]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="core.html#fabry.core.synthetic.UniformPlasma.sigma">sigma (fabry.core.synthetic.UniformPlasma attribute)</a>, <a href="core.html#fabry.core.synthetic.UniformPlasma.sigma">[1]</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="finesse.html#fabry.finesse.argon_solver.solver">solver() (in module fabry.finesse.argon_solver)</a>
+
+      <ul>
+        <li><a href="finesse.html#fabry.finesse.helium_solver.solver">(in module fabry.finesse.helium_solver)</a>
 </li>
+      </ul></li>
       <li><a href="core.html#fabry.core.ringsum.super_pixelate">super_pixelate() (in module fabry.core.ringsum)</a>
 </li>
   </ul></td>
@@ -515,6 +548,10 @@
 
       <ul>
         <li><a href="finesse.html#fabry.finesse.check_argon_solver.w0">(in module fabry.finesse.check_argon_solver)</a>
+</li>
+        <li><a href="finesse.html#fabry.finesse.helium_solver.w0">(in module fabry.finesse.helium_solver)</a>
+</li>
+        <li><a href="plasma.html#fabry.plasma.argon_plasma_solver.py.w0">(in module fabry.plasma.argon_plasma_solver.py)</a>
 </li>
       </ul></li>
   </ul></td>

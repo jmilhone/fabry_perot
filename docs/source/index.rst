@@ -13,6 +13,7 @@ Welcome to Fabry Perot's documentation!
    core
    tools
    finesse
+   plasma
 
 Indices and tables
 ==================

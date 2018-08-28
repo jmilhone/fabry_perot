@@ -89,6 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Finesse</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#argon-solver">Argon Solver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#helium-solver">Helium Solver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#check-argon-solver">Check Argon Solver</a></li>
 </ul>
 </li>
@@ -196,6 +197,65 @@
 <li><strong>data_filename</strong> (<em>str</em>) – path to file for the input data</li>
 <li><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</li>
 <li><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the user to sample the prior and compare to input data</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="helium-solver">
+<h2>Helium Solver<a class="headerlink" href="#helium-solver" title="Permalink to this headline">¶</a></h2>
+<p>This module contains a few different MultiNest calibration solvers for the Th lamp with the
+468.6 nm 0.5 fwhm nm bandpass filter.</p>
+<dl class="attribute">
+<dt id="fabry.finesse.helium_solver.mu">
+<code class="descclassname">fabry.finesse.helium_solver.</code><code class="descname">mu</code><a class="headerlink" href="#fabry.finesse.helium_solver.mu" title="Permalink to this definition">¶</a></dt>
+<dd><p>float with the relative mass of Th</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.finesse.helium_solver.w0">
+<code class="descclassname">fabry.finesse.helium_solver.</code><code class="descname">w0</code><a class="headerlink" href="#fabry.finesse.helium_solver.w0" title="Permalink to this definition">¶</a></dt>
+<dd><p>float with the dominant Th I wavelength inside the bandpass filter</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.finesse.helium_solver.full_solver">
+<code class="descclassname">fabry.finesse.helium_solver.</code><code class="descname">full_solver</code><span class="sig-paren">(</span><em>output_folder</em>, <em>data_filename</em>, <em>resume=True</em>, <em>test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.helium_solver.full_solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>MultiNest solver for point spread function calibration with the He filter</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files</li>
+<li><strong>data_filename</strong> (<em>str</em>) – path to file for input data</li>
+<li><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</li>
+<li><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the u ser to sample the prior and compare to input data</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.finesse.helium_solver.solver">
+<code class="descclassname">fabry.finesse.helium_solver.</code><code class="descname">solver</code><span class="sig-paren">(</span><em>output_folder</em>, <em>prior_filename</em>, <em>data_filename</em>, <em>Lpost</em>, <em>dpost</em>, <em>resume=True</em>, <em>test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.helium_solver.solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>MultiNest solver for point spread function with He filter. Uses previous L and d wavelength results.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files</li>
+<li><strong>prior_filename</strong> (<em>str</em>) – Unused</li>
+<li><strong>Lpost</strong> (<em>np.ndarray</em>) – array of posterior probabilties for the camera focal length, L</li>
+<li><strong>dpost</strong> (<em>np.ndarray</em>) – array of posterior probabilities for the etalon spacing, d</li>
+<li><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</li>
+<li><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the u ser to sample the prior and compare to input data</li>
 </ul>
 </td>
 </tr>

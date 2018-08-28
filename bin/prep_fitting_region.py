@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from os.path import join, abspath
 
 
-def get_finesse_region(r_array, sig_array, sig_err_array, plot_fit_region=True):
+def get_fitting_region(r_array, sig_array, sig_err_array, plot_fit_region=True):
     """
     User clicks the left and right edges of the region they would like to fit for the finesse solver
 
@@ -49,6 +49,7 @@ def get_finesse_region(r_array, sig_array, sig_err_array, plot_fit_region=True):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('Determine finesse fit region and write to hdf5 file')
     parser.add_argument("folder", type=str, help='Folder containing output (ringsum.h5) of process_image.py')
+    parser.add_argument("filename", type=str, help="Filename to be written in <folder>/")
     args = parser.parse_args()
 
     folder = abspath(args.folder)
@@ -64,7 +65,7 @@ if __name__ == "__main__":
 
     # data['sig_sd'] = np.sqrt(data['sig_sd']**2 + data['sig_sd'][min_loc]**2) # Adding in the offset error
 
-    ix = get_finesse_region(r, sig, data['sig_sd'], plot_fit_region=True)
+    ix = get_fitting_region(r, sig, data['sig_sd'], plot_fit_region=True)
 
     data['fit_ix'] = ix
 
@@ -72,6 +73,7 @@ if __name__ == "__main__":
     ax.plot(r, data['sig_sd'] / data['sig'])
     plt.show()
 
-    dict_2_h5(join(folder, 'finesse_input.h5'), data)
+    #dict_2_h5(join(folder, 'finesse_input.h5'), data)
     # dict_2_h5(join(folder, 'test_finesse_input.h5'), data)
+    dict_2_h5(join(folder, args.filename), data)
 

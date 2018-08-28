@@ -43,6 +43,45 @@ This module contains a few different MultiNest calibration solvers for the Th la
     :param test_plot: for debugging purposes, allows the user to sample the prior and compare to input data
     :type test_plot: bool or None
 
+Helium Solver
+---------------
+
+.. py:currentmodule:: fabry.finesse.helium_solver
+
+This module contains a few different MultiNest calibration solvers for the Th lamp with the
+468.6 nm 0.5 fwhm nm bandpass filter.
+
+.. py:attribute:: mu
+
+    float with the relative mass of Th
+
+.. py:attribute:: w0
+
+    float with the dominant Th I wavelength inside the bandpass filter
+
+.. function:: full_solver(output_folder,data_filename,resume=True,test_plot=False)
+
+    MultiNest solver for point spread function calibration with the He filter
+
+    :param str output_folder: path to folder containing input and output files
+    :param str data_filename: path to file for input data
+    :param resume: MultiNest will resume the calculation if True
+    :type resume: bool or None
+    :param test_plot: for debugging purposes, allows the u ser to sample the prior and compare to input data
+    :type test_plot: bool or None
+
+.. function:: solver(output_folder,prior_filename,data_filename,Lpost,dpost,resume=True,test_plot=False)
+
+    MultiNest solver for point spread function with He filter. Uses previous L and d wavelength results.
+
+    :param str output_folder: path to folder containing input and output files
+    :param str prior_filename: Unused
+    :param np.ndarray Lpost: array of posterior probabilties for the camera focal length, L
+    :param np.ndarray dpost: array of posterior probabilities for the etalon spacing, d
+    :param resume: MultiNest will resume the calculation if True
+    :type resume: bool or None
+    :param test_plot: for debugging purposes, allows the u ser to sample the prior and compare to input data
+    :type test_plot: bool or None
 
 Check Argon Solver
 --------------------

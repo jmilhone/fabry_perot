@@ -149,9 +149,9 @@
 <code class="descclassname">fabry.core.ringsum.</code><code class="descname">get_bin_edges</code><span class="sig-paren">(</span><em>dat</em>, <em>x0</em>, <em>y0</em>, <em>binsize=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.get_bin_edges" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns equal area annuli bins for a ring image given a center and binsize</p>
 <div class="math">
-<p><img src="_images/math/d25f8a0e609277acea1c2490dfa44da27731201a.svg" alt="r_n = \sqrt{n \left(2 r_N - \Delta  \right) \Delta } \quad n \in 0,...,N"/></p>
+<p><img src="_images/math/f72084390aa8770f280187fcced27f8709397c05.svg" alt="r_n = \sqrt{n \left(2 r_N - \Delta  \right) \Delta } \quad n \in 0,...,N"/></p>
 </div><div class="math">
-<p><img src="_images/math/b62c18587178e81bdf3f764894370e125290c3d1.svg" alt="\Delta = \text{ binsize}"/></p>
+<p><img src="_images/math/2b22781673a1782a8a40ab90c3272e4befbad13e.svg" alt="\Delta = \text{ binsize}"/></p>
 </div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -287,9 +287,9 @@ there is a ring at the center of the image.</li>
 <dd><p>Computes the Airy function (ideal Fabry-Perot instument function)
 as a function of wavelength and cos(theta) with parameters d and F</p>
 <div class="math">
-<p><img src="_images/math/8a80af2b9c3bda230bb8be930154b9536001d6d1.svg" alt="A = \left(1 + Q  \sin^2(\pi \frac{2d}{w} \cos\theta)\right)^{-1}"/></p>
+<p><img src="_images/math/ba9980a15b14263a7b6d37b67fd71f31a3ec3190.svg" alt="A = \left(1 + Q  \sin^2(\pi \frac{2d}{w} \cos\theta)\right)^{-1}"/></p>
 </div><div class="math">
-<p><img src="_images/math/9b9e001bb28e9dee6656e4c5855b845b8f917afc.svg" alt="Q = \left(\frac{2  \mathcal{F} }{ \pi } \right)^2"/></p>
+<p><img src="_images/math/1b89fa6921b3ec9e5d94a988d53cc1ada164e610.svg" alt="Q = \left(\frac{2  \mathcal{F} }{ \pi } \right)^2"/></p>
 </div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -318,9 +318,9 @@ as a function of wavelength and cos(theta) with parameters d and F</p>
 <dd><p>Computes the doppler broadening sigma and the new central wavelength
 from the doppler shift</p>
 <div class="math">
-<p><img src="_images/math/9a1425f5104dd7ac4c52d51a1ecb0ae09708883a.svg" alt="\sigma = w_0  \sqrt{\frac{k_B T }{ mc^2}}"/></p>
+<p><img src="_images/math/bb0a12a30323142bccb11e7a01f8c509a7820268.svg" alt="\sigma = w_0  \sqrt{\frac{k_B T }{ mc^2}}"/></p>
 </div><div class="math">
-<p><img src="_images/math/6411b353d9cd9e2e015dfc16959445fcc4dcc0f3.svg" alt="w = w_0 (1 - v/c)"/></p>
+<p><img src="_images/math/a2eb071a38c5107df3a0135bf54e7d5f6e32b873.svg" alt="w = w_0 (1 - v/c)"/></p>
 </div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -352,7 +352,7 @@ from the doppler shift</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute model on</li>
+<li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute q on</li>
 <li><strong>L</strong> (<em>float</em>) – camera lens focal length, same units as r (pixels or mm)</li>
 <li><strong>d</strong> (<em>float</em>) – etalon spacing (mm)</li>
 <li><strong>F</strong> (<em>float</em>) – etalon finesse</li>
@@ -365,7 +365,7 @@ from the doppler shift</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array length of r of forward model</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array length of r of forward q</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
@@ -380,7 +380,7 @@ from the doppler shift</p>
 <code class="descclassname">fabry.core.models.</code><code class="descname">gaussian</code><a class="headerlink" href="#fabry.core.models.gaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes a gaussian for a given central wavelength, sigma and amp</p>
 <div class="math">
-<p><img src="_images/math/6fad84066ddafac0768a988a994962ebaa1d79b3.svg" alt="G = \frac{A}{\sigma \sqrt{2 \pi}} \exp{\left( \frac{ (w - w_0)^2 }{2 \sigma^2 } \right) }"/></p>
+<p><img src="_images/math/91b9f1dd4d5ad8f09273cacce4339c0ad04b9aba.svg" alt="G = \frac{A}{\sigma \sqrt{2 \pi}} \exp{\left( \frac{ (w - w_0)^2 }{2 \sigma^2 } \right) }"/></p>
 </div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -410,7 +410,7 @@ to integrate to 1 over infinity then the amp factor will be multiplied</li>
 <code class="descclassname">fabry.core.models.</code><code class="descname">lorentzian</code><span class="sig-paren">(</span><em>wavelength</em>, <em>w</em>, <em>gamma</em>, <em>amp=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.models.lorentzian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes a lorentzian for a given central wavelength, gamma and amp</p>
 <div class="math">
-<p><img src="_images/math/558f2d62dbce401f22d72603f06e916f51cdb6a2.svg" alt="L = \frac{A}{2 \pi} \frac{\gamma }{ (w-w_0)^2 + (\gamma/2)^2}"/></p>
+<p><img src="_images/math/3afe8a2c498c9a7687b995ace8b3ff01d539c6fd.svg" alt="L = \frac{A}{2 \pi} \frac{\gamma }{ (w-w_0)^2 + (\gamma/2)^2}"/></p>
 </div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -437,13 +437,13 @@ spec to 1 over infinity</li>
 <dl class="function">
 <dt id="fabry.core.models.offset_forward_model">
 <code class="descclassname">fabry.core.models.</code><code class="descname">offset_forward_model</code><span class="sig-paren">(</span><em>r</em>, <em>L</em>, <em>d</em>, <em>F</em>, <em>w0</em>, <em>mu</em>, <em>amp</em>, <em>temp</em>, <em>v</em>, <em>nlambda=1024</em>, <em>sm_ang=False</em>, <em>coeff=0.15</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.models.offset_forward_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward model with an attempt to model the ‘offset’ from nuissance lines</p>
+<dd><p>Forward q with an attempt to q the ‘offset’ from nuissance lines</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute model on</li>
+<li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute q on</li>
 <li><strong>L</strong> (<em>float</em>) – camera lens focal length, same units as r (pixels or mm)</li>
 <li><strong>d</strong> (<em>float</em>) – etalon spacing (mm)</li>
 <li><strong>F</strong> (<em>float</em>) – etalon finesse</li>
@@ -454,11 +454,11 @@ spec to 1 over infinity</li>
 <li><strong>v</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</li>
 <li><strong>nlambda</strong> (<em>int</em>) – number of points in wavelength array, default=1024</li>
 <li><strong>sm_ang</strong> (<em>bool</em>) – use the small angle approx or not, default=True</li>
-<li><strong>coeff</strong> (<em>float</em>) – coefficient to model the relative amplitude of all the nuissance lines</li>
+<li><strong>coeff</strong> (<em>float</em>) – coefficient to q the relative amplitude of all the nuissance lines</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array length of r of forward model</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array length of r of forward q</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
@@ -473,7 +473,7 @@ spec to 1 over infinity</li>
 <code class="descclassname">fabry.core.models.</code><code class="descname">peak_calculator</code><a class="headerlink" href="#fabry.core.models.peak_calculator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple peak calculator for ideal Fabry-Perot.</p>
 <div class="math">
-<p><img src="_images/math/e22a9cfcc872d50dd2e555f2dd845b440e3e7895.svg" alt="r_j = L  \sqrt{ \left( \frac{2d/w}{\rm{Floor}(2d/w)-j}\right)^2 - 1}"/></p>
+<p><img src="_images/math/ca449a9a36b059c3953e81de8cc2d9c4c95ea91c.svg" alt="r_j = L  \sqrt{ \left( \frac{2d/w}{\rm{Floor}(2d/w)-j}\right)^2 - 1}"/></p>
 </div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1657,7 +1657,7 @@ vector an angle theta from the toroidal direction</li>
 <code class="descclassname">fabry.core.zeeman.</code><code class="descname">lande_g</code><span class="sig-paren">(</span><em>L</em>, <em>S</em>, <em>J</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.zeeman.lande_g" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the lande g factor given L, S and J</p>
 <div class="math">
-<p><img src="_images/math/d4c3df56eb53d8f3df3198dd1dfe266288a039f0.svg" alt="g = 1 + \frac{J(J+1) + S(S+1) - L(L+1)}{2J(J+1)}"/></p>
+<p><img src="_images/math/beb296392ed487caf9fc87d85e1162cddb57be2a.svg" alt="g = 1 + \frac{J(J+1) + S(S+1) - L(L+1)}{2J(J+1)}"/></p>
 </div><dl class="docutils">
 <dt>Reference: Sobel’man, I.I. Introduction to the</dt>
 <dd>Theory of Atomic Spectra. 1972. pp. 277</dd>

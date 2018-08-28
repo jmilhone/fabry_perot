@@ -506,10 +506,14 @@ def zeeman_with_lyon_profile(r, L, d, F, current, temp, vel, extra_temp=None):
 def general_model(r, L, d, F, wavelength, emission):
     cos_th = L / np.sqrt(L ** 2 + r ** 2)
     cos_th = cos_th.reshape((1, len(r)))
-    airy = airy_func(wavelength, cos_th, d, F)
 
     emis = emission[:, np.newaxis]
     w = wavelength[:, np.newaxis]
+    # print('cos shape', cos_th.shape)
+    # print('w shape', w.shape)
+    # print('emis shape', emis.shape)
+    airy = airy_func(w, cos_th, d, F)
+    # print('airy shape', airy.shape)
     model = trapz(emis * airy, w, axis=0)
 
     return model

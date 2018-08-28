@@ -3,6 +3,7 @@ import numpy as np
 from . import models
 import multiprocessing as multi
 from collections import MutableMapping
+from ..plasma import plasma
 
 ########################################
 # Physical constants, DO NOT OVERWRITE #
@@ -599,3 +600,15 @@ class VelocityProfile(object):
         R0 = velocity.get('R0', 140.0)
         offset = velocity.get('offset', 0.0)
         return cls(Vmax, max_radius, length_scale, edge_scale, R0=R0, offset=offset)
+
+
+# def PCX_Plasma(LightSource):
+#
+#     def __init__(self, Ti, w, mu, velocity_outer, R_outer, Lnu, impact_factor):
+#         super(PCX_Plasma, self).__init__(Ti, w, mu, velocity_outer)
+#         self.impact_factor = impact_factor
+#         r, _, _ = plasma.calculate_r_theta_x_from_impact_factor(self.impact_factor, rmax=40, npts=500)
+#
+#        self.velocity =
+
+
