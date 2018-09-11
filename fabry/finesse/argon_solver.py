@@ -14,6 +14,12 @@ from ..tools import file_io as io
 import random
 from os.path import abspath, join
 
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    pass
+
+
 w0 = (487.873302, 487.98634)
 mu = (232.03806, 39.948)
 
@@ -57,10 +63,10 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
         Ti = [0.025, cube[3]]
         V = [0.0, 0.0]
 
-        #vals = forward_model(r, L, d, cube[0], w, mass, amps, Ti,
-        #        V, sm_ang=False, nlambda=2000)
-        vals = offset_forward_model(r, L, d, cube[0], w, mass, amps, Ti,
-                V, sm_ang=False, nlambda=2000, coeff=0.4)
+        vals = forward_model(r, L, d, cube[0], w, mass, amps, Ti,
+                V, nlambda=2000)
+        #vals = offset_forward_model(r, L, d, cube[0], w, mass, amps, Ti,
+        #        V, sm_ang=False, nlambda=2000, coeff=0.4)
         # trying to q offset here
         #vals += cube[1] * 0.15 / (1.0 + cube[0])
 
@@ -106,7 +112,7 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
     data = io.h5_2_dict(data_filename)
 
     nL = len(Lpost)
-    ix = data['fit_ix'][0:-1:3]
+    ix = data['fit_ix']['0'][0:-1:3]
     r = data['r'][ix]
     sig = data['sig'][ix]
     error = data['sig_sd'][ix]
@@ -145,7 +151,7 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
         # plt.show()
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                resume=resume, verbose=True, sampling_efficiency='q', n_live_points=100,
+                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=100,
                 outputfiles_basename=join(folder, 'finesse_'))
 
 
@@ -174,17 +180,17 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
 
     def log_likelihood(cube, ndim, nparams):
-        #vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
-        #        [0.0, 0.0], sm_ang=False, nlambda=2000)
-        vals = offset_forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
-                [0.0, 0.0], sm_ang=False, nlambda=2000, coeff=0.5)
+        vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
+                [0.0, 0.0], nlambda=2000)
+        #vals = offset_forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
+        #        [0.0, 0.0], sm_ang=False, nlambda=2000, coeff=0.5)
 
         chisq = np.sum((vals - sig)**2 / error**2)
         return -chisq / 2.0
 
     data = io.h5_2_dict(data_filename)
 
-    ix = data['fit_ix'][0:-1:2]
+    ix = data['fit_ix']['0'][0:-1:2]
     r = data['r'][ix]
     sig = data['sig'][ix]
     error = data['sig_sd'][ix]
@@ -193,10 +199,10 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
     Ti_Th = 0.025
 
-    L_lim = [135.0, 150.0]
+    L_lim = [148.0, 152.0]
     L_lim = [x / 0.004 for x in L_lim]
 
-    d_lim = [0.86, 0.88]
+    d_lim = [0.87, 0.89]
 
     F_lim = [18.0, 22.0]
 
@@ -211,13 +217,14 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
     folder = abspath(output_folder)
 
     if test_plot:
-        npts = 100
-        test_sig = np.zeros((npts, len(r)))
-        for i in xrange(npts):
-            cube = [random.random() for _ in xrange(n_params)] 
-            log_prior(cube, None, None)
-            test_sig[i, :] = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]],
-                                           [Ti_Th, cube[5]], [0.0, 0.0], sm_ang=False, nlambda=2000)
+        pass
+        # npts = 100
+        # test_sig = np.zeros((npts, len(r)))
+        # for i in xrange(npts):
+        #     cube = [random.random() for _ in xrange(n_params)] 
+        #     log_prior(cube, None, None)
+        #     test_sig[i, :] = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]],
+        #                                    [Ti_Th, cube[5]], [0.0, 0.0], nlambda=2000)
 
         # fig, ax = plt.subplots()
         # for i in xrange(npts):
@@ -227,7 +234,7 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                resume=resume, verbose=True, sampling_efficiency='q', n_live_points=200,
+                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=200,
                 outputfiles_basename=join(folder, 'full_'))
 
 
