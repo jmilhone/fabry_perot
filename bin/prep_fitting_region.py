@@ -59,7 +59,7 @@ if __name__ == "__main__":
     print(data.keys())
     r = data['r']
     sig = data['sig']
-    data['sig_sd'] = np.sqrt(100.0*data['sig_sd']**2 + (0.01*sig)**2) # this is the error contribution from the center error
+    data['sig_sd'] = np.sqrt(data['sig_sd']**2 + (0.02*sig)**2) # this is the error contribution from the center error
     min_loc = np.argmin(sig)
     # data['sig'] -= sig.min()
 

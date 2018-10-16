@@ -91,7 +91,6 @@ if __name__ == "__main__":
 
         full_solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
                 resume=resume, test_plot=False)
-
         #full_solver(solver_in['out_folder'], solver_in['data_fname'],
         #            resume=resume, test_plot=True)
     if rank == 0:

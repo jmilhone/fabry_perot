@@ -177,22 +177,22 @@ def ld_multinest_solver(peaks, peaks_sd, orders, basename, L_lim, d_lim, livepoi
 
     nparams = 2
     pymultinest.run(log_likelihood, log_prior, nparams, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='q', n_live_points=livepoints,
+            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=livepoints,
             outputfiles_basename=basename, max_modes=500)
 
-    Lpost, dpost = read_Ld_results("/home/milhone/Research/python_FabryPerot/Data/2018_06_01/ArgonCalib/")
-    #idx = np.where(dpost > 0.8834)
-    #idx = np.where(Lpost > 154.65 / px_size)
-    #idx = np.where(Lpost < 154.45 / px_size)
-    idx = np.where(np.logical_and(Lpost > 154.45/px_size, Lpost < 154.65/px_size))
-    w = wavelengths[1]
-    #print(w)
-    order = 0
-    rvals = peak_calculator(Lpost, dpost, float(w), order)
-    peak_sd, peak = peaks_sd[w][order], peaks[w][order]
-    likeli = tanh_distribution(rvals, peak, peak_sd)
-    #print(np.min(np.exp(likeli)))
-    rarr = np.linspace(peak-2*peak_sd, peak+2*peak_sd, 1000)
+    # Lpost, dpost = read_Ld_results("/home/milhone/Research/python_FabryPerot/Data/2018_06_01/ArgonCalib/")
+    # #idx = np.where(dpost > 0.8834)
+    # #idx = np.where(Lpost > 154.65 / px_size)
+    # #idx = np.where(Lpost < 154.45 / px_size)
+    # idx = np.where(np.logical_and(Lpost > 154.45/px_size, Lpost < 154.65/px_size))
+    # w = wavelengths[1]
+    # #print(w)
+    # order = 0
+    # rvals = peak_calculator(Lpost, dpost, float(w), order)
+    # peak_sd, peak = peaks_sd[w][order], peaks[w][order]
+    # likeli = tanh_distribution(rvals, peak, peak_sd)
+    # #print(np.min(np.exp(likeli)))
+    # rarr = np.linspace(peak-2*peak_sd, peak+2*peak_sd, 1000)
     #fig, ax = plt.subplots()
     #ax.plot(rvals, np.exp(likeli), '.')
     #ax.plot(rvals[idx], np.exp(likeli)[idx], '.', color='C1')
@@ -335,7 +335,7 @@ if __name__ == "__main__":
             resume = False
         else:
             resume = True
-        # resume = False 
+        resume = False 
         if not isfile(fname) or args.overwrite:
             if isfile(org_fname):
                 data = h5_2_dict(org_fname)

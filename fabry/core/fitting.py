@@ -3,8 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy.odr import ODR, Model, RealData
-import pymultinest
 from ..tools.plotting import my_hist
+try:
+    import pymultinest
+except ImportError:
+    pass
 
 
 def determine_fit_range(r, signal, pkr, thres=0.15, plotit=False):

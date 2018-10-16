@@ -50,16 +50,18 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
         sub_prof=False, plotit=False, write=None):
 
     bgdata = None
-    if fname[-2:].lower() == "h5":
-       with h5py.File(fname, 'r') as f:
-           data = f.get("2Ddata").value
-           bgdata = np.abs(norm(scale=0.05).rvs(data.shape))
-    else:
-        fname = images.check_nef(fname)
-        bgfname = images.check_nef(bgfname)
+    # if fname[-2:].lower() == "h5":
+    #    with h5py.File(fname, 'r') as f:
+    #        data = f.get("2Ddata").value
+    #        # bgdata = np.abs(norm(scale=0.05).rvs(data.shape))
+    # else:
+    #     fname = images.check_nef(fname)
+    #     if bgfname is not None:
+    #         bgfname = images.check_nef(bgfname)
 
-        print 'loading image...'
-        data = images.get_data(fname, color=color)
+    #     print 'loading image...'
+    #     data = images.get_data(fname, color=color)
+    data = images.get_data(fname, color=color)
     npix = 1
     data = ringsum.super_pixelate(data, npix=npix)
 
@@ -87,9 +89,10 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             y0 = yguess
 
     print 'performing ringsums...'
+    print(binsize)
     r, sig0,sig0_sd = ringsum.ringsum(data,x0,y0, use_weighted=False, quadrants=False, binsize=binsize) 
 
-    if bgfname is not None or fname[-2:].lower() == "h5":
+    if bgfname is not None:
         print 'removing background...'
         if bgdata is None:
             bgdata = images.get_data(bgfname, color=color)
@@ -154,7 +157,8 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
             plt.close()
 
     fig, ax = plt.subplots()
-    ax.plot(r**2, sig, 'C1')
+    #ax.plot(r**2, sig, 'C1')
+    ax.errorbar(r**2, sig, yerr=sig_sd, color='C1')
     #ax.plot(r, sig, color='C1')
     ax.ticklabel_format(style='sci', axis='both', scilimits=(0,0))
     #ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
@@ -165,9 +169,9 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     fig.tight_layout()
     plt.show()
     # 
-    # fig, ax = plt.subplots()
-    # ax.plot(r, sig_sd / sig)
-    # plt.show()
+    fig, ax = plt.subplots()
+    ax.plot(r, sig_sd / sig)
+    plt.show()
     return dic
 
 if __name__ == "__main__":

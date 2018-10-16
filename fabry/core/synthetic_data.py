@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, division
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import trapz
@@ -13,6 +13,7 @@ def airy_func(wavelength, cos_th, d, F):
 def doppler_calc(w0, mu, temp, v):
     sigma = w0 * 3.2765e-5 * np.sqrt(temp / mu)
     w = w0 * (1.0 - 3.336e-9 * v)
+    print(w, sigma, w0, mu, temp, v)
     return sigma, w
 
 def gaussian(wavelength, w, sigma, amp=1.):
@@ -25,6 +26,7 @@ def lorentzian(wavelength, w, gamma, amp=1.):
     return A / ((wavelength - w)**2 + (0.5 * gamma)**2)
 
 def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False, nprocs=6):
+    sm_ang = False  # you are never coming back!
     if type(w0) in [list, tuple]:
         if not all([type(x) in [list,tuple] for x in [mu, amp, temp, v]]):
             raise ValueError('need to have a list for all spec params')
@@ -67,6 +69,8 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False, 
             model = np.zeros_like(cos_th)
             for i, cth in enumerate(cos_th):
                 model[i] = trapz(spec*airy_func(wavelength, cth, d, F), wavelength, axis=0)
+                model[i] *= 1000
+                model[i] += np.random.normal(loc=0.0, scale=np.sqrt(model[i]), size=1)
             if out and label:
                 out.put((label, model))
             else:
@@ -95,7 +99,8 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False, 
             model.append(sigs[k])
         model = np.concatenate(model)
     else:
-        model = trapz(spec*airy_func(wavelength, cth, d, F), wavelength, axis=0)
+        model = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
+
     return model
 
 def ccd(npx=(4016, 6016),px_size=0.004):
@@ -137,12 +142,13 @@ def full_pattern(L,d,F,w0,mu,T,V,A=1.,sm_ang=False,nprocs=6,plotit=False,saveit=
         A = [A]*len(w0)
 
     a = ccd_quad()
-    rings = forward_model(a.flatten(),L,d,F,w0,mu,A,T,V,sm_ang=sm_ang,nprocs=nprocs)
+    rings = forward_model(a.flatten(),L,d,F,w0,mu,A,T,V, nprocs=nprocs)
+    print('done with first')
     rings = rings.reshape(a.shape)
     rings = recomb_quad(rings)
 
     r = np.arange(0., (np.sqrt(rings.shape[0]**2 + rings.shape[1]**2)/2.) + 0.0005, 0.001)
-    ringsum = forward_model(r*0.004, L, d, F, w0, mu, A, T, V, sm_ang=sm_ang) 
+    ringsum = forward_model(r*0.004, L, d, F, w0, mu, A, T, V, nprocs=nprocs) 
     
     if saveit is not None:
         with h5py.File(saveit,'w') as hf:
