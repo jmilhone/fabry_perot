@@ -3,7 +3,14 @@ import numpy as np
 from scipy import special
 from ..core import models
 from functools import partial
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    pass
+
+cx_fits = {40: [0.39004112, -34.24186523],
+           4: [0.40712338, -33.82360615],
+          }
 
 
 def pcx_couette_velocity_profile(r, mom_dif_length, R_inner, R_outer, V_inner, V_outer):
@@ -54,10 +61,14 @@ def pcx_velocity_profile(r, mom_dif_length, R_outer, V_outer):
     xo = R_outer / mom_dif_length
     Iv = partial(special.iv, 1)
     vel = V_outer * Iv(x) / Iv(xo)
-
-    if any(rr > R_outer for rr in r):
-        idx = np.where(r > R_outer)
-        vel[idx] = V_outer * np.exp(-(r[idx] - R_outer) ** 2 / 4.0 ** 2)
+    
+    if isinstance(r, np.ndarray):
+        if any(rr > R_outer for rr in r):
+            idx = np.where(r > R_outer)
+            vel[idx] = V_outer * np.exp(-(r[idx] - R_outer) ** 2 / 4.0 ** 2)
+    else:
+        if r > R_outer:
+            return V_outer * np.exp(-(r - R_outer) ** 2 / 4.0 ** 2)
 
     return vel
 
@@ -177,3 +188,20 @@ def calculate_pcx_chord_emission(impact_factor, Ti, w0, mu, Lnu, Vouter, rmax=40
     # plt.show()
 
     return wavelength, spectrum
+
+
+def charge_exchange_rate(Ti, mu=40, noise=False):
+    mass = int(mu)
+
+    logTi = np.log(Ti)
+    cx = np.polyval(cx_fits[mass], logTi)
+    cx = np.exp(cx)
+    if noise:
+        cx = np.random.normal(loc=cx, scale=0.1*cx, size=1)
+    return cx
+
+def Lnu(ne_n0, Ti, mu=40, noise=False):
+    sigv_cx = charge_exchange_rate(Ti, mu=mu, noise=noise)
+    Lnu = np.sqrt(128 * 1e18 * Ti / (np.sqrt(mu) * ne_n0 * sigv_cx))
+    return Lnu
+
