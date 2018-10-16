@@ -5,7 +5,10 @@ from scipy.integrate import trapz
 from .zeeman import zeeman_lambda
 from numba import jit
 import os.path as path
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    pass
 
 
 @jit(nopython=True)
@@ -503,17 +506,25 @@ def zeeman_with_lyon_profile(r, L, d, F, current, temp, vel, extra_temp=None):
     return zee_model
 
 
+@jit(nopython=True)
 def general_model(r, L, d, F, wavelength, emission):
     cos_th = L / np.sqrt(L ** 2 + r ** 2)
-    cos_th = cos_th.reshape((1, len(r)))
 
-    emis = emission[:, np.newaxis]
-    w = wavelength[:, np.newaxis]
-    # print('cos shape', cos_th.shape)
-    # print('w shape', w.shape)
-    # print('emis shape', emis.shape)
-    airy = airy_func(w, cos_th, d, F)
-    # print('airy shape', airy.shape)
-    model = trapz(emis * airy, w, axis=0)
+    # cos_th = 1.0 - 0.5 * (r/L)**2
+    model = np.zeros_like(cos_th)
+    for idx, cos in enumerate(cos_th):
+        airy = airy_func(wavelength, cos, d, F)
+        model[idx] = trapezoidal_integration(airy*emission, wavelength)
+
+    # cos_th = cos_th.reshape((1, len(r)))
+
+    # emis = emission[:, np.newaxis]
+    # w = wavelength[:, np.newaxis]
+    # # print('cos shape', cos_th.shape)
+    # # print('w shape', w.shape)
+    # # print('emis shape', emis.shape)
+    # airy = airy_func(w, cos_th, d, F)
+    # # print('airy shape', airy.shape)
+    # model = trapz(emis * airy, w, axis=0)
 
     return model
