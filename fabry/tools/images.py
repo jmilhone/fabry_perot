@@ -4,6 +4,7 @@ import exifread
 import numpy as np
 import os.path as path
 import collections
+from . import file_io
 
 image_readers = []
 
@@ -61,6 +62,16 @@ def read_npy(fname):
     if path.splitext(fname)[-1].lower() == ".npy":
         data = np.load(fname)
         return data
+    else:
+        return None
+
+
+@register_reader
+def read_h5(fname):
+    if path.splitext(fname)[-1].lower() in [".h5", ".hdf5"]:
+        data = file_io.h5_2_dict(fname)
+        data = data.get('image', None)
+        return data.astype(np.float64)
     else:
         return None
 

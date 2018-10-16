@@ -106,7 +106,7 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
     data = io.h5_2_dict(data_filename)
 
     nL = len(Lpost)
-    ix = data['fit_ix'][0:-1:3]
+    ix = data['fit_ix']['0'][0:-1:3]
     r = data['r'][ix]
     sig = data['sig'][ix]
     error = data['sig_sd'][ix]
@@ -174,17 +174,17 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
 
     def log_likelihood(cube, ndim, nparams):
-        #vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
-        #        [0.0, 0.0], sm_ang=False, nlambda=2000)
-        vals = offset_forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
-                [0.0, 0.0], sm_ang=False, nlambda=2000, coeff=0.5)
+        vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
+                [0.0, 0.0], sm_ang=False, nlambda=2000)
+        #vals = offset_forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
+        #        [0.0, 0.0], sm_ang=False, nlambda=2000, coeff=0.5)
 
         chisq = np.sum((vals - sig)**2 / error**2)
         return -chisq / 2.0
 
     data = io.h5_2_dict(data_filename)
 
-    ix = data['fit_ix'][0:-1:2]
+    ix = data['fit_ix']['0'][0:-1:2]
     r = data['r'][ix]
     sig = data['sig'][ix]
     error = data['sig_sd'][ix]
@@ -227,7 +227,7 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                resume=resume, verbose=True, sampling_efficiency='q', n_live_points=200,
+                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=200,
                 outputfiles_basename=join(folder, 'full_'))
 
 

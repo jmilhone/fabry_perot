@@ -1,10 +1,13 @@
 from __future__ import division, print_function
 import os.path as path
 from ..tools import file_io as io
-import matplotlib.pyplot as plt
 import numpy as np
 from ..core import models
 from pymultinest import run
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    pass
 
 w0 = 468.619458
 mu = 232.03806

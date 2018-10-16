@@ -6,7 +6,6 @@ import numpy as np
 from ..core.models import forward_model, peak_calculator, offset_forward_model
 from ..tools import plotting
 import json
-import argparse
 import h5py
 import matplotlib.pyplot as plt # For testing purposes only
 from ..tools import file_io as io
@@ -33,7 +32,7 @@ def check_solver(finesse_folder, Lpost, dpost):
 
     data = io.h5_2_dict(data_filename)
 
-    ix = data['fit_ix']
+    ix = data['fit_ix']['0']
     r = data['r'][ix]
     print(len(r))
     sig = data['sig'][ix]
@@ -73,7 +72,7 @@ def check_solver(finesse_folder, Lpost, dpost):
         futures_map = {}
         for i, (L, d) in enumerate(zip(L_vals, d_vals)):
             for j, (F, A, Arel, Ti) in enumerate(zip(F_vals, A_vals, Arel_vals, Ti_vals)):
-                fut = executor.submit(offset_forward_model, r, L, d, F, w0, mu, [A*Arel, A], 
+                fut = executor.submit(forward_model, r, L, d, F, w0, mu, [A*Arel, A], 
                         [0.025, Ti], [0.0, 0.0])
                 #fut = executor.submit(int, idx)
                 futures_map[fut] = idx
@@ -96,11 +95,14 @@ def check_solver(finesse_folder, Lpost, dpost):
 
     #for ii in range(nL*nF):
     #    ax.plot(r, output[:, ii], 'C0')
+    test = forward_model(r, 150.0/0.004, 0.88, 20.7, w0, mu, [0.5*1000.0, 1000.0], [0.025, 0.1], [0.0, 0.0])
     fig, ax = plt.subplots()
     ax.fill_between(r, output_min, output_max, color='C0', alpha=0.5)
     ax.plot(r, output_mean, 'C0')
     ax.plot(r, sig, 'C1')
+    #ax.plot(r, test, 'C2', labe
     plt.show()
+    
 
     fig, ax = plt.subplots()
     ax.hist(peak_calculator(L_vals, d_vals, w0[0], 0), bins='auto')
@@ -178,7 +180,7 @@ def check_full_solver(finesse_folder):
 
     data = io.h5_2_dict(data_filename)
 
-    ix = data['fit_ix']
+    ix = data['fit_ix']['0']
     r = data['r'][ix]
     sig = data['sig'][ix]
     error = data['sig_sd'][ix]
@@ -210,7 +212,7 @@ def check_full_solver(finesse_folder):
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures_map = {}
         for j, idx in enumerate(i):
-            fut = executor.submit(offset_forward_model, r, L[idx], d[idx], F[idx], w0, mu,
+            fut = executor.submit(forward_model, r, L[idx], d[idx], F[idx], w0, mu,
                     [Arel[idx]*A[idx], A[idx]], [0.025, Ti[idx]], V, nlambda=2000)
             futures_map[fut] = j
         for future in concurrent.futures.as_completed(futures_map):
@@ -221,23 +223,49 @@ def check_full_solver(finesse_folder):
     val_std = np.nanstd(vals, axis=0)
     #vals = offset_forward_model(r, L, d, F, list(w0), list(mu), amp, temps, V, nlambda=2000)
 
+    test = forward_model(r, 150.0/0.004, 0.88, 20.7, w0, mu, [0.5*1000.0, 1000.0], [0.025, 0.1], [0.0, 0.0])
+
+    plot_folder = join(finesse_folder, 'Plots')
+    io.prep_folder(plot_folder)
+
     fig, ax = plt.subplots()
     ax.errorbar(data['r'], data['sig'], yerr=data['sig_sd'], label='data', color='C1')
     #ax.fill_between(r, val_mean-val_std, val_mean+val_std, color='C0', alpha=0.6)
     ax.fill_between(r, np.min(vals, axis=0), np.max(vals, axis=0), color='C0', alpha=0.6)
     ax.plot(r, val_mean, 'C0', label='fit')
+    ax.plot(r, test, 'C2', label='Truth')
     ax.legend()
     plt.show()
 
     pk = peak_calculator(L, d, w0[1], order=0)
 
     labels = ["L", "d", "F", "A", "Arel", "Ti"]
-    fac = [0.004, 1.0, 1.0, 1.0, 1.0, 1.0]
+    fac = [0.004*3, 1.0, 1.0, 1.0, 1.0, 1.0]
     bins = ['auto', 50, 'auto', 'auto', 'auto', 'auto']
+    fnames = ["{}_marginal.png".format(x) for x in ('L', 'd', 'F', 'A', 'Arel', "Ti")]
     for idx, label in enumerate(labels):
         print(label, ": ", np.nanmean(post[:, idx]*fac[idx]))
         fig, ax = plt.subplots()
         plotting.my_hist(ax, post[:, idx]*fac[idx], bins=bins[idx])
         ax.set_xlabel(label)
+        fig.savefig(join(plot_folder, fnames[idx]))
         plt.show(block=False)
     plt.show(block=True)
+
+    fontsize=16
+    for i, xlabel in enumerate(labels):
+        for j in range(i+1, 6):
+            fname = "{0}_{1}_joint_marginal_dist.png".format(xlabel, labels[j])
+            fig, ax = plt.subplots()
+            cb = plotting.my_hist2d(ax, post[:, i]*fac[i], post[:, j]*fac[j])  
+            cb.ax.tick_params(labelsize=fontsize)
+            ax.set_xlabel(labels[j], fontsize=fontsize)
+            ax.set_ylabel(xlabel, fontsize=fontsize)
+            ax.tick_params(labelsize=fontsize)
+            fig.tight_layout()
+            fig.savefig(join(plot_folder, fname))
+            plt.show(block=False)
+    plt.show()
+
+
+
