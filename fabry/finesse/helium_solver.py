@@ -11,7 +11,7 @@ except ImportError:
 
 w0 = 468.619458
 mu = 232.03806
-
+w1 = 468.335172
 
 def full_solver(output_folder, data_filename, resume=True, test_plot=False):
 
@@ -32,9 +32,9 @@ def full_solver(output_folder, data_filename, resume=True, test_plot=False):
 
     def forward_model(cube):
         vals0 = models.offset_forward_model(r0, cube[0], cube[1], cube[2], w0,
-                                            mu, cube[3], cube[5], 0.0, coeff=0.05)
+                                            mu, cube[3], cube[5], 0.0, coeff=0.05,Ip=3900.0,Id=113.0)
         vals1 = models.offset_forward_model(r1, cube[0], cube[1], cube[2], w0,
-                                            mu, cube[4], cube[5], 0.0, coeff=0.05)
+                                            mu, cube[4], cube[5], 0.0, coeff=0.05,Ip=3900.0,Id=113.0)
         return vals0, vals1
 
     data = io.h5_2_dict(data_filename)
@@ -49,12 +49,12 @@ def full_solver(output_folder, data_filename, resume=True, test_plot=False):
     sig1 = data['sig'][ix1]
     sig1_sd = data['sig_sd'][ix1]
 
-    L_lim = [135.0, 150.0]
+    L_lim = [145.0, 155.0]
     L_lim = [x / 0.004 for x in L_lim]
 
-    d_lim = [0.7, 0.9]
+    d_lim = [0.87, 0.89]
 
-    F_lim = [17.0, 21.0]
+    F_lim = [17.0, 24.0]
 
     A_max = np.max(sig0)
     A_lim = [0.75*A_max, 2.0*A_max]
@@ -62,7 +62,7 @@ def full_solver(output_folder, data_filename, resume=True, test_plot=False):
     B_max = np.max(sig1)
     B_lim = [0.75*B_max, 2.0*B_max]
 
-    Ti_lim = [0.025, 0.3]
+    Ti_lim = [0.025, 1.0]
 
     n_params = 6
     folder = path.abspath(output_folder)
@@ -89,7 +89,7 @@ def full_solver(output_folder, data_filename, resume=True, test_plot=False):
 
     else:
         run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='q', n_live_points=75,
+            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=75,
             outputfiles_basename=path.join(folder, 'full_'))
 
 
@@ -154,5 +154,5 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
 
     else:
         run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='q', n_live_points=75,
+            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=75,
             outputfiles_basename=path.join(folder, 'full_'))

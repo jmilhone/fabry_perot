@@ -163,7 +163,7 @@ def lorentzian(wavelength, w, gamma, amp=1.):
     return A / ((wavelength - w) ** 2 + (0.5 * gamma) ** 2)
 
 
-def offset_forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False, coeff=0.15):
+def offset_forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=False, coeff=0.15, Ip=None, Id=None):
     """Forward q with an attempt to q the 'offset' from nuissance lines
 
     Args:
@@ -189,7 +189,13 @@ def offset_forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=
     vals = forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=nlambda)
     # vals += max(amp) * coeff / (1.0 + F)
 
-    vals += np.max(amp) * coeff / (1.0 + (2.0 * F / np.pi) ** 2)
+    if Ip is not None and Id is not None:
+        # prioritize using my new offset model over arbitrary coefficient
+        Q = (2. * F / np.pi) ** 2
+        offset = -Ip/Q + (1.0+1.0/Q)*Id
+        vals += offset
+    else:
+        vals += np.max(amp) * coeff / (1.0 + (2.0 * F / np.pi) ** 2)
 
     return vals
 
