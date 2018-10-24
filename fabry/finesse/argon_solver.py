@@ -177,6 +177,7 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
         cube[3] = cube[3]*(A_lim[1] - A_lim[0]) + A_lim[0]
         cube[4] = cube[4]*(Arel_lim[1] - Arel_lim[0]) + Arel_lim[0]
         cube[5] = cube[5]*(Ti_lim[1] - Ti_lim[0]) + Ti_lim[0]
+        cube[6] = cube[6]*(off_lim[1] - off_lim[0]) + off_lim[0]
 
 
     def log_likelihood(cube, ndim, nparams):
@@ -195,25 +196,24 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
     sig = data['sig'][ix]
     error = data['sig_sd'][ix]
 
+    Ti_Th = 0.025*1000.0 / 300.0
 
-
-    Ti_Th = 0.025
-
-    L_lim = [148.0, 152.0]
+    L_lim = [145.0, 155.0]
     L_lim = [x / 0.004 for x in L_lim]
 
     d_lim = [0.87, 0.89]
 
-    F_lim = [18.0, 22.0]
+    F_lim = [17.0, 27.0]
 
     Amax = np.max(sig)
     A_lim = [0.75*Amax, 2.0*Amax]
 
     Arel_lim = [0.3, 0.6]
 
-    Ti_lim = [0.025, 0.3]
-
-    n_params = 6
+    Ti_lim = [0.025, 1.0]
+    min_val = np.abs(np.min(data['sig'][ix]))*1.2
+    off_lim = [-min_val, min_val]
+    n_params = 7
     folder = abspath(output_folder)
 
     if test_plot:
@@ -234,7 +234,7 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=200,
+                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=600,
                 outputfiles_basename=join(folder, 'full_'))
 
 
