@@ -186,7 +186,7 @@ def check_full_solver(finesse_folder):
     error = data['sig_sd'][ix]
 
 
-    n_params = 6
+    n_params = 7
 
     analyzer = pymultinest.Analyzer(n_params, outputfiles_basename=join(finesse_folder, "full_"))
     post = analyzer.get_equal_weighted_posterior()
@@ -195,12 +195,13 @@ def check_full_solver(finesse_folder):
     nrows, ncols = post.shape 
     print(nrows, ncols)
     print(len(r))
-    L = post[:, 0]
+    L = post[:, 0]#*3
     d = post[:, 1]
     F = post[:, 2]
     A = post[:, 3]
     Arel = post[:, 4]
     Ti = post[:, 5]
+    offset = post[:, 6]
     amp = [Arel*A, A]
     temps = [0.025, Ti]
     V = [0.0, 0.0]
@@ -212,8 +213,8 @@ def check_full_solver(finesse_folder):
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures_map = {}
         for j, idx in enumerate(i):
-            fut = executor.submit(forward_model, r, L[idx], d[idx], F[idx], w0, mu,
-                    [Arel[idx]*A[idx], A[idx]], [0.025, Ti[idx]], V, nlambda=2000)
+            fut = executor.submit(forward_model_wrapper, r, L[idx], d[idx], F[idx], w0, mu,
+                    [Arel[idx]*A[idx], A[idx]], [0.025, Ti[idx]], V, offset[idx], nlambda=2000)
             futures_map[fut] = j
         for future in concurrent.futures.as_completed(futures_map):
             idx = futures_map[future]
@@ -239,10 +240,14 @@ def check_full_solver(finesse_folder):
 
     pk = peak_calculator(L, d, w0[1], order=0)
 
-    labels = ["L", "d", "F", "A", "Arel", "Ti"]
-    fac = [0.004*3, 1.0, 1.0, 1.0, 1.0, 1.0]
-    bins = ['auto', 50, 'auto', 'auto', 'auto', 'auto']
-    fnames = ["{}_marginal.png".format(x) for x in ('L', 'd', 'F', 'A', 'Arel', "Ti")]
+    labels = ["L", "d", "F", "A", "Arel", "Ti", 'Offset']
+    fac = [0.004, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    dbins = (np.max(d)-np.min(d)) / (488e-6/10)
+    dbins = int(dbins)
+    if dbins < 10:
+        dbins = 50
+    bins = ['auto', dbins, 'auto', 'auto', 'auto', 'auto', 'auto']
+    fnames = ["{}_marginal.png".format(x) for x in ('L', 'd', 'F', 'A', 'Arel', "Ti", 'Offset')]
     for idx, label in enumerate(labels):
         print(label, ": ", np.nanmean(post[:, idx]*fac[idx]))
         fig, ax = plt.subplots()
@@ -268,4 +273,7 @@ def check_full_solver(finesse_folder):
     plt.show()
 
 
-
+def forward_model_wrapper(r, L, d, F, w0, mu, amp, temps, V, offset, nlambda=2000):
+    vals = forward_model(r, L, d, F, w0, mu, amp, temps, V, nlambda=nlambda)
+    vals += offset
+    return vals
