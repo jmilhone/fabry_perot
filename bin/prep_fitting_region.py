@@ -40,7 +40,7 @@ def get_fitting_region(r_array, sig_array, sig_err_array, plot_fit_region=True):
         #ax.plot(r_array[fit_indices], sig_array[fit_indices], 'C1', label='Signal to Fit', zorder=100)
         for slice in fit_indices:
             ax.axvspan(r_array[slice][0], r_array[slice][-1], color='C2', alpha=0.5)
-        ax.axhline(sig_array.max() * 0.5 / (1.0 + (2*21.0 / np.pi)**2), color='k')
+        #ax.axhline(sig_array.max() * 0.5 / (1.0 + (2*21.0 / np.pi)**2), color='k')
         ax.legend(frameon=False)
         plt.show()
     return fit_indices_dict
@@ -60,9 +60,9 @@ if __name__ == "__main__":
     r = data['r']
     sig = data['sig']
     data['sig_sd'] = np.sqrt(data['sig_sd']**2 + (0.02*sig)**2) # this is the error contribution from the center error
-    min_loc = np.argmin(sig)
+    #min_loc = np.argmin(sig)
     # data['sig'] -= sig.min()
-
+    # data['sig'] -= 0.8 * sig.min()
     # data['sig_sd'] = np.sqrt(data['sig_sd']**2 + data['sig_sd'][min_loc]**2) # Adding in the offset error
 
     ix = get_fitting_region(r, sig, data['sig_sd'], plot_fit_region=True)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     data['fit_ix'] = ix
 
     fig, ax = plt.subplots()
-    ax.plot(r, data['sig_sd'] / data['sig'])
+    ax.plot(r**2, data['sig'])
     plt.show()
 
     #dict_2_h5(join(folder, 'finesse_input.h5'), data)
