@@ -1,6 +1,6 @@
 from __future__ import division, absolute_import
-import sys
-sys.path.append("../")
+#import sys
+#sys.path.append("../")
 import numpy as np
 import argparse
 from fabry.tools.file_io import h5_2_dict, dict_2_h5, prep_folder,read_Ld_results

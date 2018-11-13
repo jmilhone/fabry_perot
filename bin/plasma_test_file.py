@@ -1,6 +1,6 @@
 from __future__ import division, print_function
-import sys
-sys.path.append("../")
+#import sys
+#sys.path.append("../")
 import numpy as np
 import matplotlib.pyplot as plt
 from fabry.plasma import plasma

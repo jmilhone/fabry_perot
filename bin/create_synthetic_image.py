@@ -1,6 +1,6 @@
 from __future__ import division, print_function
-import sys
-sys.path.append("../")
+#import sys
+#sys.path.append("../")
 from fabry.plasma import plasma
 from fabry.core import models, ringsum
 from fabry.tools import file_io, images

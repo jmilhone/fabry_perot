@@ -1,11 +1,11 @@
 from __future__ import division, print_function
-import sys
+#import sys
 from future.builtins import input
 from distutils.util import strtobool
 import argparse
 import os.path as path
 from mpi4py import MPI
-sys.path.append("../")
+#sys.path.append("../")
 from fabry.tools import file_io
 import numpy as np
 

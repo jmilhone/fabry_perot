@@ -1,9 +1,9 @@
 from __future__ import division, print_function
-import sys
+#import sys
 import os.path as path
 from distutils.util import strtobool
 from mpi4py import MPI
-sys.path.append("../")
+#sys.path.append("../")
 from fabry.tools import file_io
 import numpy as np
 import argparse

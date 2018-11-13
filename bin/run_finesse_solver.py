@@ -1,11 +1,10 @@
 from __future__ import print_function, division, absolute_import
 from future.builtins import input
 from distutils.util import strtobool
-import sys
+#import sys
 import time
 import argparse
-
-sys.path.append("../")
+#sys.path.append("../")
 import numpy as np
 from fabry.tools.file_io import read_Ld_results
 from os.path import abspath, join

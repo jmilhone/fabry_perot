@@ -1,6 +1,6 @@
 from __future__ import division, absolute_import
-import sys
-sys.path.append("../")
+#import sys
+#sys.path.append("../")
 from os.path import join, abspath
 import argparse
 import numpy as np
