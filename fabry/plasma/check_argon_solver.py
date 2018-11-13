@@ -20,6 +20,7 @@ def calculate_profile_model(r, L, d, F, cube, impact_factor, w0, mu, nr, nlambda
     return vals
 
 def const_model(r, L, d, F, w0, mu, cube, nlambda):
+    #vals = models.forward_model(r, L, d, cube[3], w0, mu, cube[1], cube[0], cube[2], nlambda=nlambda)
     vals = models.forward_model(r, L, d, F, w0, mu, cube[1], cube[0], cube[2], nlambda=nlambda)
     vals += cube[3]
     return vals
@@ -230,11 +231,11 @@ def check_profile_solver(output_folder, Fpost, Lpost, dpost):
 
 
 
-def check_constV_solver(output_folder, Fpost, Lpost, dpost):
+def check_constV_solver(output_folder, Fpost, Lpost, dpost, use_plasma_F=True):
     data_filename = path.join(output_folder, "argon_input.h5")
     data = file_io.h5_2_dict(data_filename)
 
-    ix = data['fit_ix']['0'][0:-1:2]
+    ix = data['fit_ix']['0']#[0:-1:2]
     r = data['r'][ix]
     sig = data['sig'][ix]
     error = data['sig_sd'][ix]
@@ -242,7 +243,10 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost):
     nL = len(Lpost)
     nF = len(Fpost)
 
-    n_params = 3
+    if use_plasma_F:
+        n_params = 4
+    else:
+        n_params = 4
 
     # useful things that I used to make synthetic image but not part of the solver
     nlambda = 2000
@@ -257,13 +261,25 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost):
     idx_L = np.random.choice(nL, size=n_samples)
     # idx_F = np.random.choice(nF, size=n_samples)
 
-    L_sampled = Lpost[idx_L]
+    L_sampled = Lpost[idx_L]*3
+    print(L_sampled.min(), L_sampled.max())
     d_sampled = dpost[idx_L]
     # F_sampled = Fpost[idx_F]
-    F_sampled = Fpost[idx_L]
 
     idx_cube = np.random.choice(nrows, size=n_samples)
     cubes = post[idx_cube, :]
+
+    if use_plasma_F:
+        #F_folder = "/home/milhone/Research/python_FabryPerot/Data/PCX/2158/"
+        #Fpost = np.loadtxt(path.join(F_folder, 'Ti_constV_post_equal_weights.dat'), ndmin=2)[:,3] 
+        F_folder = "/home/milhone/Research/python_FabryPerot/Data/2018_10_28/"
+        Fpost = np.loadtxt(path.join(F_folder, 'full_post_equal_weights.dat'), ndmin=2)[:,2]
+        nF = len(Fpost)
+        idx_F = np.random.choice(nF, size=n_samples)
+        F_sampled = Fpost[idx_F]
+    else:
+        F_sampled = cubes[:, 3]
+
 
     vals = np.zeros((n_samples, len(r)))
     # Calculate the model values for all of the samples 
@@ -271,9 +287,12 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost):
         # submit all of the calcultions to the executor and map to their index
         futures_map = dict()
         for j, (L, d, F, cube) in enumerate(zip(L_sampled, d_sampled, F_sampled, cubes)):
+            # L = 0.124073186132456485E+05
+            # d = 0.876551993778090566E+00
+            # F = 0.205637295793309107E+02
         #for j, (L, d, cube) in enumerate(zip(L_sampled, d_sampled, cubes)):
-            #fut = executor.submit(const_model, r, L, d, F, w0, mu, cube, nlambda)
-            fut = executor.submit(models.forward_model, r, L, d, F, w0, mu, cube[1], cube[0], cube[2], nlambda=nlambda)
+            fut = executor.submit(const_model, r, L, d, F, w0, mu, cube, nlambda)
+            #fut = executor.submit(models.forward_model, r, L, d, F, w0, mu, cube[1], cube[0], cube[2], nlambda=nlambda)
             futures_map[fut] = j
 
         # grab the results from completed futures and store in vals
@@ -285,7 +304,8 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost):
     print(r[imax])
 
     # val_std = np.nanstd(vals, axis=0)
-
+    mytest = const_model(r, 0.125379300991324253E+05, 0.879962652610075002E+00,
+            0.0, w0, mu, [0.0001, 0.43e3, -14000.0, 27.0], nlambda)
     fontsize = 8
     figsize = 3.5
     plot_folder = path.join(output_folder, 'Plots')
@@ -293,26 +313,32 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost):
 
     # Make Fit and Data comparison plot
     fig, ax = plt.subplots(figsize=(figsize, figsize/1.618))
-    ax.errorbar(r, sig, yerr=error, label='Data', color='C1', errorevery=50, lw=1)
+    ax.errorbar(r, sig, yerr=error, label='Data', color='C1', errorevery=10, lw=1)
     print(r.shape)
     ax.fill_between(r, np.min(vals, axis=0), np.max(vals, axis=0), color='C0', alpha=0.6, label='Model', hatch='//')
     #ax.plot(r, val_mean, color='C0', label='Model')
+    #ax.plot(r, mytest, 'k')
     ax.legend(fontsize=fontsize)
     ax.tick_params(labelsize=fontsize)
     ax.set_xlabel("R (px)", fontsize=fontsize)
     ax.set_ylabel("Counts", fontsize=fontsize)
 
     fig.subplots_adjust(left=0.175, right=0.95, top=0.95, bottom=0.18)
-    fig.savefig(path.join(plot_folder, 'argon_plasma_constV.pdf'))
+    fig.savefig(path.join(plot_folder, 'argon_plasma_constV.pdf'), transparent=True)
     #plt.close(fig)
     plt.show(block=True)
 
     # Make Marginal Posterior Plots
-    xlabels = ['$T_i$ (eV)', 'A (Counts)', 'V (km/s)']#, '$\mathcal{F}$']
-    ylabels = ['$P(T_i) \Delta T_i$', '$P(A) \Delta A$', '$P(V) \Delta V$']#, '$P(\mathcal{F}) \Delta \mathcal{F}$']
+    xlabels = ['$T_i$ (eV)', 'A (Counts)', 'V (km/s)']
+    ylabels = ['$P(T_i) \Delta T_i$', '$P(A) \Delta A$', '$P(V) \Delta V$']
     fnames = ["{}_marginal_vel_profile.png".format(x) for x in ('Ti', 'A', 'V')]
     #fnames = ["{}_marginal_vel_profile.png".format(x) for x in ('Ti', 'A', 'V', 'F')]
     factors = [1.0, 1.0, 1e-3, 1.0]
+
+    if not use_plasma_F:
+        xlabels.append('$\mathcal{F}$')
+        ylabels.append('$P(\mathcal{F}) \Delta \mathcal{F}$')
+        fnames.append("F_marginal_vel_profile.png")
 
     for idx, (xlabel, ylabel, factor) in enumerate(zip(xlabels, ylabels, factors)):
         fig, ax = plt.subplots(figsize=(figsize, figsize/1.618))
@@ -323,9 +349,10 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost):
         fig.savefig(path.join(plot_folder, fnames[idx]))
         # plt.close(fig)
         plt.show(block=True)
+    
 
     for i, xlabel in enumerate(xlabels):
-        for j in range(i+1, 3):
+        for j in range(i+1, len(xlabels)):
             fig, ax = plt.subplots()
             cb = plotting.my_hist2d(ax, post[:, i]*factors[i], post[:, j]*factors[j])  
             cb.ax.tick_params(labelsize=fontsize)
@@ -389,9 +416,15 @@ def check_multi_solver(output_folder, locs, folders, Lpost, dpost, Fpost):
     nL = len(Lpost)
     idx_L = np.random.choice(nL, size=n_samples)
 
+    F_folder = "/home/milhone/Research/python_FabryPerot/Data/2018_10_28/"
+    Fpost = np.loadtxt(path.join(F_folder, 'full_post_equal_weights.dat'), ndmin=2)[:,2]
+    nF = len(Fpost)
+    idx_F = np.random.choice(nF, size=n_samples)
+    
     L_sampled = Lpost[idx_L]
     d_sampled = dpost[idx_L]
-    F_sampled = Fpost[idx_L]
+    #F_sampled = Fpost[idx_L]
+    F_sampled = Fpost[idx_F]
 
     idx_cube = np.random.choice(nrows, size=n_samples)
     cubes = post[idx_cube, :]
@@ -438,6 +471,7 @@ def check_multi_solver(output_folder, locs, folders, Lpost, dpost, Fpost):
 
     fig, ax = plt.subplots(figsize=figsize)
     plotting.my_hist(ax, Lnu, bins='auto')
+    print(np.mean(Lnu), np.std(Lnu))
     ax.axvline(24.816960868, color='k')
     ax.set_xlabel("$L_{\\nu}$ (cm)", fontsize=fontsize)
     ax.set_ylabel("$P(L_{\\nu}) \Delta L_{\\nu}$ (%)", fontsize=fontsize)
@@ -482,6 +516,7 @@ def check_multi_solver(output_folder, locs, folders, Lpost, dpost, Fpost):
     answers = [0.5, 1.0, 1.6, None, None, None, None]
     for idx, (xlabel, ylabel, factor) in enumerate(zip(xlabels, ylabels, factors)):
         fig, ax = plt.subplots(figsize=figsize)
+        print(xlabel, np.mean(post[:, idx]*factor), np.std(post[:, idx]*factor))
         plotting.my_hist(ax, post[:, idx]*factor, bins='auto')
         ax.set_xlabel(xlabel, fontsize=fontsize)
         ax.set_ylabel(ylabel, fontsize=fontsize)
