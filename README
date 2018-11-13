@@ -1,2 +1,0 @@
-Requires: mpi (mpich is preferable) and MultiNest
-Python pkgs: mpi4py, rawpy, pymultinest
