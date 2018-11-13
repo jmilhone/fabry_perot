@@ -245,7 +245,7 @@ def super_pixelate(data, npix=2):
     return d
 
 
-def ringsum(data, x0, y0, binsize=0.1, quadrants=False, use_weighted=False):
+def ringsum(data, x0, y0, binsize=0.1, quadrants=False, use_weighted=False, remove_hot_pixels=False):
     """Returns a equal annulus area ringsum centered at (x0, y0) from data
 
     Args:
@@ -288,7 +288,7 @@ def ringsum(data, x0, y0, binsize=0.1, quadrants=False, use_weighted=False):
         for k in range(nprocs):
             p = mp.Process(target=_ringsum, args=(redges[1:],
                                                   R[i1[k]:i2[k], j1[k]:j2[k]], data[i1[k]:i2[k], j1[k]:j2[k]]),
-                           kwargs={'out': out, 'label': labels[k], 'use_weighted': False})
+                                                  kwargs={'out': out, 'label': labels[k], 'use_weighted': False, 'remove_hot_pixels':remove_hot_pixels})
             procs.append(p)
             p.start()
 
@@ -301,11 +301,11 @@ def ringsum(data, x0, y0, binsize=0.1, quadrants=False, use_weighted=False):
 
         return rarr, sigs['UL'], sigs['UR'], sigs['BL'], sigs['BR']
     else:
-        sig, sigma = _ringsum(redges[1:], R, data, out=None, label=None, use_weighted=False)
+        sig, sigma = _ringsum(redges[1:], R, data, out=None, label=None, use_weighted=False, remove_hot_pixels=remove_hot_pixels)
         return rarr, sig, sigma
 
 
-def _ringsum(redges, radii, data, out=None, label=None, use_weighted=False):
+def _ringsum(redges, radii, data, out=None, label=None, use_weighted=False, remove_hot_pixels=False):
     """Helper function for ringsumming
 
     Args:
@@ -342,7 +342,25 @@ def _ringsum(redges, radii, data, out=None, label=None, use_weighted=False):
             means[idx], sigmas[idx] = calculate_weighted_mean(d[portion], np.sqrt(1.8 * d[portion]))
         else:
             means[idx] = np.mean(d[portion])
-            sigmas[idx] = np.std(d[portion]) / np.sqrt(len(d[portion]))
+            std = np.std(d[portion])
+            sigmas[idx] = std / np.sqrt(len(d[portion]))
+
+
+        if remove_hot_pixels:
+            good_pixels = np.where(np.abs(d[portion] - means[idx]) <= 3.0*std)
+            if use_weighted:
+                means[idx], sigmas[idx] = calculate_weighted_mean(d[portion][good_pixels], np.sqrt(1.8 * d[portion][good_pixels]))
+            else:
+                means[idx] = np.mean(d[portion][good_pixels])
+                # print(len(d[portion]), len(d[portion][good_pixels]))
+                if idx == 700:
+                    print(edge)
+                    fig, ax = plt.subplots()
+                    ax.hist(d[portion], bins='auto')
+                    ax.axvline(means[idx]-3.0*std)
+                    ax.axvline(means[idx]+3.0*std)
+                    plt.show()
+                sigmas[idx] = np.std(d[portion][good_pixels]) / np.sqrt(len(d[portion][good_pixels]))
 
         lengths[idx] = len(d[portion])
         start += iedge

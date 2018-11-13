@@ -62,6 +62,7 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     #     print 'loading image...'
     #     data = images.get_data(fname, color=color)
     data = images.get_data(fname, color=color)
+    print(data.dtype)
     npix = 1
     data = ringsum.super_pixelate(data, npix=npix)
 
@@ -90,7 +91,7 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
 
     print 'performing ringsums...'
     print(binsize)
-    r, sig0,sig0_sd = ringsum.ringsum(data,x0,y0, use_weighted=False, quadrants=False, binsize=binsize) 
+    r, sig0,sig0_sd = ringsum.ringsum(data,x0,y0, use_weighted=False, quadrants=False, binsize=binsize, remove_hot_pixels=True) 
 
     if bgfname is not None:
         print 'removing background...'
