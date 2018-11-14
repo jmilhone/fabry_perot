@@ -4,6 +4,24 @@ Fabry
 
 Package for analyzing Fabry-Perot interference patterns
 
+Usage
+===============
+
+* Read in a Fabry-Perot image, locate the center of the ring pattern, and ring sum
+.. code-block:: python
+
+    from fabry.core import ringsum
+    from fabry.tools import images, plotting
+
+    filename = "<image_name>"
+    image_data = images.get_data(filename, color='b')  # r g b or None
+    xguess, yguess = plotting.center_plot(image_data)  # Prompt the user to click an initial guess for the center of the ring pattern
+    x0, y0 = ringsum.locate_center(image_data, xguess=xguess, yguess=yguess, binsize=0.1)  # Find the center from initial guess
+    r, signal, signal_uncertainty = ringsum.ringsum(image_data, x0, y0, binsize=0.1)
+
+This is accomplished by the process_image.py script located in python_FabryPerot/bin.
+
+
 Installation
 **************
 
