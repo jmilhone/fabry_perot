@@ -22,16 +22,17 @@ Usage
 This is accomplished by the process_image.py script located in python_FabryPerot/bin. If the user not does provide --no_click flag, the user will be prompted to click an initial guess on the ring pattern as seen in the screenshot below.
 
 .. image:: ./static/images/image_click_example.png
-    :scale: 50 %
+    :height: 100px 
 
 After the user provides a guess of the center of the rings, the locate_center function will iteratively search for the center. An example of a found center is shown below.
 
 .. image:: ./static/images/ring_center_found_example.png
-    :scale: 50 %
+    :height: 100px
 
 After the center is found, a 'ringsum' is calculated where the image is split into annuli of equal area where means and standard deviations are calculated. An example figure plotted in pixel squared space is shown below.
 
 .. image:: ./static/images/ringsum_example.png
+    :height: 100px
 
 Installation
 =================
