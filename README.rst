@@ -21,7 +21,7 @@ Usage
 
 This is accomplished by the process_image.py script located in python_FabryPerot/bin. If the user not does provide --no_click flag, the user will be prompted to click an initial guess on the ring pattern as seen in the screenshot below.
 
-.. image:: image_click_example.png
+.. image:: ./static/images/image_click_example.png
 
 Installation
 =================
