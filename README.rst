@@ -40,9 +40,35 @@ Installation
 Prerequisites
 -----------------
 
+Preparing Python Distribution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Install the requirements listed in the requirements.txt file. I recommend using anaconda to do so to pick up on any not listed dependencies. However, PyMultiNest and RawPy require external non python libraries to be installed first.
 
 * Anaconda has its own version of mpich that mpi4py is built with. I highly recommend that you uninstall mpi4py and install your own version of mpich or open-mpi. Afterwards, you will want to load them using module load mpich (or open-mpi). Then you can install mpi4py using pip. If you want to use MPI with PyMultiNest, it is critical you run module load before installation of MultiNest.
+
+If you have Anaconda installed already, but would like to start with a clean working environment, you can run this
+
+.. code-block::
+    
+    conda create -n test_env python=2.7
+    source activate test_env
+    conda install numpy h5py futures matplotlib scipy numba ipython
+    pip install exifread
+If you have libraw install already you can install rawpy via pip
+
+.. code-block::
+
+    pip install rawpy # (if you already have libraw, see below if this fails)
+
+If that step fails, see below for installing rawpy. If you have a version of MPI installed you can install mpi4py by running
+
+.. code-block::
+    module load path_to_mpi_you_want
+    pip install mpi4py
+
+Installing PyMultiNest and MultiNest
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * PyMultiNest can be installed via pip or via the github repository.
 
@@ -66,6 +92,9 @@ Use the "--user" switch if you want to install locally.
 
 
 More detailed instructions are located `here <http://johannesbuchner.github.io/pymultinest-tutorial/install.html#on-your-own-computer>`_. You will need to set the LD_LIBRARY_PATH environment variable to point to the install location of libmultinest.so.
+
+Installing Rawpy if Pip Failed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Rawpy requires libraw. If you looking for a specific version, it can be installed from the source repository.
     
