@@ -23,6 +23,14 @@ This is accomplished by the process_image.py script located in python_FabryPerot
 
 .. image:: ./static/images/image_click_example.png
 
+After the user provides a guess of the center of the rings, the locate_center function will iteratively search for the center. An example of a found center is shown below.
+
+.. image:: ./static/images/ring_center_found_example.png
+
+After the center is found, a 'ringsum' is calculated where the image is split into annuli of equal area where means and standard deviations are calculated. An example figure plotted in pixel squared space is shown below.
+
+.. image:: ./static/images/ringsum_example.png
+
 Installation
 =================
 
