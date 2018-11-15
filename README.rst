@@ -1,6 +1,6 @@
-**********
+=============
 Fabry
-**********
+=============
 
 Package for analyzing Fabry-Perot interference patterns
 
@@ -22,10 +22,12 @@ Usage
 This is accomplished by the process_image.py script located in python_FabryPerot/bin. If the user not does provide --no_click flag, the user will be prompted to click an initial guess on the ring pattern as seen in the screenshot below.
 
 .. image:: ./static/images/image_click_example.png
+    :scale: 50 %
 
 After the user provides a guess of the center of the rings, the locate_center function will iteratively search for the center. An example of a found center is shown below.
 
 .. image:: ./static/images/ring_center_found_example.png
+    :scale: 50 %
 
 After the center is found, a 'ringsum' is calculated where the image is split into annuli of equal area where means and standard deviations are calculated. An example figure plotted in pixel squared space is shown below.
 
@@ -35,7 +37,7 @@ Installation
 =================
 
 Prerequisites
-*****************
+-----------------
 
 Install the requirements listed in the requirements.txt file. I recommend using anaconda to do so to pick up on any not listed dependencies. However, PyMultiNest and RawPy require external non python libraries to be installed first.
 
@@ -77,6 +79,9 @@ More detailed instructions are located `here <http://johannesbuchner.github.io/p
     sudo make install
 
 Afterwards rawpy can be installed using ``pip install rawpy --no-binary rawpy``. 
+
+Install Fabry Package
+------------------------
 
 * After the requirements have been satisfied, I recommend installing fabry as a developer because it is under active development still. This can be done by using
 
