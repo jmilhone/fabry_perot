@@ -49,7 +49,7 @@ Install the requirements listed in the requirements.txt file. I recommend using 
 
 If you have Anaconda installed already, but would like to start with a clean working environment, you can run this
 
-.. code-block::
+.. code-block:: bash 
     
     conda create -n test_env python=2.7
     source activate test_env
@@ -57,13 +57,13 @@ If you have Anaconda installed already, but would like to start with a clean wor
     pip install exifread
 If you have libraw install already you can install rawpy via pip
 
-.. code-block::
+.. code-block:: bash
 
     pip install rawpy # (if you already have libraw, see below if this fails)
 
 If that step fails, see below for installing rawpy. If you have a version of MPI installed you can install mpi4py by running
 
-.. code-block::
+.. code-block:: bash
 
     module load path_to_mpi_you_want
     pip install mpi4py
@@ -73,7 +73,7 @@ Installing PyMultiNest and MultiNest
 
 * PyMultiNest can be installed via pip or via the github repository.
 
-.. code-block:: 
+.. code-block:: bash
     
     git clone https://github.com/JohannesBuchner/PyMultiNest/
     cd PyMultiNest
@@ -84,7 +84,7 @@ Use the "--user" switch if you want to install locally.
 
 * PyMultiNest requires MultiNest to run. The simple instructions for building and installing are
 
-.. code-block:: 
+.. code-block:: bash
     
     git clone https://github.com/JohannesBuchner/MultiNest
     cd MultiNest/build
@@ -99,7 +99,7 @@ Installing Rawpy if Pip Failed
 
 * Rawpy requires libraw. If you looking for a specific version, it can be installed from the source repository.
     
-.. code-block::
+.. code-block:: bash
     
     git clone https://github.com/LibRaw/LibRaw.git libraw
     git clone https://github.com/LibRaw/LibRaw-cmake.git libraw-cmake
@@ -116,7 +116,7 @@ Install Fabry Package
 
 * After the requirements have been satisfied, I recommend installing fabry as a developer because it is under active development still. This can be done by using
 
-.. code-block::
+.. code-block:: console
     
     cd python_FabryPerot/
     python setup.py develop
