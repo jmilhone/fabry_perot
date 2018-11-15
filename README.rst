@@ -64,6 +64,7 @@ If you have libraw install already you can install rawpy via pip
 If that step fails, see below for installing rawpy. If you have a version of MPI installed you can install mpi4py by running
 
 .. code-block::
+
     module load path_to_mpi_you_want
     pip install mpi4py
 
