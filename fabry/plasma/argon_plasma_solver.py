@@ -104,16 +104,16 @@ def const_vel_solver(output_folder, Fpost, Lpost, dpost, resume=True, test_plot=
         cube[1] = cube[1] * (A_lim[1] - A_lim[0]) + A_lim[0]
         cube[2] = cube[2] * (v_lim[1] - v_lim[0]) + v_lim[0]
         #cube[3] = cube[3] * (F_lim[1] - F_lim[0]) + F_lim[0]
-        cube[3] = cube[3] * (off_lim[1] - off_lim[0]) + off_lim[0]
+        #cube[3] = cube[3] * (off_lim[1] - off_lim[0]) + off_lim[0]
         #cube[4] = cube[4] * (F_lim[1] - F_lim[0]) + F_lim[0]
 
     def log_likelihood(cube, ndim, nparams):
         iL = np.random.choice(nL)
         LL = Lpost[iL]
         dd = dpost[iL]
-        #FF = Fpost[iL]
-        jF = np.random.choice(nF)
-        FF = Fpost[jF]
+        FF = Fpost[iL]
+        #jF = np.random.choice(nF)
+        #FF = Fpost[jF]
         #LL = 0.124073186132456485E+05
         #dd = 0.876551993778090566E+00
         #FF = 0.205637295793309107E+02
@@ -121,12 +121,13 @@ def const_vel_solver(output_folder, Fpost, Lpost, dpost, resume=True, test_plot=
         #vals = models.forward_model(r, LL, dd, cube[3], w0, mu, cube[1], cube[0], cube[2], nlambda=2000)
         vals = models.forward_model(r, LL, dd, FF, w0, mu, cube[1], cube[0], cube[2], nlambda=2000)
         #vals = models.forward_model(r, LL, dd, FF, w0, mu, cube[1], cube[0], cube[2], nlambda=2000)
-        vals += cube[3]
+        #vals += cube[3]
+        #vals += 2.7
         chisq = np.sum((vals - sig)**2 / error**2)
         return -chisq / 2
 
-    print('scaling L from npix=3 to npix=1')
-    Lpost = 3.0 * Lpost
+    #print('scaling L from npix=3 to npix=1')
+    #Lpost = 3.0 * Lpost
 
     data_filename = path.join(output_folder, "argon_input.h5")
     data = file_io.h5_2_dict(data_filename)
@@ -146,12 +147,12 @@ def const_vel_solver(output_folder, Fpost, Lpost, dpost, resume=True, test_plot=
     F_lim = [18, 35]
     #F_folder = "/home/milhone/Research/python_FabryPerot/Data/PCX/2158/"
     #Fpost = np.loadtxt(path.join(F_folder, 'Ti_constV_post_equal_weights.dat'), ndmin=2)[:,3]
-    F_folder = "/home/milhone/Research/python_FabryPerot/Data/2018_10_28/"
-    Fpost = np.loadtxt(path.join(F_folder, 'full_post_equal_weights.dat'), ndmin=2)[:,2]
+    #F_folder = "/home/milhone/Research/python_FabryPerot/Data/2018_10_28/"
+    #Fpost = np.loadtxt(path.join(F_folder, 'full_post_equal_weights.dat'), ndmin=2)[:,2]
     off_lim = [-20.0, 20.0]
     nL = len(Lpost)
     nF = len(Fpost)
-    n_params = 4
+    n_params = 3
 
     if test_plot:
         # do a test plot
@@ -183,7 +184,7 @@ def const_vel_solver(output_folder, Fpost, Lpost, dpost, resume=True, test_plot=
     else:
         # run multinest
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                        resume=resume, verbose=True, sampling_efficiency='model', n_live_points=100,
+                        resume=resume, verbose=True, sampling_efficiency='model', n_live_points=400,
                         outputfiles_basename=path.join(output_folder, 'Ti_constV_'))
 
 def profile_vel_solver(output_folder, Fpost, Lpost, dpost, resume=True, test_plot=False):

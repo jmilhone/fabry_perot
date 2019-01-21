@@ -86,7 +86,7 @@ if __name__ == "__main__":
             solver_args = (solver_in['folder'], solver_in['Fpost'], solver_in['Lpost'], solver_in['dpost'])
 
             #solver.no_vel_solver(*solver_args, resume=not solver_in['restart'], test_plot=True)
-            #solver.const_vel_solver(*solver_args, resume=not solver_in['restart'], test_plot=False)
+            solver.const_vel_solver(*solver_args, resume=not solver_in['restart'], test_plot=False)
             #solver.profile_vel_solver(*solver_args, resume=not solver_in['restart'], test_plot=False)
 
         elif solver_in['filter'] == 'helium':
@@ -104,8 +104,8 @@ if __name__ == "__main__":
             solver_args = (solver_in['folder'], solver_in['Fpost'], solver_in['Lpost'], solver_in['dpost'])
 
             #checker.check_no_solver(*solver_args)
-            #checker.check_constV_solver(*solver_args)
-            checker.check_profile_solver(*solver_args)
+            checker.check_constV_solver(*solver_args)
+            #checker.check_profile_solver(*solver_args)
 
         elif solver_in['filter'] == 'helium':
             raise NotImplementedError("Helium is not implemented yet")
