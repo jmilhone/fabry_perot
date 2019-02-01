@@ -1,5 +1,5 @@
 from __future__ import print_function, division, absolute_import
-from future.builtins import input
+# from future.builtins import input
 from distutils.util import strtobool
 #import sys
 import time
@@ -11,6 +11,7 @@ from os.path import abspath, join
 from mpi4py import MPI
 
 if __name__ == "__main__":
+    print('im here in the start of the run finesse solver script')
     start_time = time.time()
     Comm = MPI.COMM_WORLD
     rank = Comm.Get_rank()
@@ -48,7 +49,7 @@ if __name__ == "__main__":
 
         restart = args.restart
         if restart:
-            a = input("Are you sure you want to restart? ")
+            a = raw_input("Are you sure you want to restart? ")
             try:
                 a = bool(strtobool(a))
             except ValueError:
@@ -91,17 +92,18 @@ if __name__ == "__main__":
         full_solver(solver_in['out_folder'], solver_in['prior_fname'], solver_in['data_fname'],
                 resume=resume, test_plot=False)
         #full_solver(solver_in['out_folder'], solver_in['data_fname'],
-        #            resume=resume, test_plot=True)
+        #            resume=resume, test_plot=False)
     if rank == 0:
         end_time = time.time()
         print("Total Time Elasped: {} minutes".format((end_time - start_time) / 60.0))
-        if solver_in['filter'] == 'argon':
-            from fabry.finesse.check_argon_solver import check_solver, check_full_solver
-        elif solver_in['filter'] == 'helium':
-            print("still working on implementing the helium check solver")
-        else:
-            print("No idea how you got here...")
-            sys.exit(1)
+        # if solver_in['filter'] == 'argon':
+        #     #from fabry.finesse.check_argon_solver import check_solver, check_full_solver
+        #     pass
+        # elif solver_in['filter'] == 'helium':
+        #     print("still working on implementing the helium check solver")
+        # else:
+        #     print("No idea how you got here...")
+        #     sys.exit(1)
 
         #check_solver(solver_in['out_folder'], solver_in['Lpost'], solver_in['dpost'])
         #check_full_solver(solver_in['out_folder'])

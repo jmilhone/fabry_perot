@@ -8,7 +8,7 @@ from fabry.tools import file_io
 import numpy as np
 import argparse
 import ConfigParser
-
+import time
 
 def verify_restart():
     a = raw_input("Are you sure you want to restart? ")
@@ -56,6 +56,7 @@ def parse_config(config_filename):
     return locs, folders
 
 if __name__ == "__main__":
+    start_time = time.time()
     Comm = MPI.COMM_WORLD
     rank = Comm.Get_rank()
     if rank == 0:
@@ -127,14 +128,16 @@ if __name__ == "__main__":
             raise ValueError("How did we get here?")
 
     if rank == 0:
-        # run plasma solver check here
-        if solver_in['filter'] == 'argon':
-            import fabry.plasma.check_argon_solver as checker
-            checker.check_multi_solver(output_folder, chord_locs, folders, Lpost, dpost, Fpost)
-        elif solver_in['filter'] == 'helium':
-            raise NotImplementedError("Helium is not implemented yet")
-        else:
-            raise ValueError("How did we get here?")
+        end_time = time.time()
+        print("Total Time Elasped: {} minutes".format((end_time-start_time)/60.0))
+    #     # run plasma solver check here
+    #     if solver_in['filter'] == 'argon':
+    #         import fabry.plasma.check_argon_solver as checker
+    #         checker.check_multi_solver(output_folder, chord_locs, folders, Lpost, dpost, Fpost)
+    #     elif solver_in['filter'] == 'helium':
+    #         raise NotImplementedError("Helium is not implemented yet")
+    #     else:
+    #         raise ValueError("How did we get here?")
 
 
 

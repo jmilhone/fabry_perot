@@ -20,8 +20,8 @@ except ImportError:
     pass
 
 
-w0 = (487.873302, 487.98634)
-mu = (232.03806, 39.948)
+w0 = (487.873302, 487.98634, 487.800942)
+mu = (232.03806, 39.948, 232.03806)
 
 
 def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=True, test_plot=False):
@@ -177,43 +177,53 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
         cube[3] = cube[3]*(A_lim[1] - A_lim[0]) + A_lim[0]
         cube[4] = cube[4]*(Arel_lim[1] - Arel_lim[0]) + Arel_lim[0]
         cube[5] = cube[5]*(Ti_lim[1] - Ti_lim[0]) + Ti_lim[0]
-        cube[6] = cube[6]*(off_lim[1] - off_lim[0]) + off_lim[0]
+        #cube[6] = cube[6]*(off_lim[1] - off_lim[0]) + off_lim[0]
+        cube[6] = cube[6]*(Brel_lim[1] - Brel_lim[0]) + Brel_lim[0]
+        #cube[7] = cube[7]*(Brel_lim[1] - Brel_lim[0]) + Brel_lim[0]
 
 
     def log_likelihood(cube, ndim, nparams):
-        vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
-                [0.0, 0.0], nlambda=2000)
+        #vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]], [0.0, 0.0], nlambda=2000)
+        #vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3], cube[3]*cube[7]], [Ti_Th, cube[5], Ti_Th],
+        #        [0.0, 0.0, 0.0], nlambda=2000)
+        vals = forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3], cube[3]*cube[6]], [Ti_Th, cube[5], Ti_Th],
+                [0.0, 0.0, 0.0], nlambda=2000)
         #vals = offset_forward_model(r, cube[0], cube[1], cube[2], w0, mu, [cube[3]*cube[4], cube[3]], [Ti_Th, cube[5]],
         #        [0.0, 0.0], sm_ang=False, nlambda=2000, coeff=0.5)
-
+        #vals += cube[6]
         chisq = np.sum((vals - sig)**2 / error**2)
         return -chisq / 2.0
 
     data = io.h5_2_dict(data_filename)
 
-    ix = data['fit_ix']['0'][0:-1:2]
+    ix = data['fit_ix']['0']#[0:-1:2]
     r = data['r'][ix]
     sig = data['sig'][ix]
     error = data['sig_sd'][ix]
 
     Ti_Th = 0.025*1000.0 / 300.0
 
-    L_lim = [145.0, 155.0]
-    L_lim = [x / 0.004 for x in L_lim]
+    px_size = 0.004# * 3 
+    L_lim = [147.0, 153.0]
+    L_lim = [x / px_size for x in L_lim]
 
-    d_lim = [0.87, 0.89]
+    d_lim = [0.7, 1.0]
 
-    F_lim = [17.0, 27.0]
+    F_lim = [17.0, 26.0]
 
     Amax = np.max(sig)
     A_lim = [0.75*Amax, 2.0*Amax]
 
-    Arel_lim = [0.3, 0.6]
+    Arel_lim = [0.005, 0.6]
+    Brel_lim = [0.001, 0.2]
 
     Ti_lim = [0.025, 1.0]
-    min_val = np.abs(np.min(data['sig'][ix]))*1.2
-    off_lim = [-min_val, min_val]
+    #min_val = np.abs(np.min(data['sig'][ix]))
+    min_val = 50.0
+    off_lim = [0.0, min_val]
+    #n_params = 6
     n_params = 7
+    #n_params = 8
     folder = abspath(output_folder)
 
     if test_plot:
@@ -234,7 +244,7 @@ def full_solver(output_folder, prior_filename, data_filename, resume=True, test_
 
     else:
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=600,
+                resume=resume, verbose=True, sampling_efficiency='model', n_live_points=1000,
                 outputfiles_basename=join(folder, 'full_'))
 
 

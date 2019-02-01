@@ -1,6 +1,11 @@
 from __future__ import division, print_function
+<<<<<<< Updated upstream
 #import sys
 from future.builtins import input
+=======
+import sys
+#from future.builtins import input
+>>>>>>> Stashed changes
 from distutils.util import strtobool
 import argparse
 import os.path as path
