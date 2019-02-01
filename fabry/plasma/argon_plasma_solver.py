@@ -154,7 +154,7 @@ def const_vel_solver(output_folder, Fpost, Lpost, dpost, resume=True, test_plot=
     nF = len(Fpost)
     n_params = 3
 
-    if test_plot:
+    if False:#test_plot:
         # do a test plot
         npts = 100
         test_sig = np.zeros((npts, len(r)))
