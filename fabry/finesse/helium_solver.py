@@ -20,51 +20,60 @@ def full_solver(output_folder, data_filename, resume=True, test_plot=False):
         cube[1] = cube[1]*(d_lim[1] - d_lim[0]) + d_lim[0]
         cube[2] = cube[2]*(F_lim[1] - F_lim[0]) + F_lim[0]
         cube[3] = cube[3]*(A_lim[1] - A_lim[0]) + A_lim[0]
-        cube[4] = cube[4]*(B_lim[1] - B_lim[0]) + B_lim[0]
-        cube[5] = cube[5]*(Ti_lim[1] - Ti_lim[0]) + Ti_lim[0]
+        #cube[4] = cube[4]*(B_lim[1] - B_lim[0]) + B_lim[0]
+        #cube[5] = cube[5]*(Ti_lim[1] - Ti_lim[0]) + Ti_lim[0]
 
     def log_likelihood(cube, ndim, nparams):
-        vals0, vals1 = forward_model(cube)
+        #vals0, vals1 = forward_model(cube)
+        vals0 = forward_model(cube)
         chisq = np.sum((vals0 - sig0)**2 / sig0_sd**2)
-        chisq += np.sum((vals1 - sig1)**2 / sig1_sd**2)
+        #chisq += np.sum((vals1 - sig1)**2 / sig1_sd**2)
 
         return -chisq / 2.0
 
     def forward_model(cube):
         vals0 = models.offset_forward_model(r0, cube[0], cube[1], cube[2], w0,
-                                            mu, cube[3], cube[5], 0.0, coeff=0.05,Ip=3900.0,Id=113.0)
-        vals1 = models.offset_forward_model(r1, cube[0], cube[1], cube[2], w0,
-                                            mu, cube[4], cube[5], 0.0, coeff=0.05,Ip=3900.0,Id=113.0)
-        return vals0, vals1
+                                            mu, cube[3], Ti, 0.0, Ip=1764.0, Id=45.0)
+        #vals0 = models.offset_forward_model(r0, cube[0], cube[1], cube[2], [w0,w1],
+                                            #mu, cube[3], cube[5], 0.0, coeff=0.05,Ip=3900.0,Id=113.0)
+                                            #mu, cube[3], Ti, 0.0, coeff=0.05,Ip=3900.0,Id=113.0)
+                                            #mu, cube[3], Ti, 0.0, coeff=0.05,Ip=3900.0,Id=113.0-20.0)
+        #                                    [mu,mu],[cube[3],cube[4]],[Ti,Ti],[0,0],Ip=3900,Id=113.-20.)
+        #vals1 = models.offset_forward_model(r1, cube[0], cube[1], cube[2], [w0,w1],
+                                            #mu, cube[4], cube[5], 0.0, coeff=0.05,Ip=3900.0,Id=113.0)
+                                            #mu, cube[4], Ti, 0.0, coeff=0.05,Ip=3900.0,Id=113.0)
+                                            #mu, cube[4], Ti, 0.0, coeff=0.05,Ip=3900.0,Id=113.0-20.0)
+                                            #[mu,mu],[cube[3],cube[4]],[Ti,Ti],[0,0],Ip=3900,Id=113.-20.)
+        return vals0#, vals1
 
     data = io.h5_2_dict(data_filename)
     ix0 = data['fit_ix']['0']
-    ix1 = data['fit_ix']['1']
+    #ix1 = data['fit_ix']['1']
 
     r0 = data['r'][ix0]
     sig0 = data['sig'][ix0]
     sig0_sd = data['sig_sd'][ix0]
 
-    r1 = data['r'][ix1]
-    sig1 = data['sig'][ix1]
-    sig1_sd = data['sig_sd'][ix1]
+    # r1 = data['r'][ix1]
+    # sig1 = data['sig'][ix1]
+    # sig1_sd = data['sig_sd'][ix1]
 
     L_lim = [145.0, 155.0]
     L_lim = [x / 0.004 for x in L_lim]
 
-    d_lim = [0.87, 0.89]
+    d_lim = [0.86, 0.9]
 
-    F_lim = [17.0, 24.0]
+    F_lim = [17.0, 35.0]
 
     A_max = np.max(sig0)
-    A_lim = [0.75*A_max, 2.0*A_max]
+    A_lim = [0.5*A_max, 3.0*A_max]
 
-    B_max = np.max(sig1)
-    B_lim = [0.75*B_max, 2.0*B_max]
+    #B_max = np.max(sig1)
+    #B_lim = [0.5*B_max, 3.0*B_max]
+    Ti = 0.025 * 1000.0 / 300.0
+    #Ti_lim = [0.025, 1.0]
 
-    Ti_lim = [0.025, 1.0]
-
-    n_params = 6
+    n_params = 4
     folder = path.abspath(output_folder)
 
     if test_plot:
@@ -89,7 +98,7 @@ def full_solver(output_folder, data_filename, resume=True, test_plot=False):
 
     else:
         run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=75,
+            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=600,
             outputfiles_basename=path.join(folder, 'full_'))
 
 
@@ -154,5 +163,5 @@ def solver(output_folder, prior_filename, data_filename, Lpost, dpost, resume=Tr
 
     else:
         run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=75,
+            resume=resume, verbose=True, sampling_efficiency='model', n_live_points=600,
             outputfiles_basename=path.join(folder, 'full_'))

@@ -1,13 +1,13 @@
 from __future__ import division, print_function
-#import sys
-from future.builtins import input
+import sys
+#from future.builtins import input
 from distutils.util import strtobool
 import argparse
 import os.path as path
-from mpi4py import MPI
 #sys.path.append("../")
 from fabry.tools import file_io
 import numpy as np
+from mpi4py import MPI
 
 def verify_restart():
     a = raw_input("Are you sure you want to restart? ")
@@ -99,12 +99,12 @@ if __name__ == "__main__":
         # here is where we will check the solver
         if solver_in['filter'] == 'argon':
             # call argon solver of choice
-            import fabry.plasma.check_argon_solver as checker
+            #import fabry.plasma.check_argon_solver as checker
 
             solver_args = (solver_in['folder'], solver_in['Fpost'], solver_in['Lpost'], solver_in['dpost'])
 
             #checker.check_no_solver(*solver_args)
-            checker.check_constV_solver(*solver_args)
+            #checker.check_constV_solver(*solver_args)
             #checker.check_profile_solver(*solver_args)
 
         elif solver_in['filter'] == 'helium':

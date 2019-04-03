@@ -154,7 +154,7 @@ def const_vel_solver(output_folder, Fpost, Lpost, dpost, resume=True, test_plot=
     nF = len(Fpost)
     n_params = 3
 
-    if test_plot:
+    if False:#test_plot:
         # do a test plot
         npts = 100
         test_sig = np.zeros((npts, len(r)))
@@ -396,7 +396,12 @@ def multi_image_solver(output_folder, locs, folders, Lpost, dpost, Fpost, test_p
     else:
         # run multinest
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
+<<<<<<< Updated upstream
                         resume=resume, verbose=True, sampling_efficiency='model', n_live_points=200,
                         outputfiles_basename=path.join(output_folder, 'Ti_multi_Lnu_'))
+=======
+                        resume=resume, verbose=True, sampling_efficiency='model', n_live_points=600,
+                        outputfiles_basename=path.join(output_folder, 'Ti_multi_'))
+>>>>>>> Stashed changes
 
 
