@@ -4,7 +4,10 @@ import exifread
 import numpy as np
 import os.path as path
 import collections
+import skimage.io as io
 from . import file_io
+import matplotlib.pyplot as plt
+
 
 image_readers = []
 
@@ -27,6 +30,36 @@ def check_nef(filename):
         else:
             raise Exception('{0} does not exist!'.format(filename))
     return filename
+
+
+@register_reader
+def read_tiff(fname):
+    """Reads .tif file
+
+    Args:
+        fname (str) filename to read
+
+    Returns:
+        np.ndarray: 2d image data, 3d if stack, first dimension being the stack
+    """
+    if path.splitext(fname)[-1].lower() == '.tif':
+        image = io.imread(fname, plugin='tifffile')
+        #print(image)
+        if len(image.shape) == 3:
+            print('temporarily averaging over the stack')
+            sigma = np.std(image, axis=0)
+            image = np.mean(image, axis=0)
+            print(sigma.shape)
+            fig, ax = plt.subplots()
+            im = ax.imshow(sigma)# / image * 100)
+            fig.colorbar(im)
+            plt.show()
+            #print('temporarily taking the first image in the stack')
+            #image = image[0, :, :]
+            #print('temporarily taking the third image in the stack')
+            #image = image[2, :, :]
+        return image
+    return None
 
 
 @register_reader
@@ -92,6 +125,10 @@ def get_data(filename, color=None):
             break
     else:
         raise ValueError('Image not found or not supported')
+
+    if path.splitext(filename)[-1].lower() == '.tif':
+        # Ignore color propery for tif files
+        return image
 
     if color is None or len(image.shape) == 2:
         a = image
