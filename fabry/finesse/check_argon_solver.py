@@ -12,8 +12,8 @@ from ..tools import file_io as io
 import random
 from os.path import abspath, join
 
-w0 = (487.873302, 487.98634)
-mu = (232.03806, 39.948)
+w0 = (487.873302, 487.98634, 487.800942)
+mu = (232.03806, 39.948, 232.03806)
 
 def check_solver(finesse_folder, Lpost, dpost):
     """
@@ -186,25 +186,33 @@ def check_full_solver(finesse_folder):
     error = data['sig_sd'][ix]
 
 
+    #n_params = 8
     n_params = 7
+    #n_params = 6
 
     analyzer = pymultinest.Analyzer(n_params, outputfiles_basename=join(finesse_folder, "full_"))
     post = analyzer.get_equal_weighted_posterior()
 
+    nrows, ncols = post.shape
+    print('Posterior Shape: ({0},{1})'.format(nrows, ncols))
 
-    nrows, ncols = post.shape 
-    print(nrows, ncols)
-    print(len(r))
+    # Unpack posterior into relevant variable names
     L = post[:, 0]#*3
     d = post[:, 1]
     F = post[:, 2]
     A = post[:, 3]
     Arel = post[:, 4]
     Ti = post[:, 5]
-    offset = post[:, 6]
+    #print('****************************')
+    #print('offset set to zero for Cal6')
+    #print('****************************')
+    #offset = post[:, 6]
+    #offset = np.zeros_like(Ti)
+    Brel = post[:, 6]
+    #Brel = post[:, 7]
     amp = [Arel*A, A]
     temps = [0.025, Ti]
-    V = [0.0, 0.0]
+    V = [0.0, 0.0, 0.0]
 
     npts=nrows
     i = np.random.choice(nrows, size=npts)
@@ -213,8 +221,12 @@ def check_full_solver(finesse_folder):
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures_map = {}
         for j, idx in enumerate(i):
-            fut = executor.submit(forward_model_wrapper, r, L[idx], d[idx], F[idx], w0, mu,
-                    [Arel[idx]*A[idx], A[idx]], [0.025, Ti[idx]], V, offset[idx], nlambda=2000)
+            fut = executor.submit(forward_model_wrapper, r, L[idx], d[idx],
+                    F[idx], w0, mu,[Arel[idx]*A[idx], A[idx], Brel[idx]*A[idx]],
+                    [0.085, Ti[idx], 0.085], V, 0.0, nlambda=2000)
+            #fut = executor.submit(forward_model_wrapper, r, L[idx], d[idx],
+            #        F[idx], w0, mu,[Arel[idx]*A[idx], A[idx]],
+            #        [0.085, Ti[idx]], V, 0.0, nlambda=2000)#offset[idx], nlambda=2000)
             futures_map[fut] = j
         for future in concurrent.futures.as_completed(futures_map):
             idx = futures_map[future]
@@ -222,32 +234,63 @@ def check_full_solver(finesse_folder):
 
     val_mean = np.nanmean(vals, axis=0)
     val_std = np.nanstd(vals, axis=0)
-    #vals = offset_forward_model(r, L, d, F, list(w0), list(mu), amp, temps, V, nlambda=2000)
 
-    test = forward_model(r, 150.0/0.004, 0.88, 20.7, w0, mu, [0.5*1000.0, 1000.0], [0.025, 0.1], [0.0, 0.0])
+    output_fit = {'r': r, 'sig': val_mean}
+    io.dict_2_h5(join(finesse_folder, "fit_data.h5"), output_fit)
 
     plot_folder = join(finesse_folder, 'Plots')
     io.prep_folder(plot_folder)
 
-    fig, ax = plt.subplots()
+    # idx = np.random.choice(post.shape[0])
+    # L = post[idx, 0]#*3
+    # d = post[idx, 1]
+    # F = post[idx, 2]
+    # A = post[idx, 3]
+    # Arel = post[idx, 4]
+    # Ti = post[idx, 5]
+    # offset = post[idx, 6]
+    # #offset = 0.0
+    # d += 487.98634e-6 / 2.0 # Move d by one order
+    
+    #test_model = forward_model_wrapper(r, L, d, F, w0, mu, [Arel*A, A], [0.085, Ti], V, offset, nlambda=2000)
+
+    ###################### 
+    ###  Plot Results  ###
+    ###################### 
+
+    # Fit Plot
+    fig, ax = plt.subplots(figsize=(12,8))
     ax.errorbar(data['r'], data['sig'], yerr=data['sig_sd'], label='data', color='C1')
-    #ax.fill_between(r, val_mean-val_std, val_mean+val_std, color='C0', alpha=0.6)
     ax.fill_between(r, np.min(vals, axis=0), np.max(vals, axis=0), color='C0', alpha=0.6)
     ax.plot(r, val_mean, 'C0', label='fit')
-    ax.plot(r, test, 'C2', label='Truth')
-    ax.legend()
+   # ax.plot(r, test_model, 'C4', label='d+1order')
+    ax.legend(fontsize=16)
+    ax.set_xlabel("R (px)", fontsize=16)
+    ax.set_ylabel("Counts", fontsize=16)
+    ax.tick_params(labelsize=16)
+    ax.set_xlim(r.min()*0.9, r.max()*1.1)
+    plt.show()
+    
+    idx = np.abs(r - 640).argmin()
+    fig, ax = plt.subplots()
+    ax.hist(vals[:, idx], bins='auto')
     plt.show()
 
-    pk = peak_calculator(L, d, w0[1], order=0)
+    labels = ["L", "d", "F", "A", "Arel", "Ti"]#, 'Offset', "Brel"]
+    fac = [0.004, 1.0, 1.0, 1.0, 1.0, 1.0, ]#1.0, 1.0]
 
-    labels = ["L", "d", "F", "A", "Arel", "Ti", 'Offset']
-    fac = [0.004, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    #  Use lambda / 10 for a bin size 
     dbins = (np.max(d)-np.min(d)) / (488e-6/10)
+    print(np.min(d), np.max(d))
     dbins = int(dbins)
-    if dbins < 10:
+    print('dbins', dbins)
+    #dbins = 100
+    if dbins < 2:
         dbins = 50
-    bins = ['auto', dbins, 'auto', 'auto', 'auto', 'auto', 'auto']
-    fnames = ["{}_marginal.png".format(x) for x in ('L', 'd', 'F', 'A', 'Arel', "Ti", 'Offset')]
+    print(dbins)
+    # 1D Marginal Distributions
+    bins = ['auto', dbins, 'auto', 'auto', 'auto', 'auto', ]#'auto', 'auto']
+    fnames = ["{}_marginal.png".format(x) for x in ('L', 'd', 'F', 'A', 'Arel', "Ti")]#, 'Offset', 'Brel')]
     for idx, label in enumerate(labels):
         print(label, ": ", np.nanmean(post[:, idx]*fac[idx]))
         fig, ax = plt.subplots()
@@ -260,7 +303,7 @@ def check_full_solver(finesse_folder):
     fontsize=16
     for i, xlabel in enumerate(labels):
         for j in range(i+1, 6):
-            fname = "{0}_{1}_joint_marginal_dist.png".format(xlabel, labels[j])
+            fname = "{0}_{1}_joint_marginal_dist.pdf".format(xlabel, labels[j])
             fig, ax = plt.subplots()
             cb = plotting.my_hist2d(ax, post[:, i]*fac[i], post[:, j]*fac[j])  
             cb.ax.tick_params(labelsize=fontsize)
@@ -268,9 +311,10 @@ def check_full_solver(finesse_folder):
             ax.set_ylabel(xlabel, fontsize=fontsize)
             ax.tick_params(labelsize=fontsize)
             fig.tight_layout()
-            fig.savefig(join(plot_folder, fname))
-            plt.show(block=False)
-    plt.show()
+            fig.savefig(join(plot_folder, fname), transparent=True)
+            plt.close(fig)
+            #plt.show(block=False)
+    #plt.show()
 
 
 def forward_model_wrapper(r, L, d, F, w0, mu, amp, temps, V, offset, nlambda=2000):

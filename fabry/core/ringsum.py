@@ -16,6 +16,15 @@ Functions:
     new_ringsum: best ringsum to use currently
 """
 
+def quick_gaussian_peak_finder(x, y):
+
+        i_max = y.argmax()
+        sl = slice(i_max-10, i_max+11)
+        p0 = np.polyfit(x[sl], np.log(y[sl]), 2)
+
+        return -p0[1] / p0[0] / 2.0
+
+
 
 def get_bin_edges(dat, x0, y0, binsize=0.1):
     """Returns equal area annuli bins for a ring image given a center and binsize
@@ -51,7 +60,7 @@ def get_bin_edges(dat, x0, y0, binsize=0.1):
 
 
 def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, plotit=False, block_center=False,
-                  printit=True):
+                  printit=False):
     """
     Finds the center of a ring pattern image by preforming ringsums.
 
@@ -84,107 +93,129 @@ def locate_center(data_in, xguess=None, yguess=None, maxiter=25, binsize=0.1, pl
     else:
         data = data_in
 
-    line1 = None
-    line2 = None
-    fig = None
-    ax = None
+    #line1 = None
+    #line2 = None
+    #fig = None
+    #ax = None
 
-    if plotit:
-        plt.ion()
-        fig, ax = plt.subplots()
+    #if plotit:
+    #    plt.ion()
+    #    fig, ax = plt.subplots()
 
-    if printit:
-        print("Center finding:")
-        print("start x0: {0} y0: {1}".format(xguess, yguess))
+    #if printit:
+    #    print("Center finding:")
+    #    print("start x0: {0} y0: {1}".format(xguess, yguess))
 
     for ii in range(maxiter):
         binarr, ULsigarr, URsigarr, BLsigarr, BRsigarr = ringsum(data, xguess, yguess, binsize=binsize, quadrants=True)
+        ULsigarr /= ULsigarr.max()
+        URsigarr /= URsigarr.max()
+        BLsigarr /= BLsigarr.max()
+        BRsigarr /= BRsigarr.max()
 
-        thres = 0.3 * np.max(ULsigarr + URsigarr)
-        i = np.where(ULsigarr + URsigarr > thres)[0]
+        left =  ULsigarr / ULsigarr.max() + BLsigarr / BLsigarr.max()
+        right = URsigarr / URsigarr.max() + BRsigarr / BRsigarr.max()
+        rL = quick_gaussian_peak_finder(binarr, left)
+        rR = quick_gaussian_peak_finder(binarr, right)
 
-        # A cheat if the i goes to the edge of the array.  Makes sliding them past each other hard
-        if len(ULsigarr) - i.max() < 60:
-            i = i[0:-50]
-        ni = len(i)
+        up =   ULsigarr / ULsigarr.max() + URsigarr / URsigarr.max()
+        down = BLsigarr / BLsigarr.max() + BRsigarr / BRsigarr.max()
+        rU = quick_gaussian_peak_finder(binarr, up)
+        rD = quick_gaussian_peak_finder(binarr, down)
 
-        ns = 25
-        # ns = 13
-        sarr = 2 * np.arange(-ns, ns + 1, 1)
-        sarr_max = np.max(sarr)
-        UB = np.zeros(len(sarr))
-        RL = np.zeros(len(sarr))
+        dx = (rL-rR)/2.0
+        xguess -= dx #(rL - rR)/2.0
 
-        for idx, ix in enumerate(sarr):
-            UB[idx] = np.sum((ULsigarr[i - ix] + URsigarr[i - ix] - BLsigarr[i] - BRsigarr[i]) ** 2) / (
-                    1.0 * ni - np.abs(ix))
-            RL[idx] = np.sum((URsigarr[i - ix] + BRsigarr[i - ix] - ULsigarr[i] - BLsigarr[i]) ** 2) / (
-                    1.0 * ni - np.abs(ix))
-        RLfit = np.polyfit(sarr, RL, 2)
-        UBfit = np.polyfit(sarr, UB, 2)
+        dy = (rU - rD)/2.0
+        yguess -= dy #(rU - rD)/2.0
+        if printit:
+            print("Delta x={0:.4f}  Delta y={1:.4f}".format(-dx, -dy))
+        # thres = 0.3 * np.max(ULsigarr + URsigarr)
+        # i = np.where(ULsigarr + URsigarr > thres)[0]
 
-        """
-        The logic for the center jump is matching A(x-x0)^2 = C0 x^2 + C1 x + C2
-        x0 = - C1 / (2 C0)
-        """
-        if RLfit[0] < 0.0:
-            # Concave down fit
-            RLcent = -2 * np.max(sarr) * np.sign(RLfit[1])
-        else:
-            # concave up
-            RLcent = -RLfit[1] / (2 * RLfit[0])
+        # # A cheat if the i goes to the edge of the array.  Makes sliding them past each other hard
+        # if len(ULsigarr) - i.max() < 60:
+        #     i = i[0:-50]
+        # ni = len(i)
 
-        # Dont jump fartther than max(sarr)
-        if np.abs(RLcent) > sarr_max:
-            RLcent = np.sign(RLcent) * np.max(sarr)
+        # ns = 25
+        # # ns = 13
+        # sarr = 2 * np.arange(-ns, ns + 1, 1)
+        # sarr_max = np.max(sarr)
+        # UB = np.zeros(len(sarr))
+        # RL = np.zeros(len(sarr))
 
-        if UBfit[0] < 0.0:
-            # concave down
-            UBcent = -2 * np.max(sarr) * np.sign(UBfit[1])
-        else:
-            # concave up
-            UBcent = -UBfit[1] / (2 * UBfit[0])
+        # for idx, ix in enumerate(sarr):
+        #     UB[idx] = np.sum((ULsigarr[i - ix] + URsigarr[i - ix] - BLsigarr[i] - BRsigarr[i]) ** 2) / (
+        #             1.0 * ni - np.abs(ix))
+        #     RL[idx] = np.sum((URsigarr[i - ix] + BRsigarr[i - ix] - ULsigarr[i] - BLsigarr[i]) ** 2) / (
+        #             1.0 * ni - np.abs(ix))
+        # RLfit = np.polyfit(sarr, RL, 2)
+        # UBfit = np.polyfit(sarr, UB, 2)
 
-        # Dont jump fartther than max(sarr)
-        if np.abs(UBcent) > sarr_max:
-            UBcent = np.sign(UBcent) * np.max(sarr)
+        # """
+        # The logic for the center jump is matching A(x-x0)^2 = C0 x^2 + C1 x + C2
+        # x0 = - C1 / (2 C0)
+        # """
+        # if RLfit[0] < 0.0:
+        #     # Concave down fit
+        #     RLcent = -2 * np.max(sarr) * np.sign(RLfit[1])
+        # else:
+        #     # concave up
+        #     RLcent = -RLfit[1] / (2 * RLfit[0])
 
-        if False:  # ~np.isfinite(RLcent):
-            xguess -= binsize
-        else:
-            xguess -= RLcent * binsize
+        # # Dont jump fartther than max(sarr)
+        # if np.abs(RLcent) > sarr_max:
+        #     RLcent = np.sign(RLcent) * np.max(sarr)
 
-        if False:  # ~np.isfinite(UBcent):
-            yguess += binsize
-        else:
-            yguess += UBcent * binsize
+        # if UBfit[0] < 0.0:
+        #     # concave down
+        #     UBcent = -2 * np.max(sarr) * np.sign(UBfit[1])
+        # else:
+        #     # concave up
+        #     UBcent = -UBfit[1] / (2 * UBfit[0])
+
+        # # Dont jump fartther than max(sarr)
+        # if np.abs(UBcent) > sarr_max:
+        #     UBcent = np.sign(UBcent) * np.max(sarr)
+
+        # if False:  # ~np.isfinite(RLcent):
+        #     xguess -= binsize
+        # else:
+        #     xguess -= RLcent * binsize
+
+        # if False:  # ~np.isfinite(UBcent):
+        #     yguess += binsize
+        # else:
+        #     yguess += UBcent * binsize
 
         if printit:
             print("{2:d}, update x0: {0}, y0: {1}".format(xguess, yguess, ii))
 
-        if plotit:
-            if line1 is not None:
-                line1.set_data(sarr, UB)
-            else:
-                line1, = ax.plot(sarr, UB, 'r', lw=1, label='UD')
+        # if plotit:
+        #     if line1 is not None:
+        #         line1.set_data(sarr, UB)
+        #     else:
+        #         line1, = ax.plot(sarr, UB, 'r', lw=1, label='UD')
 
-            if line2 is not None:
-                line2.set_data(sarr, RL)
-            else:
-                line2, = ax.plot(sarr, RL, 'b', lw=1, label='RL')
+        #     if line2 is not None:
+        #         line2.set_data(sarr, RL)
+        #     else:
+        #         line2, = ax.plot(sarr, RL, 'b', lw=1, label='RL')
 
-            if ii == 0:
-                ax.legend()
+        #     if ii == 0:
+        #         ax.legend()
 
-            fig.canvas.draw()
-            plt.pause(1.0)
+        #     fig.canvas.draw()
+        #     plt.pause(1.0)
 
-        if np.sqrt((UBcent * binsize) ** 2 + (RLcent * binsize) ** 2) / binsize < 0.1:
+        #if np.sqrt((UBcent * binsize) ** 2 + (RLcent * binsize) ** 2) / binsize < 0.1:
+        if np.sqrt(dx**2 + dy**2) < binsize * 0.2:
             break
 
-    if plotit:
-        plt.close(fig)
-        plt.ioff()
+    # if plotit:
+    #     plt.close(fig)
+    #     plt.ioff()
 
     return xguess, yguess
 
@@ -353,7 +384,7 @@ def _ringsum(redges, radii, data, out=None, label=None, use_weighted=False, remo
             else:
                 means[idx] = np.mean(d[portion][good_pixels])
                 # print(len(d[portion]), len(d[portion][good_pixels]))
-                if idx == 700:
+                if False:#idx == 700:
                     print(edge)
                     fig, ax = plt.subplots()
                     ax.hist(d[portion], bins='auto')
@@ -365,6 +396,7 @@ def _ringsum(redges, radii, data, out=None, label=None, use_weighted=False, remo
         lengths[idx] = len(d[portion])
         start += iedge
 
+    #print(len(d[portion]))
     if out and label:
         out.put((label, means, sigmas))
     else:

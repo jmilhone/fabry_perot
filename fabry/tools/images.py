@@ -11,6 +11,20 @@ import matplotlib.pyplot as plt
 
 image_readers = []
 
+def retrieve_color_section(image, color):
+    if color is None or len(image.shape) == 2:
+        a = image
+    elif color.lower() in ['r', 'red']:
+        a = image[:, :, 0]
+    elif color.lower() in ['g', 'green']:
+        a = image[:, :, 1]
+    elif color.lower() in ['b', 'blue']:
+        a = image[:, :, 2]
+    else:
+        raise ValueError('not a valid color choice')
+ 
+    return a
+
 
 def register_reader(reader_func):
     """Decorator for registering functions as image readers
@@ -33,27 +47,35 @@ def check_nef(filename):
 
 
 @register_reader
-def read_tiff(fname):
+def read_tiff(fname, **kwargs):
     """Reads .tif file
 
     Args:
-        fname (str) filename to read
-
+        fname (str): filename to read
+        image_idx (int): image idx to read from tiff stack
+        return_mean (bool): returns the mean over the tiff stack, overrides image_idx
     Returns:
         np.ndarray: 2d image data, 3d if stack, first dimension being the stack
     """
     if path.splitext(fname)[-1].lower() == '.tif':
         image = io.imread(fname, plugin='tifffile')
-        #print(image)
         if len(image.shape) == 3:
-            print('temporarily averaging over the stack')
-            sigma = np.std(image, axis=0)
-            image = np.mean(image, axis=0)
-            print(sigma.shape)
-            fig, ax = plt.subplots()
-            im = ax.imshow(sigma)# / image * 100)
-            fig.colorbar(im)
-            plt.show()
+            idx = kwargs.get('image_index', None)
+            return_mean = kwargs.get('return_mean', None)
+
+            if return_mean:
+                image = np.mean(image, axis=0)
+            elif idx is not None:
+                image = image[idx, : , :]
+
+            #print('temporarily averaging over the stack')
+            #sigma = np.std(image, axis=0)
+            #image = np.mean(image, axis=0)
+            #print(sigma.shape)
+            #fig, ax = plt.subplots()
+            #im = ax.imshow(sigma)# / image * 100)
+            #fig.colorbar(im)
+            #plt.show()
             #print('temporarily taking the first image in the stack')
             #image = image[0, :, :]
             #print('temporarily taking the third image in the stack')
@@ -63,7 +85,7 @@ def read_tiff(fname):
 
 
 @register_reader
-def read_nef(fname):
+def read_nef(fname, **kwargs):
     """Reads .nef image files
 
     Args:
@@ -72,18 +94,21 @@ def read_nef(fname):
     Returns:
         np.ndarray: 2d image data
     """
+    color = kwargs.get('color', None)
     if path.splitext(fname)[-1].lower() == '.nef':
         image = rawpy.imread(fname)
         data = image.postprocess(demosaic_algorithm=rawpy.DemosaicAlgorithm.LINEAR,
                                  output_color=rawpy.ColorSpace.raw, output_bps=16, no_auto_bright=True,
                                  adjust_maximum_thr=0., gamma=(1, 1)).astype('float64')
+        if color is not None:
+            data = retrieve_color_section(data, color)
         return data
     else:
         return None
 
 
 @register_reader
-def read_npy(fname):
+def read_npy(fname, **kwargs):
     """Reads numpy binary files
 
     Args:
@@ -94,22 +119,29 @@ def read_npy(fname):
     """
     if path.splitext(fname)[-1].lower() == ".npy":
         data = np.load(fname)
+        color = kwargs.get('color', None)
+        if color is not None:
+            data = retrieve_color_section(data, color)
         return data
     else:
         return None
 
 
 @register_reader
-def read_h5(fname):
+def read_h5(fname, **kwargs):
     if path.splitext(fname)[-1].lower() in [".h5", ".hdf5"]:
         data = file_io.h5_2_dict(fname)
         data = data.get('image', None)
-        return data.astype(np.float64)
+        data.astype(np.float64)
+        color = kwargs.get('color', None)
+        if color is not None:
+            data = retrieve_color_section(data, color)
+        return data
     else:
         return None
 
 
-def get_data(filename, color=None):
+def get_data(filename, color=None, image_index=None, return_mean=False):
     """Reads image data from filename
 
     Args:
@@ -120,7 +152,8 @@ def get_data(filename, color=None):
         np.ndarray: 2d image data
     """
     for reader in image_readers:
-        image = reader(filename)
+        image = reader(filename, color=color, image_index=image_index, 
+                return_mean=return_mean)
         if image is not None:
             break
     else:
@@ -130,18 +163,7 @@ def get_data(filename, color=None):
         # Ignore color propery for tif files
         return image
 
-    if color is None or len(image.shape) == 2:
-        a = image
-    elif color.lower() in ['r', 'red']:
-        a = image[:, :, 0]
-    elif color.lower() in ['g', 'green']:
-        a = image[:, :, 1]
-    elif color.lower() in ['b', 'blue']:
-        a = image[:, :, 2]
-    else:
-        raise ValueError('not a valid color choice')
-
-    return a
+    return image
 
 
 def get_metadata(filename):

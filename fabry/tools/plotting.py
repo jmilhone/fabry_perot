@@ -260,6 +260,7 @@ def ring_plot(data, fax=None, block=True):
         fig, ax = fax
 
     cb = ax.imshow(data, cmap='Greys_r', origin='lower', interpolation=None)
+    #cb = ax.imshow(data, cmap='Greys_r', interpolation=None)
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='5%', pad=0.05)
     fig.colorbar(cb, cax=cax, extend='max')

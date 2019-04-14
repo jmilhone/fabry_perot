@@ -22,7 +22,7 @@ def calculate_profile_model(r, L, d, F, cube, impact_factor, w0, mu, nr, nlambda
 def const_model(r, L, d, F, w0, mu, cube, nlambda):
     #vals = models.forward_model(r, L, d, cube[3], w0, mu, cube[1], cube[0], cube[2], nlambda=nlambda)
     vals = models.forward_model(r, L, d, F, w0, mu, cube[1], cube[0], cube[2], nlambda=nlambda)
-    vals += cube[3]
+    #vals += 2.7#cube[3]
     return vals
 
 
@@ -231,23 +231,24 @@ def check_profile_solver(output_folder, Fpost, Lpost, dpost):
 
 
 
-def check_constV_solver(output_folder, Fpost, Lpost, dpost, use_plasma_F=True):
+def check_constV_solver(output_folder, Fpost, Lpost, dpost, use_plasma_F=False):
     data_filename = path.join(output_folder, "argon_input.h5")
     data = file_io.h5_2_dict(data_filename)
 
     ix = data['fit_ix']['0']#[0:-1:2]
-    r = data['r'][ix]
-    sig = data['sig'][ix]
-    error = data['sig_sd'][ix]
+    r = data['r']#[ix]
+    sig = data['sig']#[ix]
+    error = data['sig_sd']#[ix]
 
     nL = len(Lpost)
     nF = len(Fpost)
-
+    print('F mean', np.mean(Fpost))
     if use_plasma_F:
         n_params = 4
     else:
         n_params = 4
-
+    #n_params = 3
+    n_params = 4
     # useful things that I used to make synthetic image but not part of the solver
     nlambda = 2000
 
@@ -261,27 +262,30 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost, use_plasma_F=True):
     idx_L = np.random.choice(nL, size=n_samples)
     # idx_F = np.random.choice(nF, size=n_samples)
 
-    L_sampled = Lpost[idx_L]*3
+    L_sampled = Lpost[idx_L]#*3
     print(L_sampled.min(), L_sampled.max())
     d_sampled = dpost[idx_L]
-    # F_sampled = Fpost[idx_F]
+    F_sampled = Fpost[idx_L]
+    #F_sampled = Fpost[idx_F]
 
     idx_cube = np.random.choice(nrows, size=n_samples)
     cubes = post[idx_cube, :]
 
-    if use_plasma_F:
+    if False:#use_plasma_F:
         #F_folder = "/home/milhone/Research/python_FabryPerot/Data/PCX/2158/"
         #Fpost = np.loadtxt(path.join(F_folder, 'Ti_constV_post_equal_weights.dat'), ndmin=2)[:,3] 
-        F_folder = "/home/milhone/Research/python_FabryPerot/Data/2018_10_28/"
-        Fpost = np.loadtxt(path.join(F_folder, 'full_post_equal_weights.dat'), ndmin=2)[:,2]
+        #F_folder = "/home/milhone/Research/python_FabryPerot/Data/2018_10_28/"
+        #Fpost = np.loadtxt(path.join(F_folder, 'full_post_equal_weights.dat'), ndmin=2)[:,2]
         nF = len(Fpost)
         idx_F = np.random.choice(nF, size=n_samples)
         F_sampled = Fpost[idx_F]
     else:
-        F_sampled = cubes[:, 3]
+        pass
+        #F_sampled = cubes[:, 3]
 
 
-    vals = np.zeros((n_samples, len(r)))
+    rr = np.linspace(400, 850, 1000)
+    vals = np.zeros((n_samples, len(rr)))
     # Calculate the model values for all of the samples 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         # submit all of the calcultions to the executor and map to their index
@@ -291,17 +295,17 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost, use_plasma_F=True):
             # d = 0.876551993778090566E+00
             # F = 0.205637295793309107E+02
         #for j, (L, d, cube) in enumerate(zip(L_sampled, d_sampled, cubes)):
-            fut = executor.submit(const_model, r, L, d, F, w0, mu, cube, nlambda)
+            fut = executor.submit(const_model, rr, L, d, 22.7, w0, mu, cube, nlambda)
             #fut = executor.submit(models.forward_model, r, L, d, F, w0, mu, cube[1], cube[0], cube[2], nlambda=nlambda)
             futures_map[fut] = j
 
         # grab the results from completed futures and store in vals
         for future in concurrent.futures.as_completed(futures_map):
             index = futures_map[future]
-            vals[index, :] = future.result()
+            vals[index, :] = future.result() + cubes[index, 3]
     val_mean = np.nanmean(vals, axis=0)
     imax = np.argmax(val_mean)
-    print(r[imax])
+    #print(r[imax])
 
     # val_std = np.nanstd(vals, axis=0)
     mytest = const_model(r, 0.125379300991324253E+05, 0.879962652610075002E+00,
@@ -315,7 +319,7 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost, use_plasma_F=True):
     fig, ax = plt.subplots(figsize=(figsize, figsize/1.618))
     ax.errorbar(r, sig, yerr=error, label='Data', color='C1', errorevery=10, lw=1)
     print(r.shape)
-    ax.fill_between(r, np.min(vals, axis=0), np.max(vals, axis=0), color='C0', alpha=0.6, label='Model', hatch='//')
+    ax.fill_between(rr, np.min(vals, axis=0), np.max(vals, axis=0), color='C0', alpha=0.6, label='Model', hatch='//')
     #ax.plot(r, val_mean, color='C0', label='Model')
     #ax.plot(r, mytest, 'k')
     ax.legend(fontsize=fontsize)
@@ -341,6 +345,7 @@ def check_constV_solver(output_folder, Fpost, Lpost, dpost, use_plasma_F=True):
         fnames.append("F_marginal_vel_profile.png")
 
     for idx, (xlabel, ylabel, factor) in enumerate(zip(xlabels, ylabels, factors)):
+        print(np.mean(post[:,idx])*factor, np.std(post[:,idx])*factor)
         fig, ax = plt.subplots(figsize=(figsize, figsize/1.618))
         plotting.my_hist(ax, post[:, idx]*factor, bins='auto')
         ax.set_xlabel(xlabel, fontsize=fontsize)
