@@ -145,7 +145,7 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
                     return_mean=return_tiff_mean, image_index=tiff_image_idx)
             if npix > 1:
                 bgdata = ringsum.super_pixelate(bgdata, npix=npix)
-        _, bg,bg_sd = ringsum.ringsum(bgdata,x0,y0, use_weighted=False, binsize=binsize)
+        _, bg,bg_sd = ringsum.ringsum(bgdata,x0,y0, use_weighted=False, binsize=binsize, remove_hot_pixels=True)
         sig = sig0 - bg
         sig_sd = np.sqrt(sig0_sd**2+bg_sd**2)
     else:
