@@ -96,17 +96,17 @@ if __name__ == "__main__":
     if rank == 0:
         end_time = time.time()
         print("Total Time Elasped: {} minutes".format((end_time - start_time) / 60.0))
-        # if solver_in['filter'] == 'argon':
-        #     #from fabry.finesse.check_argon_solver import check_solver, check_full_solver
+        if solver_in['filter'] == 'argon':
+            from fabry.finesse.check_argon_solver import check_solver, check_full_solver
         #     pass
         # elif solver_in['filter'] == 'helium':
         #     print("still working on implementing the helium check solver")
-        # else:
-        #     print("No idea how you got here...")
-        #     sys.exit(1)
+        else:
+            print("No idea how you got here...")
+            sys.exit(1)
 
         #check_solver(solver_in['out_folder'], solver_in['Lpost'], solver_in['dpost'])
-        #check_full_solver(solver_in['out_folder'])
+        check_full_solver(solver_in['out_folder'])
 
     # folder = "../Data/2018_04_23/Argon3"
 

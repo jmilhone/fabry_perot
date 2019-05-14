@@ -91,7 +91,7 @@ if __name__ == "__main__":
     r = data['r']
     sig = data['sig']
     #data['sig_sd'] = np.sqrt(data['sig_sd']**2 + (0.02*sig)**2) # this is the error contribution from the center error
-    #data['sig_sd'] = np.sqrt(data['sig_sd']**2 + (0.01*sig)**2) # this is the error contribution from the center error
+    data['sig_sd'] = np.sqrt(data['sig_sd']**2 + (0.005*sig)**2) # this is the error contribution from the center error
     
     #ix = get_fitting_region(r, sig, data['sig_sd'], plot_fit_region=True)['0']
     #print(ix)
