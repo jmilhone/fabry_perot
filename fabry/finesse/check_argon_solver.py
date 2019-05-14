@@ -277,7 +277,8 @@ def check_full_solver(finesse_folder):
     plt.show()
 
     labels = ["L", "d", "F", "A", "Arel", "Ti"]#, 'Offset', "Brel"]
-    fac = [0.004, 1.0, 1.0, 1.0, 1.0, 1.0, ]#1.0, 1.0]
+    #fac = [0.004, 1.0, 1.0, 1.0, 1.0, 1.0, ]#1.0, 1.0]
+    fac = [0.00586, 1.0, 1.0, 1.0, 1.0, 1.0, ]#1.0, 1.0]
 
     #  Use lambda / 10 for a bin size 
     dbins = (np.max(d)-np.min(d)) / (488e-6/10)
