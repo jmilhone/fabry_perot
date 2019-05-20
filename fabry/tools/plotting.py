@@ -1,4 +1,4 @@
-from __future__ import print_function, division
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
@@ -159,9 +159,9 @@ def center_plot(data, x0=None, y0=None):
     fig.colorbar(cb, cax=cax)
     axs[1].imshow(data, cmap='gray', origin='lower')
     axs[1].set_title('Click for center guess')
-    plt.setp(axs[1].spines.values(), color='red')
-    [i.set_linewidth(5) for i in axs[1].spines.itervalues()]
-    [i.set_linestyle('--') for i in axs[1].spines.itervalues()]
+    plt.setp(list(axs[1].spines.values()), color='red')
+    [i.set_linewidth(5) for i in axs[1].spines.values()]
+    [i.set_linestyle('--') for i in axs[1].spines.values()]
     axs[1].set_ylim(y0 - dy, y0 + dy)
     axs[1].set_xlim(x0 - dx, x0 + dy)
 
@@ -220,7 +220,7 @@ def peak_plot(r, sig, peaks, peaks_sd, orders, fax=None, anspks=None, anspks_sd=
     colors = tableau20_colors()
     ax.plot(r ** 2, sig, 'o-', color=colors[0], lw=2)
     i = 1
-    for key in peaks.keys():
+    for key in list(peaks.keys()):
         for j, pk in enumerate(peaks[key]):
             pk_sd = 2. * pk * peaks_sd[key][j] / 2.0  # binwidth / 2.0
             ax.axvspan(pk ** 2 - pk_sd, pk ** 2 + pk_sd, color=colors[i],
