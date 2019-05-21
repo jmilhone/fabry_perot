@@ -24,7 +24,7 @@ def trapezoidal_integration(y, x):
     """
     n = len(x)
     area = 0.0
-    for i in xrange(n - 1):
+    for i in range(n - 1):
         area += (x[i + 1] - x[i]) * (y[i + 1] + y[i])
     return area / 2.0
 

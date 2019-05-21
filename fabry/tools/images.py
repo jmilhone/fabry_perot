@@ -66,7 +66,7 @@ def read_tiff(fname, **kwargs):
             if return_mean:
                 image = np.mean(image, axis=0)
             elif idx is not None:
-                image = image[idx, : , :]
+                image = image[idx, :, :]
 
             #print('temporarily averaging over the stack')
             #sigma = np.std(image, axis=0)

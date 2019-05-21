@@ -10,7 +10,10 @@ from scipy.stats import norm
 
 
 # I should move interpolate_point and check_fwhm to somwhere in the fabry module soon
-def interpolate_point((x1,y1), (x2, y2), thres):
+#def interpolate_point((x1,y1), (x2, y2), thres):
+def interpolate_point(pt1, pt2, thres):
+    x1, y1 = pt1
+    x2, y2 = pt2
     slope = (y2-y1)/(x2-x1)
     offset = y2 - slope*x2
 
@@ -23,18 +26,30 @@ def check_fwhm(r, sig):
     max_locs = []
     for pk in pk_guess:
         indices.append(fitting.determine_fit_range(r**2, sig, pk, thres=0.2))
-
+    my_new_maxes = []
+    my_pk_locations = []
+    my_sigmas = []
     for idx in indices:
         loc = np.argmax(sig[idx])
         loc += idx[0]
         max_locs.append(loc)
 
+        p0 = np.polyfit(r[idx]**2, np.log(sig[idx]), 2)
+        sigma = np.sqrt(-0.5 / p0[0])
+        mu = np.sqrt(-p0[1] / 2 / p0[0])
+        lnA = p0[2] - p0[1]**2 / 4 / p0[0]
+        Amp = np.exp(lnA)
+        print(f"sigma: {sigma}, mu: {mu}, A: {Amp}")
+        my_new_maxes.append(Amp)
+        my_pk_locations.append(mu)
+        my_sigmas.append(sigma)
     right = []
     left = []
     idx_right = []
     idx_left = []
-    for loc in max_locs:
-        half = 0.5 * sig[loc]
+    for j, loc in enumerate(max_locs):
+        # half = 0.5 * sig[loc]
+        half = 0.5 * my_new_maxes[j]
         iR = np.min(np.where(sig[loc:] < half)) + loc
         iL = np.max(np.where(sig[:loc] < half))
         r_sq_L = interpolate_point((r[iL]**2, sig[iL]), (r[iL+1]**2, sig[iL+1]), half)
@@ -48,13 +63,18 @@ def check_fwhm(r, sig):
     print(('Widths (px^2): ', [R-L for (R,L) in zip(right, left)]))
     print([r[loc]**2 for loc in max_locs])
     print(((r[max_locs[1]]**2 - r[max_locs[0]]**2) / (right[0]-left[0])))
+    print((my_pk_locations[1]**2 - my_pk_locations[0]**2) / (right[0]-left[0]))
     fig, ax = plt.subplots()
     ax.plot(r**2/1e6, sig)
-    for L, R in zip(idx_left, idx_right):
+    for idx, (L, R) in enumerate(zip(idx_left, idx_right)):
+        A = my_new_maxes[idx]
+        mu = my_pk_locations[idx]
+        sigma = my_sigmas[idx]
         xx = [r[L], r[R]]
         xx = [temp**2/1e6 for temp in xx]
         yy = [sig[L], sig[L]]
         ax.plot(xx, yy, '-k')
+        ax.plot(r[L:R]**2/1e6, A*np.exp( -(r[L:R]**2 - mu**2)**2/2.0/sigma**2))
         rr = [r[max_locs[0]]**2, r[max_locs[1]]**2]
         rr = [temp/1e6 for temp in rr]
         ss = [sig[max_locs[0]], sig[max_locs[0]]]
@@ -107,6 +127,8 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     bgdata = None
     data = images.get_data(fname, color=color, 
             return_mean=return_tiff_mean, image_index=tiff_image_idx)
+            #return_mean=False, image_index=None)
+    #data = np.sum(data, axis=0)
 
     if npix > 1:
         data = ringsum.super_pixelate(data, npix=npix)
@@ -135,7 +157,7 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
         else:
             y0 = yguess
 
-    print('Performing Annual Sum...')
+    print('Performing Annular Sum...')
     r, sig0,sig0_sd = ringsum.ringsum(data,x0,y0, use_weighted=False, quadrants=False, binsize=binsize, remove_hot_pixels=True)
 
     if bgfname is not None:
@@ -203,11 +225,11 @@ def main(fname, bgfname=None, color='b', binsize=0.1, xguess=None,
     fig.tight_layout()
     #fig.savefig('fp_ringsum_2332.pdf', transparent=True)
     plt.show()
-    # 
-    fig, ax = plt.subplots()
-    ax.plot(r, sig_sd / sig)
-    plt.show()
-    #check_fwhm(r, sig-sig.min())
+    ## 
+    #fig, ax = plt.subplots()
+    #ax.plot(r, sig_sd / sig)
+    #plt.show()
+    check_fwhm(r, sig-sig.min())
     return dic
 
 if __name__ == "__main__":
