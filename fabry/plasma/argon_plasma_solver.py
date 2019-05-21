@@ -396,12 +396,7 @@ def multi_image_solver(output_folder, locs, folders, Lpost, dpost, Fpost, test_p
     else:
         # run multinest
         pymultinest.run(log_likelihood, log_prior, n_params, importance_nested_sampling=False,
-<<<<<<< Updated upstream
-                        resume=resume, verbose=True, sampling_efficiency='model', n_live_points=200,
-                        outputfiles_basename=path.join(output_folder, 'Ti_multi_Lnu_'))
-=======
                         resume=resume, verbose=True, sampling_efficiency='model', n_live_points=600,
                         outputfiles_basename=path.join(output_folder, 'Ti_multi_'))
->>>>>>> Stashed changes
 
 
