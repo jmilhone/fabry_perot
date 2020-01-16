@@ -3,7 +3,7 @@ from collections import Iterable
 import numpy as np
 from scipy.integrate import trapz
 from .zeeman import zeeman_lambda
-from numba import jit
+from numba import jit, generated_jit, types
 import os.path as path
 try:
     import matplotlib.pyplot as plt
@@ -201,66 +201,12 @@ def offset_forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024, sm_ang=
 
 
 @jit
-def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024):
-    """
-    Convolves the Doppler spectrum with the ideal Fabry-Perot Airy function.
+def forward_model_single_w(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024):
 
-    Args:
-        r (np.ndarray): array of r values to compute q on
-        L (float): camera lens focal length, same units as r (pixels or mm)
-        d (float): etalon spacing (mm)
-        F (float): etalon finesse
-        w0 (Union[float, list]): central wavelength(s) in nm
-        mu (Union[float, list]): mass(es) in amu
-        amp (Union[float, list]): amplitude(s) for the lines
-        temp (Union[float, list]): temperature(s) in eV
-        v (Union[float, list]): velocities in m/s
-        nlambda (int): number of points in wavelength array, default=1024
-
-    Returns:
-        np.ndarray: array length of r of forward q
-    """
-    # if type(w0) in [list, tuple]:
-    #    if not all([type(x) in [list,tuple] for x in [mu, amp, temp, v]]):
-    #        raise ValueError('need to have a list for all spec params')
-    #    if not all([len(x) == len(w0) for x in [mu, amp, temp, v]]):
-    #        raise ValueError('spec params are not all the same length')
-    if isinstance(w0, Iterable):
-        # if not all(isinstance(x, Iterable) for x in [mu, amp, temp, v]):
-        #     raise ValueError('Need to have a iterable for all spec params')
-        # if not all(len(x) == len(w0) for x in [mu, amp, temp, v]):
-        #     raise ValueError('spec params are not all the same length')
-
-        sigma = []
-        w = []
-        for i, ww in enumerate(w0):
-            width, new_w = doppler_calc(ww, mu[i], temp[i], v[i])
-            sigma.append(width)
-            w.append(new_w)
-        # wavelength = np.linspace(min(w) - 10.*max(sigma), max(w) + 10.*max(sigma), nlambda)[:,np.newaxis]
-        wavelength = np.linspace(min(w) - 10. * max(sigma), max(w) + 10. * max(sigma), nlambda)  # .reshape(nlambda, 1)
-        spec = 0.0
-        for idx, ww in enumerate(w):
-            spec += gaussian(wavelength, ww, sigma[idx], amp[idx])
-
-    else:
-        # if not all([type(x) not in [list,tuple] for x in [mu, amp, temp, v]]):
-        #    raise ValueError('need to have a list or not for all spec params')
-        # if any(isinstance(x, Iterable) for x in [mu, amp, temp, v]):
-        #     raise ValueError('all spec params must be an instance of Iterable or not an instance, no mixing')
-
-        sigma, w = doppler_calc(w0, mu, temp, v)
-        wavelength = np.linspace(w - 10. * sigma, w + 10. * sigma, nlambda)  # [:,np.newaxis]
-        # wavelength = np.linspace(w - 10.*sigma, w + 10.*sigma, nlambda).reshape(nlambda, 1)
-        spec = gaussian(wavelength, w, sigma, amp)
-
-    # sigma, w = doppler_calc(w0, mu, temp, v)
-    # wavelength = np.linspace(w - 10.*sigma, w + 10.*sigma, nlambda)#[:,np.newaxis]
-    # spec = gaussian(wavelength, w, sigma, amp)
-    # if sm_ang:
-    #    cos_th = 1.0 - 0.5 * (r/L)**2
-    # else:
-    #    cos_th = L / np.sqrt(L**2 + r**2)
+    sigma, w = doppler_calc(w0, mu, temp, v)
+    wavelength = np.linspace(w - 10. * sigma, w + 10. * sigma, nlambda)  # [:,np.newaxis]
+    # wavelength = np.linspace(w - 10.*sigma, w + 10.*sigma, nlambda).reshape(nlambda, 1)
+    spec = gaussian(wavelength, w, sigma, amp)
     cos_th = L / np.sqrt(L ** 2 + r ** 2)
 
     # cos_th = cos_th.reshape((1,len(r)))
@@ -274,6 +220,118 @@ def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024):
         # q[idx] = trapz(spec*airy_func(wavelength, cos, d, F), wavelength)
         model[idx] = trapezoidal_integration(spec * airy_func(wavelength, cos, d, F), wavelength)
     return model
+
+def forward_model_multiple_w(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024):
+    sigma = []
+    w = []
+    for i, ww in enumerate(w0):
+        width, new_w = doppler_calc(ww, mu[i], temp[i], v[i])
+        sigma.append(width)
+        w.append(new_w)
+    # wavelength = np.linspace(min(w) - 10.*max(sigma), max(w) + 10.*max(sigma), nlambda)[:,np.newaxis]
+    wavelength = np.linspace(min(w) - 10. * max(sigma), max(w) + 10. * max(sigma), nlambda)  # .reshape(nlambda, 1)
+    spec = 0.0
+    for idx, ww in enumerate(w):
+        spec += gaussian(wavelength, ww, sigma[idx], amp[idx])
+
+    cos_th = L / np.sqrt(L ** 2 + r ** 2)
+
+    # cos_th = cos_th.reshape((1,len(r)))
+    # cos_th = cos_th[np.newaxis, :]
+
+    # q = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
+    model = np.zeros_like(cos_th)
+
+    for idx, cos in enumerate(cos_th):
+        # print(trapz(spec*airy_func(wavelength, cos, d, F), wavelength).shape)
+        # q[idx] = trapz(spec*airy_func(wavelength, cos, d, F), wavelength)
+        model[idx] = trapezoidal_integration(spec * airy_func(wavelength, cos, d, F), wavelength)
+    return model
+
+
+@generated_jit(nopython=True)
+def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024):
+
+    if isinstance(w0, types.Float):
+        # we only have a single wavelength
+        return forward_model_single_w
+    else:
+        # making a big assumption that this is for multiple wavelengths 
+        return foward_model_multiple_w
+#@jit
+#def forward_model(r, L, d, F, w0, mu, amp, temp, v, nlambda=1024):
+#    """
+#    Convolves the Doppler spectrum with the ideal Fabry-Perot Airy function.
+#
+#    Args:
+#        r (np.ndarray): array of r values to compute q on
+#        L (float): camera lens focal length, same units as r (pixels or mm)
+#        d (float): etalon spacing (mm)
+#        F (float): etalon finesse
+#        w0 (Union[float, list]): central wavelength(s) in nm
+#        mu (Union[float, list]): mass(es) in amu
+#        amp (Union[float, list]): amplitude(s) for the lines
+#        temp (Union[float, list]): temperature(s) in eV
+#        v (Union[float, list]): velocities in m/s
+#        nlambda (int): number of points in wavelength array, default=1024
+#
+#    Returns:
+#        np.ndarray: array length of r of forward q
+#    """
+#    # if type(w0) in [list, tuple]:
+#    #    if not all([type(x) in [list,tuple] for x in [mu, amp, temp, v]]):
+#    #        raise ValueError('need to have a list for all spec params')
+#    #    if not all([len(x) == len(w0) for x in [mu, amp, temp, v]]):
+#    #        raise ValueError('spec params are not all the same length')
+#    if isinstance(w0, Iterable):
+#        # if not all(isinstance(x, Iterable) for x in [mu, amp, temp, v]):
+#        #     raise ValueError('Need to have a iterable for all spec params')
+#        # if not all(len(x) == len(w0) for x in [mu, amp, temp, v]):
+#        #     raise ValueError('spec params are not all the same length')
+#
+#        sigma = []
+#        w = []
+#        for i, ww in enumerate(w0):
+#            width, new_w = doppler_calc(ww, mu[i], temp[i], v[i])
+#            sigma.append(width)
+#            w.append(new_w)
+#        # wavelength = np.linspace(min(w) - 10.*max(sigma), max(w) + 10.*max(sigma), nlambda)[:,np.newaxis]
+#        wavelength = np.linspace(min(w) - 10. * max(sigma), max(w) + 10. * max(sigma), nlambda)  # .reshape(nlambda, 1)
+#        spec = 0.0
+#        for idx, ww in enumerate(w):
+#            spec += gaussian(wavelength, ww, sigma[idx], amp[idx])
+#
+#    else:
+#        # if not all([type(x) not in [list,tuple] for x in [mu, amp, temp, v]]):
+#        #    raise ValueError('need to have a list or not for all spec params')
+#        # if any(isinstance(x, Iterable) for x in [mu, amp, temp, v]):
+#        #     raise ValueError('all spec params must be an instance of Iterable or not an instance, no mixing')
+#
+#        sigma, w = doppler_calc(w0, mu, temp, v)
+#        wavelength = np.linspace(w - 10. * sigma, w + 10. * sigma, nlambda)  # [:,np.newaxis]
+#        # wavelength = np.linspace(w - 10.*sigma, w + 10.*sigma, nlambda).reshape(nlambda, 1)
+#        spec = gaussian(wavelength, w, sigma, amp)
+#
+#    # sigma, w = doppler_calc(w0, mu, temp, v)
+#    # wavelength = np.linspace(w - 10.*sigma, w + 10.*sigma, nlambda)#[:,np.newaxis]
+#    # spec = gaussian(wavelength, w, sigma, amp)
+#    # if sm_ang:
+#    #    cos_th = 1.0 - 0.5 * (r/L)**2
+#    # else:
+#    #    cos_th = L / np.sqrt(L**2 + r**2)
+#    cos_th = L / np.sqrt(L ** 2 + r ** 2)
+#
+#    # cos_th = cos_th.reshape((1,len(r)))
+#    # cos_th = cos_th[np.newaxis, :]
+#
+#    # q = trapz(spec*airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
+#    model = np.zeros_like(cos_th)
+#
+#    for idx, cos in enumerate(cos_th):
+#        # print(trapz(spec*airy_func(wavelength, cos, d, F), wavelength).shape)
+#        # q[idx] = trapz(spec*airy_func(wavelength, cos, d, F), wavelength)
+#        model[idx] = trapezoidal_integration(spec * airy_func(wavelength, cos, d, F), wavelength)
+#    return model
 
 
 def match_finesse_forward(r, L, d, F, temp, v, errtemp=None, w0=487.98634, mu=39.948):
