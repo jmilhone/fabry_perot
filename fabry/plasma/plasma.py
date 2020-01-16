@@ -12,6 +12,28 @@ cx_fits = {40: [0.39004112, -34.24186523],
            4: [0.40712338, -33.82360615],
           }
 
+def pcx_vfd_velocity_profile(r, r_anode, V_max):
+    """Calculates the toroidal velocity profile for VFD on PCX
+
+    Args:
+        r (Union[np.ndarray, float]): radii to calculate profile on
+        r_anode (float): location of anodes, assumed location of peak profile starting
+        V_max (float): maximum velocity at r_anode
+    Returns:
+        np.ndarray: torodial velocity profile as a function of r
+    """
+    x = r / r_anode
+    # numpy array case
+    if isinstance(x, np.ndarray):
+        velocity = np.where(x < 1, V_max*x, V_max)
+        return velocity
+
+    # single r value case
+    if x < 1:
+        return x*V_max
+    else:
+        return V_max
+
 
 def pcx_couette_velocity_profile(r, mom_dif_length, R_inner, R_outer, V_inner, V_outer):
     """Calculates the torodial velocity profile for PCX
@@ -65,7 +87,7 @@ def pcx_velocity_profile(r, mom_dif_length, R_outer, V_outer):
     if isinstance(r, np.ndarray):
         if any(rr > R_outer for rr in r):
             idx = np.where(r > R_outer)
-            vel[idx] = V_outer * np.exp(-(r[idx] - R_outer) ** 2 / 4.0 ** 2)
+            vel[idx] = V_outer # * np.exp(-(r[idx] - R_outer) ** 2 / 4.0 ** 2)
     else:
         if r > R_outer:
             return V_outer * np.exp(-(r - R_outer) ** 2 / 4.0 ** 2)
@@ -86,6 +108,13 @@ def density_profile(r, r_edge, gradient_length_scale):
     """
     x = np.asarray(r)
     return 0.5 * (1.0 - np.tanh((x - r_edge) / gradient_length_scale))
+
+
+def vfd_density_profile(r, r_anode):
+    offset = 0.2
+    density = 0.85*(1.0 - (r/r_anode)**1.6)**2 + offset
+    density = np.where(r > r_anode, offset, density)
+    return density
 
 
 def calculate_r_theta_x_from_impact_factor(impact_factor, rmax=150.0, npts=101):
@@ -149,7 +178,11 @@ def calculate_pcx_chord_emission(impact_factor, Ti, w0, mu, Lnu, Vouter, rmax=40
         tuple: (np.ndarray, np.ndarray) wavelength and spectrum
     """
     r, theta, x = calculate_r_theta_x_from_impact_factor(impact_factor, rmax=rmax, npts=nr)
+    #print('using vfd velocity profile')
+    #vel = pcx_vfd_velocity_profile(r, 32.0, Vouter)
     vel = pcx_velocity_profile(r, Lnu, R_outer, Vouter)
+
+
     # fig, ax = plt.subplots()
     # ax.plot(r, vel)
     # plt.show()
@@ -168,16 +201,22 @@ def calculate_pcx_chord_emission(impact_factor, Ti, w0, mu, Lnu, Vouter, rmax=40
     # ax.plot(vel_adjusted, w_shifts)
     # plt.show()
 
-    dens = density_profile(r, rmax, Lne)
+    #dens = density_profile(r, rmax, Lne)
+    #dens = dens[:, np.newaxis]
+    dens = vfd_density_profile(r, 32.0)
     dens = dens[:, np.newaxis]
+    #print('removing density profile')
+    #dens = 1.0
 
     full_spectrum *= dens ** 2
 
-    # fig, ax = plt.subplots()
-    # for idx, spec in enumerate(full_spectrum):
-    #    ax.plot(wavelength, spec, 'C0')
-    #    ax.axvline(w_shifts[idx], color='C1')
-    # plt.show()
+    #fig, ax = plt.subplots(figsize=(12,9))
+    #for idx, spec in enumerate(full_spectrum):
+    #   ax.plot(wavelength, spec)#, 'C0')
+    #   # ax.axvline(w_shifts[idx], color='C1')
+    #ax.axvline(w0, color='k')
+    #ax.set_xlim(488-0.03, 488)
+    #plt.show()
 
     # print(full_spectrum.shape)
     spectrum = np.trapz(full_spectrum, x=x, axis=0)
