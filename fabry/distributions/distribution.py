@@ -22,7 +22,7 @@ def LogUniformPrior(cube, a, b):
     :returns: Maps cube in [0,1] to [a,b] with a LogUniform distribution
     """
 
-    return 10.0**Uniform(cube, a, b)
+    return 10.0**UniformPrior(cube, a, b)
 
 
 def NormalPrior(cube, mu, sigma):

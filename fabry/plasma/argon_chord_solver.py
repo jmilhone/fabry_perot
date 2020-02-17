@@ -82,9 +82,10 @@ def chop_down_to_fit_range(r, signal, std, fit_range):
     return r[sl], signal[sl], std[sl]
 
 
-def pcx_vfd_model(r, b, Ti_params, V_params, ne_params, delta_d, amp, L, d, F):
+def pcx_vfd_model(r, b, Ti_params, V_params, ne_params, delta_d, amp, L, d, F, rmax=40.0):
+
     w_model, radiance_model = plasma.vfd_chord(b, Ti_params, V_params, ne_params,
-            rmax=40.0, w0=w0, mu=mu, nr=101, nlambda=2048, test_plot=False)
+            rmax=rmax, w0=w0, mu=mu, nr=101, nlambda=2048, test_plot=False)
 
     model_signal = amp*models.general_model(r, L, d+delta_d, F, w_model, radiance_model)
     return model_signal
@@ -94,7 +95,7 @@ def calculate_delta_d(velocity_offset):
 
 # def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior, config_name,  image_index=4, resume=True, test_plot=False):
 def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior, 
-        config_name,  image_data, image_index=4, resume=True, test_plot=False):
+        config_name,  image_data, resume=True, test_plot=False):
     """Runs MultiNest solver for multiple chords in a PCX Ar plasma with a fixed Lnu.
 
     :param str output_folder: output folder to store multinest files
@@ -149,13 +150,13 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
             # model_signal = models.general_model(rr, L, d, F, wavelength, emission)
             # model_signal = cube[i+2] * model_signal
 
-            Ti_params = [cube[0], cube[1])
-            V_params = [cube[2], 50.0, 32.0]
-            ne_params = [32.0, ]
+            Ti_params = [cube[0], cube[1]]
+            V_params = [cube[2], rmax, r_anode]
+            ne_params = [r_anode, ]
             delta_d = calculate_delta_d(v_offset)
             amp = cube[i+3]
-            model_signal = pcx_vfd_model(r, loc, Ti_params, V_params, ne_params, delta_d, amp, L, d, F):
-            chisq += np.sum((model_signal-ss)**2 / std**2)
+            mod_signal = pcx_vfd_model(rr, loc, Ti_params, V_params, ne_params, delta_d, amp, L, d, F, rmax=rmax)
+            chisq += np.sum((mod_signal-ss)**2 / std**2)
 
             i+=1
 

@@ -184,7 +184,7 @@ def main():
                         'calib_posterior': calib_posterior,
                         'restart': restart,
                         'config_name': config_name,
-                        'image_index': args.image_index,
+                        # 'image_index': args.image_index,
                         'r': r,
                         'sig': sig,
                         'sd': sd,
@@ -204,19 +204,18 @@ def main():
         calib_posterior = solver_input['calib_posterior']
         restart = solver_input['restart']
         config_name = solver_input['config_name']
-        image_index = solver_input['image_index']
+        # image_index = solver_input['image_index']
 
         image_data = (solver_input['r'], solver_input['sig'], solver_input['sd'], solver_input['impact_factors'])
         # run the solver here
         start_time = time.time()
         print("solving...")
-        acs.argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
-                config_name, image_data, image_index=image_index, resume=not restart,
-                test_plot=False)
+        acs.argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior, config_name, image_data,
+                                               resume=not restart, test_plot=False)
         end_time = time.time()
 
     if rank == 0:
-        print("Total Time Elasped: {} minutes".format((end_time-start_time)/60.0))
+        print("Total Time Elapsed: {} minutes".format((end_time-start_time)/60.0))
         # can also run the posterior plotting here...
         from fabry.plasma import check_argon_chord_solver as cacs
         cacs.check_const_Lnu_solver(output_folder, calib_posterior, image_data)
