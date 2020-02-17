@@ -89,6 +89,8 @@ def pcx_vfd_model(r, b, Ti_params, V_params, ne_params, delta_d, amp, L, d, F):
     model_signal = amp*models.general_model(r, L, d+delta_d, F, w_model, radiance_model)
     return model_signal
 
+def calculate_delta_d(velocity_offset):
+        return 2.94734982e-09*velocity_offset
 
 # def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior, config_name,  image_index=4, resume=True, test_plot=False):
 def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior, 
@@ -106,11 +108,15 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
     def prior(cube, ndim, nparams):
         """Transforms prior hypercube to physical units
         """
+        # cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
+        # cube[1] = dist.UniformPrior(cube[1], -5000.0, 5000.0)
         cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
-        cube[1] = dist.UniformPrior(cube[1], -5000.0, 5000.0)
+        cube[1] = dist.UniformPrior(cube[1], 0.025, 3.0)
+        cube[2] = dist.UniformPrior(cube[2], -5000.0, 5000.0)
 
         # I want to use a less broad prior for the amplitudes, but not allow negative amplitude
-        for i in range(2, nparams):
+        # for i in range(2, nparams):
+        for i in range(3, nparams):
             cube[i] = dist.TruncatedNormal(cube[i], 60.0, 30.0, 0.0, 1000.0)
             # cube[i] = dist.UniformPrior(cube[i], 1.0, 100.0)
 
@@ -132,17 +138,23 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
 
         # For each image, calculate the model signal and update the total chisquared
         i = 0
-        for loc, rr, ss, std  in zip(impact_factors, r, sig, sd):
+        for loc, rr, ss, std, v_offset in zip(impact_factors, r, sig, sd, vel_offsets):
             # sample a v_offset to account for the zero velocity calibration drift
-            v_offset = np.random.normal(loc=0.0, scale=75.0, size=1)
+            # v_offset = np.random.normal(loc=0.0, scale=75.0, size=1)
 
-            wavelength, emission = plasma.calculate_pcx_chord_emission(loc, cube[0],
-                    # w0, mu, Lnu, cube[1], rmax=rmax, nr=101, nlambda=2000,
-                    w0, mu, Lnu, cube[1]+v_offset, rmax=rmax, nr=101, nlambda=2000,
-                    R_outer=r_anode)
-            model_signal = models.general_model(rr, L, d, F, wavelength, emission)
-            model_signal = cube[i+2] * model_signal
+            # wavelength, emission = plasma.calculate_pcx_chord_emission(loc, cube[0],
+            #         # w0, mu, Lnu, cube[1], rmax=rmax, nr=101, nlambda=2000,
+            #         w0, mu, Lnu, cube[1]+v_offset, rmax=rmax, nr=101, nlambda=2000,
+            #         R_outer=r_anode)
+            # model_signal = models.general_model(rr, L, d, F, wavelength, emission)
+            # model_signal = cube[i+2] * model_signal
 
+            Ti_params = [cube[0], cube[1])
+            V_params = [cube[2], 50.0, 32.0]
+            ne_params = [32.0, ]
+            delta_d = calculate_delta_d(v_offset)
+            amp = cube[i+3]
+            model_signal = pcx_vfd_model(r, loc, Ti_params, V_params, ne_params, delta_d, amp, L, d, F):
             chisq += np.sum((model_signal-ss)**2 / std**2)
 
             i+=1
@@ -160,7 +172,6 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
     r_anode = 32.0
     fit_range = (180, 230)
     n_calib_points = calib_posterior.shape[0]
-
     # filepaths = info_dict['filepath']
     # filenames = info_dict['filename']
     # filenames = [os.path.join(fpath, fname) for (fpath, fname) in zip(filepaths, filenames)]
@@ -198,9 +209,15 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
     sd = image_data[2]
     impact_factors = image_data[3]
     n_images = len(r)
+    
+    print("Code in the velocity offsets!")
+    vel_offsets = [0.0 for _ in range(n_images)]
 
     # params are Ti, Vmax, +amplitudes for each image
-    n_params = 2 + n_images
+    #n_params = 2 + n_images
+
+    # params are Ti_inner, Ti_outer, Vmax, +amplitudes for each image
+    n_params = 3 + n_images
 
     if test_plot:
         import matplotlib.pyplot as plt
