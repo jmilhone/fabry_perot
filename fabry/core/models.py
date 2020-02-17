@@ -116,7 +116,8 @@ def doppler_broadening(w0, mu, temp):
 
 
 @jit
-def gaussian(wavelength, w, sigma, amp=1., norm=True):
+#def gaussian(wavelength, w, sigma, amp=1., norm=True):
+def gaussian(wavelength, w, sigma, amp=1.):
     """
     Computes a gaussian for a given central wavelength, sigma and amp
     
@@ -134,12 +135,13 @@ def gaussian(wavelength, w, sigma, amp=1., norm=True):
     Returns:
         np.ndarray: spectrum evaluated on wavelength array
     """
-    if norm:
-        norm = 1. / (sigma * np.sqrt(2. * np.pi))
-    else:
-        norm = 1.
+#    if norm:
+#        norm = 1. / (sigma * np.sqrt(2. * np.pi))
+#    else:
+#        norm = 1.
     exp = np.exp(-0.5 * (wavelength - w) ** 2 / sigma ** 2)
-    return amp * norm * exp
+    #return amp * norm * exp
+    return amp * exp
 
 
 def lorentzian(wavelength, w, gamma, amp=1.):
@@ -340,7 +342,8 @@ def match_finesse_forward(r, L, d, F, temp, v, errtemp=None, w0=487.98634, mu=39
         errsigma, _ = doppler_calc(w0, mu, errtemp, v * 1000.)
         sigma = np.sqrt(sigma ** 2 + errsigma ** 2)
     wavelength = np.linspace(w - 10. * sigma, w + 10. * sigma, 512)[:, np.newaxis]
-    spec = gaussian(wavelength, w, sigma, norm=False)
+    # spec = gaussian(wavelength, w, sigma, norm=False)
+    spec = gaussian(wavelength, w, sigma)
 
     cos_th = 1.0 - 0.5 * (r / L) ** 2
     model = trapz(spec * airy_func(wavelength, cos_th, d, F), wavelength, axis=0)
@@ -414,7 +417,7 @@ def model_with_velocity_profile(r, L, d, F, T, vel_profile, dens_profile=None, z
     for idx, vel in enumerate(vel_profile):
         wshift = doppler_shift(w0, vel)
         sigma = doppler_broadening(wshift, mu, T)
-        spectra[idx, :] = gaussian(w_arr, wshift, sigma, amp=dens_profile[idx]**2, norm=False)
+        spectra[idx, :] = gaussian(w_arr, wshift, sigma, amp=dens_profile[idx]**2)#, norm=False)
         ax.plot(w_arr, spectra[idx, :])
     plt.show()
 
@@ -424,7 +427,8 @@ def model_with_velocity_profile(r, L, d, F, T, vel_profile, dens_profile=None, z
         total_spectra = np.trapz(spectra, zarr, axis=0)
 
     new_sigma_Ti = doppler_broadening(w_max_shifted, mu, T)
-    test_spectra = gaussian(w_arr, w_max_shifted, new_sigma_Ti, norm=False)
+    # test_spectra = gaussian(w_arr, w_max_shifted, new_sigma_Ti, norm=False)
+    test_spectra = gaussian(w_arr, w_max_shifted, new_sigma_Ti)#, norm=False)
     fig, ax = plt.subplots()
     i = np.argmax(total_spectra)
     j = np.argmax(test_spectra)
@@ -491,7 +495,8 @@ def zeeman_with_arb_nv(r, L, d, F, current, temp, vbulk, vincrease, extra_temp=N
             sigma_Ti = doppler_broadening(wz, mu, temp)
             sigma_Ti = np.sqrt(sigma_Ti**2 + sigma_extra**2)
 
-            spectrum[idx, :] += gaussian(warr, wz, sigma_Ti, amp=az, norm=False) * ne**2
+            #spectrum[idx, :] += gaussian(warr, wz, sigma_Ti, amp=az, norm=False) * ne**2
+            spectrum[idx, :] += gaussian(warr, wz, sigma_Ti, amp=az) * ne**2
     final_spectrum = np.trapz(spectrum, z, axis=0)
     cos_theta = L / np.sqrt(L**2 + r**2)
     cos_theta.shape = (1, len(r))
@@ -553,7 +558,7 @@ def zeeman_with_lyon_profile(r, L, d, F, current, temp, vel, extra_temp=None):
 
         w_zee, a_zee = zeeman_lambda(w, bb, zeeman_fac, amps=zeeman_amp)
         for wz, az in zip(w_zee, a_zee):
-            spectrum[idx, :] += gaussian(w_arr, wz, sigma_Ti, amp=az, norm=False)
+            spectrum[idx, :] += gaussian(w_arr, wz, sigma_Ti, amp=az)#, norm=False)
 
     final_spectrum = np.trapz(spectrum, z, axis=0)
 

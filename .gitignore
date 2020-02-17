@@ -2,6 +2,7 @@
 *.nef
 *.h5
 .idea/*
+*.json
 
 # Ipython Notebook files
 .ipynb_checkpoints/*
