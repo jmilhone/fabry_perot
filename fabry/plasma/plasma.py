@@ -90,7 +90,7 @@ def pcx_velocity_profile(r, mom_dif_length, R_outer, V_outer):
             vel[idx] = V_outer # * np.exp(-(r[idx] - R_outer) ** 2 / 4.0 ** 2)
     else:
         if r > R_outer:
-            return V_outer * np.exp(-(r - R_outer) ** 2 / 4.0 ** 2)
+            return V_outer# * np.exp(-(r - R_outer) ** 2 / 4.0 ** 2)
 
     return vel
 
@@ -187,7 +187,7 @@ def calculate_pcx_chord_emission(impact_factor, Ti, w0, mu, Lnu, Vouter, rmax=40
     # ax.plot(r, vel)
     # plt.show()
     vel_adjusted = vel * np.cos(theta)
-
+    #print(vel.max(), vel_adjusted.max())
     # ToDo: Should really iterate over w0 to handle the He II complex
     w_shifted_max = models.doppler_shift(w0, np.max(vel_adjusted))
     sigma = models.doppler_broadening(w_shifted_max, mu, Ti)
@@ -195,7 +195,8 @@ def calculate_pcx_chord_emission(impact_factor, Ti, w0, mu, Lnu, Vouter, rmax=40
 
     # Now to build a big spectrum matrix
     w_shifts = models.doppler_shift(w0, vel_adjusted)
-    full_spectrum = models.gaussian(wavelength[np.newaxis, :], w_shifts[:, np.newaxis], sigma, amp=1.0, norm=False)
+    #full_spectrum = models.gaussian(wavelength[np.newaxis, :], w_shifts[:, np.newaxis], sigma, amp=1.0)#, norm=False)
+    full_spectrum = models.gaussian(wavelength[np.newaxis, :], w_shifts[:, np.newaxis], sigma, amp=1.0)#, norm=False)
 
     # fig, ax = plt.subplots()
     # ax.plot(vel_adjusted, w_shifts)
@@ -244,3 +245,109 @@ def Lnu(ne_n0, Ti, mu=40, noise=False):
     Lnu = np.sqrt(128 * 1e18 * Ti / (np.sqrt(mu) * ne_n0 * sigv_cx))
     return Lnu
 
+
+def radiance_from_profiles(x, w0, Ti, V_adjusted, amp, mu=39.948, nlambda=2048, test_plot=False):
+    """Calculates radiance for a plasma chord given profiles and position along the chord
+
+    Args:
+        x (np.ndarray): position along the chord
+        w0 (float): central wavelength
+        V_adjusted (np.ndarray): toroidal velocity array but adjusted with the dot product with the chord vector
+        amp (np.ndarray): emissivity amplitude along the chord
+        mu (float): relative mass of the ion
+        nlambda (int): number of wavelengths to calculate
+
+    Returns:
+        Tuple(np.ndarray, np.ndarray): wavelength and radiance as a function of wavelength for the chord
+    """
+    w_shifted_max = models.doppler_shift(w0, np.max(V_adjusted))
+    sigma = models.doppler_broadening(w_shifted_max, mu, Ti)
+    wavelength = np.linspace(-1, 1, nlambda) * 10.0 * np.max(sigma) + w_shifted_max
+
+    # Now to build a big spectrum matrix
+    w_shifts = models.doppler_shift(w0, V_adjusted)
+
+    spectra = models.gaussian(wavelength[np.newaxis, :], w_shifts[:, np.newaxis],
+            sigma[:, np.newaxis], amp=amp[:, np.newaxis])#, norm=False)
+
+    if test_plot:
+        leg = False 
+        fig, ax = plt.subplots(figsize=(10,10))
+        for i in range(x.shape[0]):
+            ax.plot(wavelength, spectra[i, :], label=f"{x[i]:.2f}")
+        ax.set_xlabel("Wavelength (nm)")
+        ax.set_ylabel("Spectral Emissivity (AU)")
+        ax.axvline(w0, ls='--', color='k')
+
+        # reset x limits
+        xlo, xhigh = ax.get_xlim()
+        xdiff = xhigh-xlo
+        xmid = 0.5*(xhigh+xlo)
+        xdiff /= 2.0
+        ax.set_xlim(xmid-0.5*xdiff, xmid+0.5*xdiff)
+
+        if leg:
+            ax.legend()
+        plt.show()
+    radiance = np.trapz(spectra, x=x, axis=0)
+    return wavelength, radiance
+
+
+def linear_Ti_profile(r, Ti_center, Ti_edge, r_edge):
+    """Calculates a linear Ti profile at the radii r
+
+    Args:
+        r (Union[float, np.ndarray]): radius or radius array to calculate Ti
+        Ti_center (float): Ti at r=0
+        Ti_edge (float): Ti at r=r_edge
+        r_edge (float): Edge of the plasma where Ti(r=r_edge)=Ti_ege
+    Returns:
+        Ti at r=r with the same shape as r
+    """
+    return Ti_center + (Ti_edge - Ti_center) * r / r_edge
+
+
+def vfd_chord(impact_factor, Ti_args, V_args, ne_args, w0=487.98634, rmax=40.0, nr=100, nlambda=2048, mu=39.948, test_plot=False):
+
+    r, theta, x = calculate_r_theta_x_from_impact_factor(impact_factor, rmax=rmax, npts=nr)
+    
+    #for tup in zip(r, x, theta):
+    #    print(tup)
+    # calculate Ti profile
+    Ti_center = Ti_args[0]
+    Ti_edge = Ti_args[1]
+    Ti_profile = linear_Ti_profile(r, Ti_center, Ti_edge, rmax)
+
+    # calculate V profile
+    Vouter = V_args[0]
+    Lnu = V_args[1]
+    R_outer = V_args[2]
+    vel = pcx_velocity_profile(r, Lnu, R_outer, Vouter)
+    V_adjusted = vel*np.cos(theta)
+
+    # calculate amplitude profile
+    r_anode = ne_args[0]
+    dens = vfd_density_profile(r, r_anode)
+    amp = dens**2
+
+    if test_plot:
+        fig, ax = plt.subplots(3, sharex=True, figsize=(8, 8))
+        ax[0].plot(r, Ti_profile)
+        ax[1].plot(r, vel)
+        ax[1].plot(r, V_adjusted, '--')
+        ax[2].plot(r, dens)
+
+        ax[2].set_xlim(0.0, rmax)
+        ax[2].set_xlabel("R (cm)")
+        ax[0].set_ylabel(r"$T_i$ (eV)")
+        ax[1].set_ylabel(r"$V_{\phi}$ (m/s)")
+        ax[2].set_ylabel(r"$n_e$ (AU)")
+
+        fig.subplots_adjust(hspace=0.0)
+        fig.align_ylabels()
+        plt.show()
+
+    wavelength, radiance = radiance_from_profiles(x, w0, Ti_profile, V_adjusted, amp, mu=mu, 
+            nlambda=nlambda, test_plot=test_plot)
+
+    return wavelength, radiance
