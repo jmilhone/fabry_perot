@@ -1,11 +1,14 @@
 from __future__ import print_function, division
-import numpy as np
-import pymultinest
-from mpi4py import MPI
+
 import argparse
 import os.path as path
-from distutils.util import strtobool
+import sys
 import time
+from distutils.util import strtobool
+
+import numpy as np
+from mpi4py import MPI
+
 from fabry.tools import file_io
 
 
@@ -34,6 +37,7 @@ def parse_csv_config(filename):
                 info_dict[key].append(value)
     return info_dict
 
+
 def convert_items_to_type(input_dict, keys_to_convert, types):
     """Converts values in input_dict[key] for each key in keys_to_convert to the type in types
 
@@ -45,6 +49,7 @@ def convert_items_to_type(input_dict, keys_to_convert, types):
         value = input_dict[key]
         value = [f(x) for x in value]
         input_dict[key] = value
+
 
 def retrieve_ringsum_data(filename, image_index):
     """Reads the ringsum data at image_index in the hdf5 filename
@@ -62,6 +67,7 @@ def retrieve_ringsum_data(filename, image_index):
 
     return r, sig, sd
 
+
 def chop_down_to_fit_range(r, signal, std, fit_range):
     """Reduces the portion of the ringsum to fit_range
 
@@ -71,26 +77,31 @@ def chop_down_to_fit_range(r, signal, std, fit_range):
     :param fit_range: lower and upper bound in the radius array to chop down to
     :returns: Tuple with chopped down radius, signal, and signal std arrays
     """
-    i0 = np.abs(r-fit_range[0]).argmin()
-    i1 = np.abs(r-fit_range[1]).argmin()
-    sl = slice(i0, i1+1) 
+    i0 = np.abs(r - fit_range[0]).argmin()
+    i1 = np.abs(r - fit_range[1]).argmin()
+    sl = slice(i0, i1 + 1)
 
     return r[sl], signal[sl], std[sl]
 
 
+def read_calibration(calibration_folder, filename="full_post_equal_weights.dat"):
+    """Read equal weighted calibration posterior file created by MultiNest
 
-def read_calibration(calibration_folder):
+    :param str calibration_folder: folder location for calibration file
+    :param str filename: filename to read located in calibration_folder
+    :return: posterior distribution for L, d, and F
+    :rtype: np.ndarray
     """
-    """
-    posterior = np.loadtxt(path.join(calibration_folder, 'full_post_equal_weights.dat'), ndmin=2)
+    posterior = np.loadtxt(path.join(calibration_folder, filename), ndmin=2)
     # L, d, F are indices 0, 1, and 2
     return posterior[:, 0:3]
 
 
 def verify_restart():
+    """Verifies with the user via console that the user really wants to restart the solver
     """
-    """
-    #a = raw_input("Are you sure you want to restart? ")
+
+    # a = raw_input("Are you sure you want to restart? ")
     a = input("Are you sure you want to restart? ")
     try:
         a = bool(strtobool(a))
@@ -109,11 +120,16 @@ def verify_restart():
 
 
 def clean_filepath(filepath):
-    """
+    """Takes a path that contains relative paths and returns an absolute path
+
+    :param str filepath: filepath to be turned into an absolute filepath
+    :return: absolute filepath
+    :rtype: str
     """
     clean_path = path.expanduser(filepath)
     clean_path = path.abspath(clean_path)
     return clean_path
+
 
 def main():
     Comm = MPI.COMM_WORLD
@@ -122,16 +138,16 @@ def main():
     if rank == 0:
         # single process here
         parser = argparse.ArgumentParser()
-        parser.add_argument('config', type=str,
-                help='Filepath of configuration file')
-        parser.add_argument('cal_folder', metavar='calibration-folder', type=str,
-                help='Folder containing the fabry-perot calibration')
-        parser.add_argument('out_folder', metavar='output-folder',
-                type=str, help='Folder to place output files in')
-        parser.add_argument('--restart', action='store_true', default=False,
+        parser.add_argument("config", type=str,
+                            help="Filepath of configuration file")
+        parser.add_argument("cal_folder", metavar="calibration-folder", type=str,
+                            help="Folder containing the fabry-perot calibration")
+        parser.add_argument("out_folder", metavar="output-folder",
+                            type=str, help="Folder to place output files in")
+        parser.add_argument("--restart", action="store_true", default=False,
                             help="Set to True if you want MultiNest to start over instead of resuming")
-        parser.add_argument('--image_index', type=int, default=5,
-                help="Image index to solve for")
+        parser.add_argument("--image_index", type=int, default=5,
+                            help="Image index to solve for")
 
         args = parser.parse_args()
 
@@ -145,8 +161,9 @@ def main():
 
         calib_posterior = read_calibration(cal_folder)
 
-        info_dict = parse_csv_config(config_name) 
-        convert_items_to_type(info_dict, ['impact_factor', 'gain', 'int_time', 'shot_num'], types=[float, float, float, int])
+        info_dict = parse_csv_config(config_name)
+        convert_items_to_type(info_dict, ['impact_factor', 'gain', 'int_time', 'shot_num'],
+                              types=[float, float, float, int])
 
         image_index = args.image_index
         filepaths = info_dict['filepath']
@@ -167,15 +184,15 @@ def main():
 
         n_images = len(r)
 
-        fit_range = (193, 230)
+        fit_range = (197, 230)
         # Only look at the data if r is in interval [fit_range[0], fit_range[1]]
         for idx in range(n_images):
             r[idx], sig[idx], sd[idx] = chop_down_to_fit_range(r[idx], sig[idx], sd[idx], fit_range)
 
         # Adjust signal/std amplitudes based on camera gain and integration time 
         for idx, (signal, std) in enumerate(zip(sig, sd)):
-            #signal *= info_df.loc[idx, 'gain'] / info_df.loc[idx, 'int_time']
-            #std *= info_df.loc[idx, 'gain'] / info_df.loc[idx, 'int_time']
+            # signal *= info_df.loc[idx, 'gain'] / info_df.loc[idx, 'int_time']
+            # std *= info_df.loc[idx, 'gain'] / info_df.loc[idx, 'int_time']
             # moving toward a dict instead of a dataframe
             signal *= info_dict['gain'][idx] / info_dict['int_time'][idx]
             std *= info_dict['gain'][idx] / info_dict['int_time'][idx]
@@ -189,7 +206,7 @@ def main():
                         'sig': sig,
                         'sd': sd,
                         'impact_factors': impact_factors
-                       }
+                        }
     else:
         solver_input = None
 
@@ -210,14 +227,16 @@ def main():
         # run the solver here
         start_time = time.time()
         print("solving...")
-        acs.argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior, config_name, image_data,
+        acs.argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior, image_data,
                                                resume=not restart, test_plot=False)
         end_time = time.time()
 
     if rank == 0:
-        print("Total Time Elapsed: {} minutes".format((end_time-start_time)/60.0))
+        print("Total Time Elapsed: {} minutes".format((end_time - start_time) / 60.0))
         # can also run the posterior plotting here...
         from fabry.plasma import check_argon_chord_solver as cacs
         cacs.check_const_Lnu_solver(output_folder, calib_posterior, image_data)
+
+
 if __name__ == "__main__":
     main()

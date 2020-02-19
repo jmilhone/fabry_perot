@@ -1,36 +1,43 @@
 from __future__ import print_function, division
+
 import concurrent.futures
-import pymultinest
-import numpy as np
-from fabry.core import models
-from fabry.tools import plotting, file_io
-from fabry.plasma import plasma
-from matplotlib import rcParams
-import matplotlib.pyplot as plt
 import os.path as path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pymultinest
+from matplotlib import rcParams
+
+import fabry.plasma.argon_chord_solver as acs
+from fabry.tools import plotting, file_io
 
 rcParams['font.size'] = 16
 rcParams['figure.figsize'] = (8, 6)
 
 w0 = 487.98634
-mu = 39.948
+mu = 39.94
 
 
-def check_const_Lnu_solver(output_folder, calib_posterior, image_data):
+def check_const_Lnu_solver(output_folder, calib_posterior, image_data, n_samples=200):
     plot_folder = path.join(output_folder, 'Plots')
     file_io.prep_folder(plot_folder)
 
     # Hard coded calibration!
-    print('Using a hard coded calibration')
-    L = 74.6 / 0.00586
-    d = 0.8836181
-    F = 20.9
+    hard_coded_calib = True
+    if hard_coded_calib:
+        print('Using a hard coded calibration')
+        from fabry.plasma.argon_chord_solver import L, d, F
+        print("L, d, F = ", L, d, F)
+    else:
+        idx_calib = np.random.choice(calib_posterior.shape[0], size=n_samples)
+        L = calib_posterior[idx_calib, 0]
+        d = calib_posterior[idx_calib, 1]
+        F = calib_posterior[idx_calib, 2]
 
     px_size = 0.00586
     Lnu = 100.0
     rmax = 40.0
     r_anode = 32.0
-
 
     # unpact image_data
     r = image_data[0]
@@ -39,26 +46,26 @@ def check_const_Lnu_solver(output_folder, calib_posterior, image_data):
     impact_factors = image_data[3]
     n_images = len(r)
 
+    print("Code in the velocity offsets!")
+    vel_offsets = [0.0 for _ in range(n_images)]
+
     # params are Ti, Vmax, +amplitudes for each image
-    n_params = 2 + n_images
+    # n_params = 2 + n_images
+
+    # params are Ti inner, Ti_outer, Vmax, +amplitudes for each image
+    n_params = 3 + n_images
 
     analyzer = pymultinest.Analyzer(n_params, outputfiles_basename=path.join(output_folder, "Ti_chord_"))
     post = analyzer.get_equal_weighted_posterior()
-    print("overwriting velocity in post!")
-    post[:, 1] -= -200
+    # print("overwriting velocity in post!")
+    # post[:, 1] -= -200
     post_means = np.mean(post, axis=0)
     print(post_means)
     nrows, ncols = post.shape
 
-    n_samples = 200
     idx_cube = np.random.choice(nrows, size=n_samples)
     cubes = post[idx_cube, :]
 
-    # Use this if you are not hard coding the calibration
-    # idx_calib = np.random.choice(calib_posterior.shape[0], size=n_samples)
-    # L = calib_posterior[idx_calib, 0]
-    # d = calib_posterior[idx_calib, 1]
-    # F = calib_posterior[idx_calib, 2]
 
     # allocate memory for posterior values
     values = []
@@ -110,6 +117,10 @@ def check_const_Lnu_solver(output_folder, calib_posterior, image_data):
     ## Histogram Plotting ##
     ######################## 
     xlabels = ['$T_i$ (eV)', '$V_{pk}$ (km/s)']
+    xlabels = ['$T_i$ (eV)', '$V_{pk}$ (km/s)']
+    xlabels = ['$T_i$ (eV)', '$V_{pk}$ (km/s)']
+    xlabels = ['$T_i$ (eV)', '$V_{pk}$ (km/s)']
+    xlabels = ['$T_i$ (eV)', '$V_{pk}$ (km/s)']
     ylabels = ['$P(T_i) \Delta T_i$ (%)', '$P(V_{pk}) \Delta V_{pk}$ (%)']
     factors = [1.0, 1e-3]
 
@@ -145,14 +156,25 @@ def make_histograms(posterior, xlabels, ylabels, factors, fnames, save=False, pl
 
         plt.show()
 
-def calculate_multi_models(r, impact_factors, L, d, F, Lnu, cube, nlambda=2000, nr=101, rmax=40.0, r_anode=32.0):
+def calculate_multi_models(r, impact_factors, vel_offsets, L, d, F, Lnu, cube, nlambda=2000,
+                           nr=101, rmax=40.0, r_anode=32.0):
     values = list()
-    for idx, loc in enumerate(impact_factors):
-        wavelength, emission = plasma.calculate_pcx_chord_emission(loc, cube[0],
-                w0, mu, Lnu, cube[1], rmax=rmax, nr=101, nlambda=2000,
-                R_outer=r_anode)
-        model_signal = models.general_model(r[idx], L, d, F, wavelength, emission)
-        model_signal = cube[idx+2] * model_signal
+    for idx, (loc, v_offset) in enumerate(zip(impact_factors, vel_offsets)):
+        # wavelength, emission = plasma.calculate_pcx_chord_emission(loc, cube[0],
+        #         w0, mu, Lnu, cube[1], rmax=rmax, nr=101, nlambda=2000,
+        #         R_outer=r_anode)
+        # model_signal = models.general_model(r[idx], L, d, F, wavelength, emission)
+        # model_signal = cube[idx+2] * model_signal
+
+        # prepare parameters for the model function
+        Ti_params = [cube[0], cube[1]]
+        V_params = [cube[2], Lnu, r_anode]
+        ne_params = [r_anode, ]
+        delta_d = acs.calculate_delta_d(v_offset)
+        amp = cube[idx + 3]
+
+        model_signal = acs.pcx_vfd_model(r[idx], loc, Ti_params, V_params, ne_params,
+                                                                     delta_d, amp, L, d, F, rmax=rmax)
         values.append(model_signal)
 
     return values

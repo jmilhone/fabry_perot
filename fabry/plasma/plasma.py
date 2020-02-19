@@ -1,16 +1,22 @@
 from __future__ import division, print_function
+
+from functools import partial
+
 import numpy as np
 from scipy import special
+
 from ..core import models
-from functools import partial
+
 try:
     import matplotlib.pyplot as plt
 except ImportError:
+    print("Matplotlib is not installed. Moving on...")
     pass
 
 cx_fits = {40: [0.39004112, -34.24186523],
            4: [0.40712338, -33.82360615],
           }
+
 
 def pcx_vfd_velocity_profile(r, r_anode, V_max):
     """Calculates the toroidal velocity profile for VFD on PCX
