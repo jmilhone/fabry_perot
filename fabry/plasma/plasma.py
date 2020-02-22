@@ -72,7 +72,7 @@ def pcx_couette_velocity_profile(r, mom_dif_length, R_inner, R_outer, V_inner, V
     return A * special.iv(1, x) + B * special.kv(1, x)
 
 
-def pcx_velocity_profile(r, mom_dif_length, R_outer, V_outer):
+def pcx_velocity_profile(r, mom_dif_length, R_outer, V_outer, V_offset):
     """Calculates the toroidal velocity profile with no inner boundary for PCX
 
     Args:
@@ -80,6 +80,7 @@ def pcx_velocity_profile(r, mom_dif_length, R_outer, V_outer):
         mom_dif_length (float): momentum diffusion length scale
         R_outer (float): Radii for outer boundary
         V_outer (float): Velocity at outer boundary
+        V_offset (float): Offset velocity applied to whole profile to account for any erros in the diagnostic
 
     Returns:
         np.ndarray: torodial velocity profile as a function of r
@@ -88,17 +89,18 @@ def pcx_velocity_profile(r, mom_dif_length, R_outer, V_outer):
 
     xo = R_outer / mom_dif_length
     Iv = partial(special.iv, 1)
-    vel = V_outer * Iv(x) / Iv(xo)
+    vel = (V_outer-V_offset) * Iv(x) / Iv(xo)
     
     if isinstance(r, np.ndarray):
-        if any(rr > R_outer for rr in r):
-            idx = np.where(r > R_outer)
-            vel[idx] = V_outer # * np.exp(-(r[idx] - R_outer) ** 2 / 4.0 ** 2)
+        vel = np.where(r > R_outer, (V_outer-V_offset), vel)
+        #if any(rr > R_outer for rr in r):
+        #    idx = np.where(r > R_outer)
+        #    vel[idx] = V_outer # * np.exp(-(r[idx] - R_outer) ** 2 / 4.0 ** 2)
     else:
         if r > R_outer:
-            return V_outer# * np.exp(-(r - R_outer) ** 2 / 4.0 ** 2)
+            return V_outer-V_offset# * np.exp(-(r - R_outer) ** 2 / 4.0 ** 2)
 
-    return vel
+    return vel + V_offset
 
 
 def density_profile(r, r_edge, gradient_length_scale):
@@ -328,7 +330,8 @@ def vfd_chord(impact_factor, Ti_args, V_args, ne_args, w0=487.98634, rmax=40.0, 
     Vouter = V_args[0]
     Lnu = V_args[1]
     R_outer = V_args[2]
-    vel = pcx_velocity_profile(r, Lnu, R_outer, Vouter)
+    V_offset = V_args[3]
+    vel = pcx_velocity_profile(r, Lnu, R_outer, Vouter, V_offset)
     V_adjusted = vel*np.cos(theta)
 
     # calculate amplitude profile

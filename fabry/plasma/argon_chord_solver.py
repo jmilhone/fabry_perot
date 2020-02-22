@@ -16,7 +16,8 @@ mu = 39.948
 
 # For testing purposes, dont' have a calibration to use
 L = 74.6 / 0.00586
-d = 0.8836181
+d = 0.883618  # 2020_02_05
+#d = 0.8836155  # 2020_01_15
 F = 20.9
 
 
@@ -72,12 +73,15 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
         # cube[1] = dist.UniformPrior(cube[1], -5000.0, 5000.0)
         cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
         cube[1] = dist.UniformPrior(cube[1], 0.025, 3.0)
-        cube[2] = dist.UniformPrior(cube[2], -5000.0, 5000.0)
+        cube[2] = dist.UniformPrior(cube[2], -2000.0, 2000.0)
+        cube[3] = dist.UniformPrior(cube[3], -500.0, 500.0)
 
         # I want to use a less broad prior for the amplitudes, but not allow negative amplitude
         # for i in range(2, nparams):
-        for i in range(3, nparams):
-            cube[i] = dist.TruncatedNormal(cube[i], 60.0, 30.0, 0.0, 1000.0)
+        #for i in range(3, nparams):
+        for i in range(4, nparams):
+            cube[i] = dist.TruncatedNormal(cube[i], 80.0, 30.0, 0.0, 1000.0) # 2020_02_05
+            #cube[i] = dist.TruncatedNormal(cube[i], 250.0, 150.0, 0.0, 1000.0) # 2020_01_15
             # cube[i] = dist.UniformPrior(cube[i], 1.0, 100.0)
 
     def loglikelihood(cube, ndim, nparams):
@@ -92,17 +96,19 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
         # F = calib_posterior[i_choice, 2]
 
 
+        delta_d = [calculate_delta_d(offset) for offset in vel_offsets]
         # For each image, calculate the model signal and update the total chisquared
         for i, (loc, rr, ss, std, v_offset) in enumerate(zip(impact_factors, r, sig, sd, vel_offsets)):
             # prepare parameters for the model function
             Ti_params = [cube[0], cube[1]]
-            V_params = [cube[2], Lnu, r_anode]
+            # V_params = [cube[2], Lnu, r_anode]
+            V_params = [cube[2], Lnu, r_anode, cube[3]]
             ne_params = [r_anode, ]
-            delta_d = calculate_delta_d(v_offset)
-            amp = cube[i + 3]
+            # amp = cube[i + 3]
+            amp = cube[i + 4]
 
             mod_signal = pcx_vfd_model(rr, loc, Ti_params, V_params, ne_params,
-                                       delta_d, amp, L, d, F, rmax=rmax)
+                                       delta_d[i], amp, L, d, F, rmax=rmax)
             chisq += np.sum((mod_signal - ss) ** 2 / std ** 2)
 
         return -chisq / 2.0
@@ -116,13 +122,14 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
         cubes = np.random.rand(n_samples, n_params)
 
         # grab image data to compare prior samples to
-        image_idx = 2
+        #image_idx = 2
         loc = impact_factors[image_idx]
         rr = r[image_idx]
         ss = sig[image_idx]
         std = sd[image_idx]
 
         model_signal = np.zeros((n_samples, len(rr)))
+        delta_d = calculate_delta_d(vel_offsets[image_idx])
 
         for idx, cube in enumerate(cubes):
             # transform unit hypercube to physical units
@@ -131,7 +138,6 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
             Ti_params = [cube[0], cube[1]]
             V_params = [cube[2], rmax, r_anode]
             ne_params = [r_anode, ]
-            delta_d = calculate_delta_d(vel_offsets[image_idx])
             amp = cube[image_idx + 3]
             model_signal[idx, :] = pcx_vfd_model(rr, loc, Ti_params, V_params,
                                                  ne_params, delta_d, amp, L, d, F,
@@ -166,13 +172,20 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
     n_images = len(r)
 
     print("Code in the velocity offsets!")
-    vel_offsets = [0.0 for _ in range(n_images)]
+    # vel_offsets = [0.0 for _ in range(n_images)]
+    #vel_offsets = [322.0, 190.0, 162.0, 204.0]  # 2020_02_05
+    vel_offsets = [322.0, 190.0, 162.0, 204.0, 306.0, 220.0]  # 2020_02_05 6 images
+    # vel_offsets = [620.0, 470.0, 566.0, 509.0]  # 2020_01_15
+    #vel_offsets = [620.0, 470.0, 566.0, 509.0, 503.0, 538.0]  # 2020_01_15 6 images
 
     # params are Ti, Vmax, +amplitudes for each image
     # n_params = 2 + n_images
 
     # params are Ti_inner, Ti_outer, Vmax, +amplitudes for each image
-    n_params = 3 + n_images
+    # n_params = 3 + n_images
+
+    # params are Ti_inner, Ti_outer, Vmax, Voffset, +amplitudes for each image
+    n_params = 4 + n_images
 
     if test_plot:
         create_test_plot(n_samples=500, image_idx=0)
@@ -180,7 +193,7 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
         pymultinest.run(loglikelihood, prior, n_params,
                         importance_nested_sampling=False, resume=resume,
                         verbose=True, sampling_efficiency='model',
-                        n_live_points=150,
+                        n_live_points=400,
                         outputfiles_basename=os.path.join(output_folder, 'Ti_chord_')
                         )
 

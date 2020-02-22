@@ -159,7 +159,9 @@ def main():
         config_name = clean_filepath(args.config)
         cal_folder = clean_filepath(args.cal_folder)
 
-        calib_posterior = read_calibration(cal_folder)
+        print("not using calibration right now!")
+        calib_posterior = np.zeros((1000, 3))
+        # calib_posterior = read_calibration(cal_folder)
 
         info_dict = parse_csv_config(config_name)
         convert_items_to_type(info_dict, ['impact_factor', 'gain', 'int_time', 'shot_num'],
@@ -184,7 +186,8 @@ def main():
 
         n_images = len(r)
 
-        fit_range = (197, 230)
+        # fit_range = (185, 230)
+        fit_range = (204, 230)
         # Only look at the data if r is in interval [fit_range[0], fit_range[1]]
         for idx in range(n_images):
             r[idx], sig[idx], sd[idx] = chop_down_to_fit_range(r[idx], sig[idx], sd[idx], fit_range)
@@ -196,7 +199,12 @@ def main():
             # moving toward a dict instead of a dataframe
             signal *= info_dict['gain'][idx] / info_dict['int_time'][idx]
             std *= info_dict['gain'][idx] / info_dict['int_time'][idx]
-
+            std = np.sqrt((signal*0.02)**2 + std**2)
+            # import matplotlib.pyplot as plt
+            # fig, ax = plt.subplots()
+            # ax.errorbar(r[idx], signal, yerr=std)
+            # plt.show()
+            sd[idx] = std
         solver_input = {'output_folder': output_folder,
                         'calib_posterior': calib_posterior,
                         'restart': restart,
