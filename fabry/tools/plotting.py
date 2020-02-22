@@ -64,7 +64,7 @@ def my_hist(ax, data, bins=None, horizontal=False):
     return bins
 
 
-def my_hist2d(ax, data1, data2, bins=None, z=30):
+def my_hist2d(ax, data1, data2, bins=None, z=30, cmap='Blues', plot_contours=False, use_percentage=True):
     """Custom 2d histrogram option for plotting correlations
 
     Args:
@@ -77,6 +77,11 @@ def my_hist2d(ax, data1, data2, bins=None, z=30):
     Returns:
         matplotlib.colorbar.Colorbar: colorbar from the 2d histogram
     """
+    if use_percentage:
+        factor = 100.0
+    else:
+        factor = 1.0
+
     if bins is not None:
         hist, xx, yy = np.histogram2d(data1, data2, normed=True, bins=bins)
     else:
@@ -85,7 +90,9 @@ def my_hist2d(ax, data1, data2, bins=None, z=30):
     dx = xx[1] - xx[0]
     dy = yy[1] - yy[0]
 
-    im = ax.contourf(yy[0:-1], xx[0:-1], hist * dx * dy, z)
+    im = ax.contourf(yy[0:-1], xx[0:-1], hist * dx * dy*100, z, cmap=cmap)
+    if plot_contours:
+        ax.contour(yy[0:-1], xx[0:-1], hist * dx * dy, 5, colors='k')
     # ax_divider = make_axes_locatable(ax)
     # cax = ax_divider.append_axes("right", size="7%", pad="2%")
     cb = plt.colorbar(im, ax=ax)
