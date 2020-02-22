@@ -71,7 +71,8 @@ def recursive_load_dict_from_h5(h5, path):
     for key, item in h5[path].items():
         # if type(item) == h5py._hl.dataset.Dataset:
         if isinstance(item, h5py.Dataset):
-            out_dict[key] = item.value
+            #out_dict[key] = item.value
+            out_dict[key] = item[()]
         # elif type(item) == h5py._hl.group.Group:
         elif isinstance(item, h5py.Group):
             out_dict[key] = recursive_load_dict_from_h5(h5, path + key + '/')
