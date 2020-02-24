@@ -21,22 +21,25 @@ rcParams['figure.figsize'] = (8, 6)
 w0 = 487.98634
 mu = 39.94
 
-def prior(cube, ndim, nparams):
-    """Transforms prior hypercube to physical units
-    """
-    # cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
-    # cube[1] = dist.UniformPrior(cube[1], -5000.0, 5000.0)
-    cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
-    cube[1] = dist.UniformPrior(cube[1], 0.025, 3.0)
-    cube[2] = dist.UniformPrior(cube[2], -2000.0, 2000.0)
-    cube[3] = dist.UniformPrior(cube[3], -500, 500)
+# grab the prior from argon_chord_solver
+prior = acs.prior
 
-    # I want to use a less broad prior for the amplitudes, but not allow negative amplitude
-    # for i in range(2, nparams):
-    for i in range(3, nparams):
-        #cube[i] = dist.TruncatedNormal(cube[i], 80.0, 30.0, 0.0, 1000.0) # 2020_02_05
-        cube[i] = dist.TruncatedNormal(cube[i], 250.0, 150.0, 0.0, 1000.0) # 2020_01_15
-        # cube[i] = dist.UniformPrior(cube[i], 1.0, 100.0)
+# def prior(cube, ndim, nparams):
+#     """Transforms prior hypercube to physical units
+#     """
+#     # cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
+#     # cube[1] = dist.UniformPrior(cube[1], -5000.0, 5000.0)
+#     cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
+#     cube[1] = dist.UniformPrior(cube[1], 0.025, 3.0)
+#     cube[2] = dist.UniformPrior(cube[2], -2000.0, 2000.0)
+#     cube[3] = dist.UniformPrior(cube[3], -500, 500)
+#
+#     # I want to use a less broad prior for the amplitudes, but not allow negative amplitude
+#     # for i in range(2, nparams):
+#     for i in range(3, nparams):
+#         #cube[i] = dist.TruncatedNormal(cube[i], 80.0, 30.0, 0.0, 1000.0) # 2020_02_05
+#         cube[i] = dist.TruncatedNormal(cube[i], 250.0, 150.0, 0.0, 1000.0) # 2020_01_15
+#         # cube[i] = dist.UniformPrior(cube[i], 1.0, 100.0)
 
 
 def check_const_Lnu_solver(output_folder, calib_posterior, image_data, n_samples=200):
@@ -144,10 +147,6 @@ def check_const_Lnu_solver(output_folder, calib_posterior, image_data, n_samples
     idx_cube = np.random.choice(nrows, size=n_samples)
     cubes = post[idx_cube, :]
 
-    # fig, ax = plt.subplots()
-    # sns.kdeplot(post[:, 0], post[:, 1], shade=True, shade_lowest=False, cmap='Reds')
-    # plt.show()
-
     # allocate memory for posterior values
     values = []
     for rr in r:
@@ -212,11 +211,8 @@ def check_const_Lnu_solver(output_folder, calib_posterior, image_data, n_samples
     alphas = [0.5, 0.3, 0.1]
 
     # Let's reorder the plots by impact factor
-    print(impact_factors)
     isort = np.argsort(impact_factors)
-    print(isort)
     impact_factors = [impact_factors[x] for x in isort]
-    print(impact_factors)
     r = [r[x] for x in isort]
     sig = [sig[x] for x in isort]
     sd = [sd[x] for x in isort]
@@ -272,9 +268,9 @@ def check_const_Lnu_solver(output_folder, calib_posterior, image_data, n_samples
     fig.savefig(path.join(plot_folder, "ringsum_fits_all_chords.png"), dpi=400)
     plt.show()
 
-    ######################## 
-    ## Histogram Plotting ##
-    ######################## 
+    #################################
+    ## Marginal Histogram Plotting ##
+    #################################
     #xlabels = [r'$T_{i,\rm{center}}$ (eV)', r'$T_{i,\rm{edge}}$ (eV)', '$V_{pk}$ (km/s)']
     xlabels = [r'$T_{i,\rm{center}}$ (eV)', r'$T_{i,\rm{edge}}$ (eV)', '$V_{pk}$ (km/s)', r"$V_{\rm{offset}}$ (km/s)"]
     #ylabels = [r'PDF$(T_{i,\rm{center}})$', r'PDF$(T_{i,\rm{edge}})$', 'PDF$(V_{pk})$']
@@ -290,135 +286,136 @@ def check_const_Lnu_solver(output_folder, calib_posterior, image_data, n_samples
     factors += [1.0 for _ in range(n_images)]
 
     for i in range(n_params):
-        fig, ax = plt.subplots()
-        sns.distplot(post[:, i]*factors[i], kde=True, color='C3')
-        ax.set_xlabel(xlabels[i])
-        ax.set_ylabel(ylabels[i])
-        fig.savefig(marginal_fnames[i], dpi=400)
-        plt.show(block=False)
+        fig, ax = marginal_plot(post[:, i]*factors[i], xlabels[i], ylabels[i],
+                                fname=marginal_fnames[i], savefig=True, block=False)
+        # fig, ax = plt.subplots()
+        # sns.distplot(post[:, i]*factors[i], kde=True, color='C3')
+        # ax.set_xlabel(xlabels[i])
+        # ax.set_ylabel(ylabels[i])
+        # fig.savefig(marginal_fnames[i], dpi=400)
+        # plt.show(block=False)
 
     plt.show(block=True)
 
-    #make_histograms(post, xlabels, ylabels, factors, None, save=False, block=False)
-    #plt.show()
-    ##################################################### 
-    ## 2D Marginal Posterior Distribution for Ti and V ##
-    ##################################################### 
-    #fig, ax = plt.subplots()
-    #sns.kdeplot(post[:, 1]*factors[1], post[:, 0]*factors[0], cmap='Reds', shade=True, shade_lowest=False)
-    ##cb = plotting.my_hist2d(ax, post[:, 0]*factors[0], post[:, 1]*factors[1], plot_contours=True)
-    ##cb.ax.tick_params(labelsize=16)
-    #ax.set_xlabel(xlabels[1])
-    #ax.set_ylabel(xlabels[0])
-    #plt.show(block=False)
-
-    #fig, ax = plt.subplots()
-    #sns.kdeplot(post[:, 2]*factors[2], post[:, 0]*factors[0], cmap='Reds', shade=True, shade_lowest=False)
-    ##cb = plotting.my_hist2d(ax, post[:, 0]*factors[0], post[:, 2]*factors[2], plot_contours=True)
-    ##cb.ax.tick_params(labelsize=16)
-    #ax.set_xlabel(xlabels[2])
-    #ax.set_ylabel(xlabels[0])
-    #plt.show(block=False)
-
-    #fig, ax = plt.subplots()
-    #sns.kdeplot(post[:, 2]*factors[2], post[:, 1]*factors[1], cmap='Reds', shade=True, shade_lowest=False)
-    ##cb = plotting.my_hist2d(ax, post[:, 1]*factors[1], post[:, 2]*factors[2], plot_contours=True)
-    ##cb.ax.tick_params(labelsize=16)
-    #ax.set_xlabel(xlabels[2])
-    #ax.set_ylabel(xlabels[1])
-    #plt.show()
-
-
-    # fig, ax = plt.subplots(2, 2)
-    # ax[0, 1].axis('off')
-    # sns.distplot(post[:, 1], kde=True, color='C3', ax=ax[0, 0])
-    # sns.distplot(post[:, 0], kde=True, color='C3', ax=ax[1, 1], vertical=True)
-    # sns.kdeplot(post[:, 1]*factors[1], post[:, 0]*factors[0], cmap='Reds', shade=True, shade_lowest=False, ax=ax[1, 0])
-
-    # ax[0, 0].set_xticks([])
-    # ax[1, 1].set_yticks([])
-    # ax[1, 0].set_xlabel(xlabels[1])
-    # ax[1, 0].set_xlabel(xlabels[0])
-
-    # fig.subplots_adjust(hspace=0.0, wspace=0.0)
-    # plt.show(block=False)
-
-    #g = sns.jointplot(post[:, 0], post[:, 1], kind='kde', color='C3', join_kws={'shade_lowest': False})
-
+    #######################################
+    ## Joint Marginal Histogram Plotting ##
+    #######################################
     n = 4
     pairs = itertools.product(range(n), range(n))
     pairs = filter(lambda tup: tup[1] > tup[0], pairs)
     for (i, j) in pairs:
-        g = sns.JointGrid(post[:, i], post[:, j], space=0.0, height=8)
-        g = g.plot_joint(sns.kdeplot, cmap='Reds', shade_lowest=False, shade=True)
-        g = g.plot_marginals(sns.distplot, kde=True, color='C3')
-        g.set_axis_labels(xlabels[i], xlabels[j])
-        fig = g.fig
-        fig.tight_layout()
-        fig.subplots_adjust(hspace=0.0, wspace=0.0)
         fname = f"{post_variables[i]}_{post_variables[j]}_joint_marginal.png"
         fname = path.join(plot_folder, fname)
+        fig, g = joint_marginal_plot(post[:, i], post[:, j], xlabels[i],
+                                     xlabels[j], savfig=True, fname=fname, block=False)
+        # g = sns.JointGrid(post[:, i], post[:, j], space=0.0, height=8)
+        # g = g.plot_joint(sns.kdeplot, cmap='Reds', shade_lowest=False, shade=True)
+        # g = g.plot_marginals(sns.distplot, kde=True, color='C3')
+        # g.set_axis_labels(xlabels[i], xlabels[j])
+        # fig = g.fig
+        # fig.tight_layout()
+        # fig.subplots_adjust(hspace=0.0, wspace=0.0)
+        # fname = f"{post_variables[i]}_{post_variables[j]}_joint_marginal.png"
+        # fname = path.join(plot_folder, fname)
+        # fig.savefig(fname, dpi=400)
+        # plt.show(block=False)
+   plt.show()
+
+
+def joint_marginal_plot(xpost, ypost, xlabel, ylabel, savefig=False, fname=None, block=False):
+    """Plot joint marginal distribution with marginals for x and y posteriors
+
+    :param np.ndarray xpost: posterior values for the x axis
+    :param np.ndarray ypost: posterior values for the y axis
+    :param str xlabel: x axis label
+    :param str ylabel: y axis label
+    :param bool savefig: True if the figure should be saved
+    :param str fname: filename to save figure to
+    :param bool block: block script while showing figure. User must close figure to continue
+    :return: Tuple with figure and axes
+    :rtype: Tuple
+    """
+    g = sns.JointGrid(xpost, ypost, space=0.0, height=8)
+    g = g.plot_joint(sns.kdeplot, cmap='Reds', shade_lowest=False, shade=True)
+    g = g.plot_marginals(sns.distplot, kde=True, color='C3')
+    g.set_axis_labels(xlabel, xlabel)
+    fig = g.fig
+    fig.tight_layout()
+    fig.subplots_adjust(hspace=0.0, wspace=0.0)
+    if savefig and fname is not None:
         fig.savefig(fname, dpi=400)
-        plt.show(block=False)
+    plt.show(block=block)
 
-    # g = sns.JointGrid(post[:, 0], post[:, 1], space=0.0, height=8)
-    # g = g.plot_joint(sns.kdeplot, cmap='Reds', shade_lowest=False, shade=True)
-    # g = g.plot_marginals(sns.distplot, kde=True, color='C3') 
-    # g.set_axis_labels(xlabels[0], xlabels[1])
-    # fig = g.fig
-    # fig.tight_layout()
-    # fig.subplots_adjust(hspace=0.0, wspace=0.0)
-    # plt.show(block=False)
-
-    # g = sns.JointGrid(post[:, 0], post[:, 2]*factors[2], space=0.0, height=8)
-    # g = g.plot_joint(sns.kdeplot, cmap='Reds', shade_lowest=False, shade=True)
-    # g = g.plot_marginals(sns.distplot, kde=True, color='C3') 
-    # g.set_axis_labels(xlabels[0], xlabels[2])
-    # fig = g.fig
-    # fig.tight_layout()
-    # fig.subplots_adjust(hspace=0.0, wspace=0.0)
-    # plt.show(block=False)
-
-    # g = sns.JointGrid(post[:, 1], post[:, 2]*factors[2], space=0.0, height=8)
-    # g = g.plot_joint(sns.kdeplot, cmap='Reds', shade_lowest=False, shade=True)
-    # g = g.plot_marginals(sns.distplot, kde=True, color='C3') 
-    # g.set_axis_labels(xlabels[1], xlabels[2])
-    # fig = g.fig
-    # fig.tight_layout()
-    # fig.subplots_adjust(hspace=0.0, wspace=0.0)
-    # plt.show(block=False)
-
-    plt.show()
+    return fig, g
 
 
-def make_histograms(posterior, xlabels, ylabels, factors, fnames, save=False, plot_folder=None, block=True):
+def marginal_plot(posterior, xlabel, ylabel, savefig=False, fname=None, block=False):
+    """
 
-    for idx, (xlabel, ylabel, factor) in enumerate(zip(xlabels, ylabels, factors)):
-        hist_data = posterior[:, idx]*factor
-        fig, ax = plt.subplots()
-        bins = plotting.my_hist(ax, hist_data, bins='auto')
+    :param np.ndarray posterior: posterior to plot
+    :param str xlabel: x axis label
+    :param str ylabel: y axis label
+    :param bool savefig: True if the figure should be saved
+    :param str fname: filename to save figure to
+    :param bool block: block script while showing figure. User must close figure to continue.
+    :return:
+    """
+    fig, ax = plt.subplots()
+    sns.distplot(posterior, kde=True, color='C3')
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
 
-        mu = np.mean(hist_data)
-        sigma = np.std(hist_data)
-        x = np.linspace(hist_data.min(), hist_data.max(), 500) 
-        kde = np.exp(-(x-mu)**2/2/sigma**2) / np.sqrt(2.0 *np.pi) / sigma
-        ax.plot(x, kde*(bins[1]-bins[0])*100, zorder=100, color='k')
-        # print("")
-        # print(xlabel)
-        # print('bin width', bins[1]-bins[0])
-        # print('kde max', kde.max())
-        # print("")
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+    if savefig and fname is not None:
+        fig.savefig(fname, dpi=400)
 
-        if save and plot_folder is not None:
-            filepath = path.join(plot_folder, fnames[idx])
-            fig.savefig(filepath, transparent=True)
+    plt.show(block=block)
+    return fig, ax
 
-        plt.show(block=block)
+
+# def make_histograms(posterior, xlabels, ylabels, factors, fnames, save=False, plot_folder=None, block=True):
+
+    # for idx, (xlabel, ylabel, factor) in enumerate(zip(xlabels, ylabels, factors)):
+    #     hist_data = posterior[:, idx]*factor
+    #     fig, ax = plt.subplots()
+    #     bins = plotting.my_hist(ax, hist_data, bins='auto')
+
+        # mu = np.mean(hist_data)
+        # sigma = np.std(hist_data)
+        # x = np.linspace(hist_data.min(), hist_data.max(), 500)
+        # kde = np.exp(-(x-mu)**2/2/sigma**2) / np.sqrt(2.0 *np.pi) / sigma
+        # ax.plot(x, kde*(bins[1]-bins[0])*100, zorder=100, color='k')
+        # # print("")
+        # # print(xlabel)
+        # # print('bin width', bins[1]-bins[0])
+        # # print('kde max', kde.max())
+        # # print("")
+        # ax.set_xlabel(xlabel)
+        # ax.set_ylabel(ylabel)
+
+        # if save and plot_folder is not None:
+        #     filepath = path.join(plot_folder, fnames[idx])
+        #     fig.savefig(filepath, transparent=True)
+
+        # plt.show(block=block)
 
 def calculate_multi_models(r, impact_factors, vel_offsets, L, d, F, Lnu, cube, nlambda=2000,
                            nr=101, rmax=40.0, r_anode=32.0):
+    """
+
+    :param r:
+    :param impact_factors:
+    :param vel_offsets:
+    :param L:
+    :param d:
+    :param F:
+    :param Lnu:
+    :param cube:
+    :param nlambda:
+    :param nr:
+    :param rmax:
+    :param r_anode:
+    :return:
+    """
     values = list()
     for idx, (loc, v_offset) in enumerate(zip(impact_factors, vel_offsets)):
         # wavelength, emission = plasma.calculate_pcx_chord_emission(loc, cube[0],

@@ -20,21 +20,20 @@ d = 0.883618  # 2020_02_05
 #d = 0.8836155  # 2020_01_15
 F = 20.9
 
-
 def pcx_vfd_model(r, b, Ti_params, V_params, ne_params, delta_d, amp, L, d, F, rmax=40.0):
-    """
+    """Simple wrapper for modeling chords on PCX for VFD experiments
 
-    :param r:
-    :param b:
-    :param Ti_params:
-    :param V_params:
-    :param ne_params:
-    :param delta_d:
-    :param amp:
-    :param L:
-    :param d:
-    :param F:
-    :param rmax:
+    :param np.ndarray r: array of pixel radius locations
+    :param float b: impact factor
+    :param List Ti_params: List containing args for Ti profile
+    :param List V_params: List containing args for V profile
+    :param List ne_params: List containing args for ne profile
+    :param float delta_d: change in etalon spacing in mm
+    :param float amp: amplitude
+    :param float L: focal length in pixels
+    :param float d: etalon spacing in mm
+    :param float F: etalon finesse
+    :param float rmax: max radius in the plasma to model
     :return:
     """
     w_model, radiance_model = plasma.vfd_chord(b, Ti_params, V_params, ne_params,
@@ -54,6 +53,24 @@ def calculate_delta_d(velocity_offset):
     """
     return 2.94734982e-09 * velocity_offset
 
+def prior(cube, ndim, nparams):
+    """Transforms prior hypercube to physical units
+    """
+    # cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
+    # cube[1] = dist.UniformPrior(cube[1], -5000.0, 5000.0)
+    cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
+    cube[1] = dist.UniformPrior(cube[1], 0.025, 3.0)
+    cube[2] = dist.UniformPrior(cube[2], -2000.0, 2000.0)
+    cube[3] = dist.UniformPrior(cube[3], -500.0, 500.0)
+
+    # I want to use a less broad prior for the amplitudes, but not allow negative amplitude
+    # for i in range(2, nparams):
+    #for i in range(3, nparams):
+    for i in range(4, nparams):
+        cube[i] = dist.TruncatedNormal(cube[i], 80.0, 30.0, 0.0, 1000.0) # 2020_02_05
+        #cube[i] = dist.TruncatedNormal(cube[i], 250.0, 150.0, 0.0, 1000.0) # 2020_01_15
+        # cube[i] = dist.UniformPrior(cube[i], 1.0, 100.0)
+
 
 def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
                                        image_data, resume=True, test_plot=False):
@@ -66,23 +83,6 @@ def argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior,
     :param bool test_plot: Runs test plot sampling from prior instead of running solver, default=False
     """
 
-    def prior(cube, ndim, nparams):
-        """Transforms prior hypercube to physical units
-        """
-        # cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
-        # cube[1] = dist.UniformPrior(cube[1], -5000.0, 5000.0)
-        cube[0] = dist.UniformPrior(cube[0], 0.025, 3.0)
-        cube[1] = dist.UniformPrior(cube[1], 0.025, 3.0)
-        cube[2] = dist.UniformPrior(cube[2], -2000.0, 2000.0)
-        cube[3] = dist.UniformPrior(cube[3], -500.0, 500.0)
-
-        # I want to use a less broad prior for the amplitudes, but not allow negative amplitude
-        # for i in range(2, nparams):
-        #for i in range(3, nparams):
-        for i in range(4, nparams):
-            cube[i] = dist.TruncatedNormal(cube[i], 80.0, 30.0, 0.0, 1000.0) # 2020_02_05
-            #cube[i] = dist.TruncatedNormal(cube[i], 250.0, 150.0, 0.0, 1000.0) # 2020_01_15
-            # cube[i] = dist.UniformPrior(cube[i], 1.0, 100.0)
 
     def loglikelihood(cube, ndim, nparams):
         """Calculates the log likelihood
