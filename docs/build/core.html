@@ -13,43 +13,40 @@
 
   
   
+  
+  
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Fabry Perot 0.1.0 documentation" href="index.html"/>
-        <link rel="next" title="Tools" href="tools.html"/>
-        <link rel="prev" title="Welcome to Fabry Perot’s documentation!" href="index.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tools" href="tools.html" />
+    <link rel="prev" title="Welcome to Fabry Perot’s documentation!" href="index.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
+   
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -84,18 +81,20 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents:</span></p>
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Core</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.ringsum">RingSum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.models">Models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.fitting">Fitting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.synthetic">Synthetic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-fabry.core.zeeman">Zeeman</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="finesse.html">Finesse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plasma.html">Plasma</a></li>
 </ul>
 
             
@@ -107,34 +106,54 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Fabry Perot</a>
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Fabry Perot</a>
+        
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Core</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Core</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="_sources/core.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -146,136 +165,116 @@
 <span id="ringsum"></span><h2>RingSum<a class="headerlink" href="#module-fabry.core.ringsum" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="fabry.core.ringsum.get_bin_edges">
-<code class="descclassname">fabry.core.ringsum.</code><code class="descname">get_bin_edges</code><span class="sig-paren">(</span><em>dat</em>, <em>x0</em>, <em>y0</em>, <em>binsize=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.get_bin_edges" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.ringsum.</code><code class="sig-name descname">get_bin_edges</code><span class="sig-paren">(</span><em class="sig-param">dat</em>, <em class="sig-param">x0</em>, <em class="sig-param">y0</em>, <em class="sig-param">binsize=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.get_bin_edges" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns equal area annuli bins for a ring image given a center and binsize</p>
 <div class="math">
-<p><img src="_images/math/f72084390aa8770f280187fcced27f8709397c05.svg" alt="r_n = \sqrt{n \left(2 r_N - \Delta  \right) \Delta } \quad n \in 0,...,N"/></p>
+<p><img src="_images/math/c2509810f6bec3d10af91eec3e1036ee06792b06.png" alt="r_n = \sqrt{n \left(2 r_N - \Delta  \right) \Delta } \quad n \in 0,...,N"/></p>
 </div><div class="math">
-<p><img src="_images/math/2b22781673a1782a8a40ab90c3272e4befbad13e.svg" alt="\Delta = \text{ binsize}"/></p>
-</div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dat</strong> (<em>np.ndarray</em>) – pixel values for the camera image</li>
-<li><strong>x0</strong> (<em>float</em>) – x location (pixels) of the center of the image</li>
-<li><strong>y0</strong> (<em>float</em>) – y location (pixels) of the center of the image</li>
-<li><strong>binsize</strong> (<em>float</em><em>, </em><em>optional</em>) – smallest radial bin size (occurs at the largest bin)</li>
+<p><img src="_images/math/ccb5ec5574664fbaf368ff9d0e34e39e0c1d83d3.png" alt="\Delta = \text{ binsize}"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dat</strong> (<em>np.ndarray</em>) – pixel values for the camera image</p></li>
+<li><p><strong>x0</strong> (<em>float</em>) – x location (pixels) of the center of the image</p></li>
+<li><p><strong>y0</strong> (<em>float</em>) – y location (pixels) of the center of the image</p></li>
+<li><p><strong>binsize</strong> (<em>float</em><em>, </em><em>optional</em>) – smallest radial bin size (occurs at the largest bin)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bins for the ring sum in pixels</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bins for the ring sum in pixels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.core.ringsum.locate_center">
-<code class="descclassname">fabry.core.ringsum.</code><code class="descname">locate_center</code><span class="sig-paren">(</span><em>data_in</em>, <em>xguess=None</em>, <em>yguess=None</em>, <em>maxiter=25</em>, <em>binsize=0.1</em>, <em>plotit=False</em>, <em>block_center=False</em>, <em>printit=True</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.locate_center" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.ringsum.</code><code class="sig-name descname">locate_center</code><span class="sig-paren">(</span><em class="sig-param">data_in</em>, <em class="sig-param">xguess=None</em>, <em class="sig-param">yguess=None</em>, <em class="sig-param">maxiter=25</em>, <em class="sig-param">binsize=0.1</em>, <em class="sig-param">plotit=False</em>, <em class="sig-param">block_center=False</em>, <em class="sig-param">printit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.locate_center" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds the center of a ring pattern image by preforming ringsums.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data_in</strong> (<em>np.ndarray</em>) – pixel values for the camera image</li>
-<li><strong>xguess</strong> (<em>float</em>) – guess of x location of center, if None, takes data center</li>
-<li><strong>yguess</strong> (<em>float</em>) – guess of y location of center, if None, takes data center</li>
-<li><strong>maxiter</strong> (<em>int</em>) – maximum number of center finding iterations</li>
-<li><strong>binsize</strong> (<em>float</em>) – smallest radial binsize (occurs at the largest bin)</li>
-<li><strong>plotit</strong> (<em>bool</em>) – plot fitting curves</li>
-<li><strong>block_center</strong> (<em>bool</em>) – block center of image (600x600 on xguess,yguess) when finding center. This helps when
-there is a ring at the center of the image.</li>
-<li><strong>printit</strong> (<em>bool</em>) – print center find progress if True</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_in</strong> (<em>np.ndarray</em>) – pixel values for the camera image</p></li>
+<li><p><strong>xguess</strong> (<em>float</em>) – guess of x location of center, if None, takes data center</p></li>
+<li><p><strong>yguess</strong> (<em>float</em>) – guess of y location of center, if None, takes data center</p></li>
+<li><p><strong>maxiter</strong> (<em>int</em>) – maximum number of center finding iterations</p></li>
+<li><p><strong>binsize</strong> (<em>float</em>) – smallest radial binsize (occurs at the largest bin)</p></li>
+<li><p><strong>plotit</strong> (<em>bool</em>) – plot fitting curves</p></li>
+<li><p><strong>block_center</strong> (<em>bool</em>) – block center of image (600x600 on xguess,yguess) when finding center. This helps when
+there is a ring at the center of the image.</p></li>
+<li><p><strong>printit</strong> (<em>bool</em>) – print center find progress if True</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">x and y location of the center</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (float, float)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>x and y location of the center</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple (float, float)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.core.ringsum.ringsum">
-<code class="descclassname">fabry.core.ringsum.</code><code class="descname">ringsum</code><span class="sig-paren">(</span><em>data</em>, <em>x0</em>, <em>y0</em>, <em>binsize=0.1</em>, <em>quadrants=False</em>, <em>use_weighted=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.ringsum" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.ringsum.</code><code class="sig-name descname">ringsum</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">x0</em>, <em class="sig-param">y0</em>, <em class="sig-param">binsize=0.1</em>, <em class="sig-param">quadrants=False</em>, <em class="sig-param">use_weighted=False</em>, <em class="sig-param">remove_hot_pixels=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.ringsum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a equal annulus area ringsum centered at (x0, y0) from data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</li>
-<li><strong>x0</strong> (<em>float</em>) – center location in x</li>
-<li><strong>y0</strong> (<em>float</em>) – center location in y</li>
-<li><strong>binsize</strong> (<em>float</em><em>, </em><em>optional</em>) – the delta r of the last annulus, default=0.1</li>
-<li><strong>quadrants</strong> (<em>bool</em>) – split the ringsum into 4 quadrants to use multiprocessing, default=False</li>
-<li><strong>use_weighted</strong> (<em>bool</em>) – use a weighted mean, default=False</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</p></li>
+<li><p><strong>x0</strong> (<em>float</em>) – center location in x</p></li>
+<li><p><strong>y0</strong> (<em>float</em>) – center location in y</p></li>
+<li><p><strong>binsize</strong> (<em>float</em><em>, </em><em>optional</em>) – the delta r of the last annulus, default=0.1</p></li>
+<li><p><strong>quadrants</strong> (<em>bool</em>) – split the ringsum into 4 quadrants to use multiprocessing, default=False</p></li>
+<li><p><strong>use_weighted</strong> (<em>bool</em>) – use a weighted mean, default=False</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">tuple</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.core.ringsum.super_pixelate">
-<code class="descclassname">fabry.core.ringsum.</code><code class="descname">super_pixelate</code><span class="sig-paren">(</span><em>data</em>, <em>npix=2</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.super_pixelate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.ringsum.</code><code class="sig-name descname">super_pixelate</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">npix=2</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.super_pixelate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates super pixels for image data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</li>
-<li><strong>npix</strong> (<em>int</em>) – integer number of pixels to create an npix x npix super pixel, default=2</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – 2d image data</p></li>
+<li><p><strong>npix</strong> (<em>int</em>) – integer number of pixels to create an npix x npix super pixel, default=2</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">new image made from the super pixels</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>new image made from the super pixels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.core.ringsum.calculate_weighted_mean">
-<code class="descclassname">fabry.core.ringsum.</code><code class="descname">calculate_weighted_mean</code><span class="sig-paren">(</span><em>data</em>, <em>error</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.calculate_weighted_mean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.ringsum.</code><code class="sig-name descname">calculate_weighted_mean</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">error</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.ringsum.calculate_weighted_mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the weighted mean of data with standard deviation error</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) – some stuff</li>
-<li><strong>error</strong> (<em>np.ndarray</em>) – standard deviation error bar for data</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – some stuff</p></li>
+<li><p><strong>error</strong> (<em>np.ndarray</em>) – standard deviation error bar for data</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">weighted mean and weighted standard deviation</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple (float, float)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>weighted mean and weighted standard deviation</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple (float, float)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -283,247 +282,283 @@ there is a ring at the center of the image.</li>
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-fabry.core.models" title="Permalink to this headline">¶</a></h2>
 <dl class="attribute">
 <dt id="fabry.core.models.airy_func">
-<code class="descclassname">fabry.core.models.</code><code class="descname">airy_func</code><a class="headerlink" href="#fabry.core.models.airy_func" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">airy_func</code><a class="headerlink" href="#fabry.core.models.airy_func" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Airy function (ideal Fabry-Perot instument function)
 as a function of wavelength and cos(theta) with parameters d and F</p>
 <div class="math">
-<p><img src="_images/math/ba9980a15b14263a7b6d37b67fd71f31a3ec3190.svg" alt="A = \left(1 + Q  \sin^2(\pi \frac{2d}{w} \cos\theta)\right)^{-1}"/></p>
+<p><img src="_images/math/23c12a8d5b7f838e7f5ec87e56ce3d86acb190ed.png" alt="A = \left(1 + Q  \sin^2(\pi \frac{2d}{w} \cos\theta)\right)^{-1}"/></p>
 </div><div class="math">
-<p><img src="_images/math/1b89fa6921b3ec9e5d94a988d53cc1ada164e610.svg" alt="Q = \left(\frac{2  \mathcal{F} }{ \pi } \right)^2"/></p>
-</div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array in nm</li>
-<li><strong>cos_th</strong> (<em>np.ndarray</em>) – cos(theta) array</li>
-<li><strong>d</strong> (<em>float</em>) – etalon spacing in mm</li>
-<li><strong>F</strong> (<em>float</em>) – etalon finesse</li>
+<p><img src="_images/math/e99e048bb0f0228ead306aa4589ac74637f4322c.png" alt="Q = \left(\frac{2  \mathcal{F} }{ \pi } \right)^2"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array in nm</p></li>
+<li><p><strong>cos_th</strong> (<em>np.ndarray</em>) – cos(theta) array</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – etalon spacing in mm</p></li>
+<li><p><strong>F</strong> (<em>float</em>) – etalon finesse</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">evaluated airy function</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>evaluated airy function</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.core.models.doppler_broadening">
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">doppler_broadening</code><a class="headerlink" href="#fabry.core.models.doppler_broadening" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates doppler broadening</p>
+<div class="math">
+<p><img src="_images/math/d571b7396ebc0f9a01829d8ddeae790a17830b97.png" alt="\sigma = w_0  \sqrt{\frac{k_B T }{ mc^2}}"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w0</strong> (<em>float</em>) – central wavelength</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – mass in amu</p></li>
+<li><p><strong>temp</strong> (<em>float</em>) – temperature in eV</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>doppler broadening sigma</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.models.doppler_calc">
-<code class="descclassname">fabry.core.models.</code><code class="descname">doppler_calc</code><a class="headerlink" href="#fabry.core.models.doppler_calc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">doppler_calc</code><a class="headerlink" href="#fabry.core.models.doppler_calc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the doppler broadening sigma and the new central wavelength
 from the doppler shift</p>
 <div class="math">
-<p><img src="_images/math/bb0a12a30323142bccb11e7a01f8c509a7820268.svg" alt="\sigma = w_0  \sqrt{\frac{k_B T }{ mc^2}}"/></p>
+<p><img src="_images/math/d571b7396ebc0f9a01829d8ddeae790a17830b97.png" alt="\sigma = w_0  \sqrt{\frac{k_B T }{ mc^2}}"/></p>
 </div><div class="math">
-<p><img src="_images/math/a2eb071a38c5107df3a0135bf54e7d5f6e32b873.svg" alt="w = w_0 (1 - v/c)"/></p>
-</div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>w0</strong> (<em>float</em>) – unshifted wavelength in nm</li>
-<li><strong>mu</strong> (<em>float</em>) – atomic mass in amu</li>
-<li><strong>temp</strong> (<em>float</em>) – temperature in eV</li>
-<li><strong>v</strong> (<em>float</em>) – velocity in m/s</li>
+<p><img src="_images/math/af156d989ae0a5cbd0e2d4bf47f81ce0de24d4f6.png" alt="w = w_0 (1 - v/c)"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w0</strong> (<em>float</em>) – unshifted wavelength in nm</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – atomic mass in amu</p></li>
+<li><p><strong>temp</strong> (<em>float</em>) – temperature in eV</p></li>
+<li><p><strong>v</strong> (<em>float</em>) – velocity in m/s</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">sigma in nm, shifted wavelength in nm</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(float, float))</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sigma in nm, shifted wavelength in nm</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(float, float))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.core.models.doppler_shift">
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">doppler_shift</code><a class="headerlink" href="#fabry.core.models.doppler_shift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates doppler shift of w0 for velocity v</p>
+<div class="math">
+<p><img src="_images/math/af156d989ae0a5cbd0e2d4bf47f81ce0de24d4f6.png" alt="w = w_0 (1 - v/c)"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w0</strong> (<em>float</em>) – central wavelength</p></li>
+<li><p><strong>or float v</strong> (<em>np.ndarray</em>) – velocity in m/s</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>doppler shift wavelength from velocity</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray or float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.models.forward_model">
-<code class="descclassname">fabry.core.models.</code><code class="descname">forward_model</code><a class="headerlink" href="#fabry.core.models.forward_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">forward_model</code><a class="headerlink" href="#fabry.core.models.forward_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convolves the Doppler spectrum with the ideal Fabry-Perot Airy function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute q on</li>
-<li><strong>L</strong> (<em>float</em>) – camera lens focal length, same units as r (pixels or mm)</li>
-<li><strong>d</strong> (<em>float</em>) – etalon spacing (mm)</li>
-<li><strong>F</strong> (<em>float</em>) – etalon finesse</li>
-<li><strong>w0</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – central wavelength(s) in nm</li>
-<li><strong>mu</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – mass(es) in amu</li>
-<li><strong>amp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – amplitude(s) for the lines</li>
-<li><strong>temp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – temperature(s) in eV</li>
-<li><strong>v</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</li>
-<li><strong>nlambda</strong> (<em>int</em>) – number of points in wavelength array, default=1024</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute q on</p></li>
+<li><p><strong>L</strong> (<em>float</em>) – camera lens focal length, same units as r (pixels or mm)</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – etalon spacing (mm)</p></li>
+<li><p><strong>F</strong> (<em>float</em>) – etalon finesse</p></li>
+<li><p><strong>w0</strong> (<em>Union</em><em>[</em><em>float</em><em>,</em><em>List</em><em>]</em>) – central wavelength(s) in nm</p></li>
+<li><p><strong>mu</strong> (<em>Union</em><em>[</em><em>float</em><em>,</em><em>List</em><em>]</em>) – mass(es) in amu</p></li>
+<li><p><strong>amp</strong> (<em>Union</em><em>[</em><em>float</em><em>,</em><em>List</em><em>]</em>) – amplitude(s) for the lines</p></li>
+<li><p><strong>temp</strong> (<em>Union</em><em>[</em><em>float</em><em>,</em><em>List</em><em>]</em>) – temperature(s) in eV</p></li>
+<li><p><strong>v</strong> (<em>Union</em><em>[</em><em>float</em><em>,</em><em>List</em><em>]</em>) – velocities in m/s</p></li>
+<li><p><strong>nlambda</strong> (<em>int</em>) – number of points in wavelength array, default=1024</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array length of r of forward q</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>array length of r of forward q</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.models.gaussian">
-<code class="descclassname">fabry.core.models.</code><code class="descname">gaussian</code><a class="headerlink" href="#fabry.core.models.gaussian" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">gaussian</code><a class="headerlink" href="#fabry.core.models.gaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes a gaussian for a given central wavelength, sigma and amp</p>
 <div class="math">
-<p><img src="_images/math/91b9f1dd4d5ad8f09273cacce4339c0ad04b9aba.svg" alt="G = \frac{A}{\sigma \sqrt{2 \pi}} \exp{\left( \frac{ (w - w_0)^2 }{2 \sigma^2 } \right) }"/></p>
-</div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array to calculate spec on</li>
-<li><strong>w</strong> (<em>float</em>) – central wavelength (same units as wavelength array)</li>
-<li><strong>sigma</strong> (<em>float</em>) – sigma for gaussian (same units as w)</li>
-<li><strong>amp</strong> (<em>float</em>) – amplitude of spectrum, default=1.0</li>
-<li><strong>norm</strong> (<em>bool</em>) – if true, the gaussian will be normalized, default=True
-to integrate to 1 over infinity then the amp factor will be multiplied</li>
+<p><img src="_images/math/54729622408aa9ddd03b19a60db7917a970f03ac.png" alt="G = \exp{\left( \frac{ (w - w_0)^2 }{2 \sigma^2 } \right) }"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array to calculate spec on</p></li>
+<li><p><strong>w</strong> (<em>float</em>) – central wavelength (same units as wavelength array)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – sigma for gaussian (same units as w)</p></li>
+<li><p><strong>amp</strong> (<em>float</em>) – amplitude of spectrum, default=1.0</p></li>
+<li><p><strong>norm</strong> (<em>bool</em>) – if true, the gaussian will be normalized, default=True
+to integrate to 1 over infinity then the amp factor will be multiplied</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">spectrum evaluated on wavelength array</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>spectrum evaluated on wavelength array</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.core.models.general_model">
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">general_model</code><a class="headerlink" href="#fabry.core.models.general_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the etalon spectra given plasma spectra vs wavelength</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>np.ndarray</em>) – array of pixel r values to compute etalon spectra on</p></li>
+<li><p><strong>L</strong> (<em>float</em>) – camera focal length in pixels</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – etalon spacing in mm</p></li>
+<li><p><strong>F</strong> (<em>float</em>) – etalon finesse</p></li>
+<li><p><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array</p></li>
+<li><p><strong>emission</strong> (<em>np.ndarray</em>) – emission array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>etalon spectra</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.core.models.lorentzian">
-<code class="descclassname">fabry.core.models.</code><code class="descname">lorentzian</code><span class="sig-paren">(</span><em>wavelength</em>, <em>w</em>, <em>gamma</em>, <em>amp=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.models.lorentzian" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">lorentzian</code><span class="sig-paren">(</span><em class="sig-param">wavelength</em>, <em class="sig-param">w</em>, <em class="sig-param">gamma</em>, <em class="sig-param">amp=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.models.lorentzian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes a lorentzian for a given central wavelength, gamma and amp</p>
 <div class="math">
-<p><img src="_images/math/3afe8a2c498c9a7687b995ace8b3ff01d539c6fd.svg" alt="L = \frac{A}{2 \pi} \frac{\gamma }{ (w-w_0)^2 + (\gamma/2)^2}"/></p>
-</div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>wavelength</strong> (<em>np.array</em>) – wavelength array to calculate spec on</li>
-<li><strong>w</strong> (<em>float</em>) – central wavelength (same units as wavelength array)</li>
-<li><strong>gamma</strong> (<em>float</em>) – lorentzian gamma parameter</li>
-<li><strong>amp</strong> (<em>float</em><em>, </em><em>default=1.</em>) – amplitude in addition to one that integrates
-spec to 1 over infinity</li>
+<p><img src="_images/math/e8ced96d9c1f1d97303ed4003663edc505edae46.png" alt="L = \frac{A}{2 \pi} \frac{\gamma }{ (w-w_0)^2 + (\gamma/2)^2}"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavelength</strong> (<em>np.array</em>) – wavelength array to calculate spec on</p></li>
+<li><p><strong>w</strong> (<em>float</em>) – central wavelength (same units as wavelength array)</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – lorentzian gamma parameter</p></li>
+<li><p><strong>amp</strong> (<em>float</em><em>, </em><em>default=1.</em>) – amplitude in addition to one that integrates
+spec to 1 over infinity</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">spectrum evaluated on wavelength array</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">spec (np.ndarray)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>spectrum evaluated on wavelength array</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>spec (np.ndarray)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.core.models.offset_forward_model">
-<code class="descclassname">fabry.core.models.</code><code class="descname">offset_forward_model</code><span class="sig-paren">(</span><em>r</em>, <em>L</em>, <em>d</em>, <em>F</em>, <em>w0</em>, <em>mu</em>, <em>amp</em>, <em>temp</em>, <em>v</em>, <em>nlambda=1024</em>, <em>sm_ang=False</em>, <em>coeff=0.15</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.models.offset_forward_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward q with an attempt to q the ‘offset’ from nuissance lines</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute q on</li>
-<li><strong>L</strong> (<em>float</em>) – camera lens focal length, same units as r (pixels or mm)</li>
-<li><strong>d</strong> (<em>float</em>) – etalon spacing (mm)</li>
-<li><strong>F</strong> (<em>float</em>) – etalon finesse</li>
-<li><strong>w0</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – central wavelength(s) in nm</li>
-<li><strong>mu</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – mass(es) in amu</li>
-<li><strong>amp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – amplitude(s) for the lines</li>
-<li><strong>temp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – temperature(s) in eV</li>
-<li><strong>v</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</li>
-<li><strong>nlambda</strong> (<em>int</em>) – number of points in wavelength array, default=1024</li>
-<li><strong>sm_ang</strong> (<em>bool</em>) – use the small angle approx or not, default=True</li>
-<li><strong>coeff</strong> (<em>float</em>) – coefficient to q the relative amplitude of all the nuissance lines</li>
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">offset_forward_model</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">L</em>, <em class="sig-param">d</em>, <em class="sig-param">F</em>, <em class="sig-param">w0</em>, <em class="sig-param">mu</em>, <em class="sig-param">amp</em>, <em class="sig-param">temp</em>, <em class="sig-param">v</em>, <em class="sig-param">nlambda=1024</em>, <em class="sig-param">sm_ang=False</em>, <em class="sig-param">coeff=0.15</em>, <em class="sig-param">Ip=None</em>, <em class="sig-param">Id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.models.offset_forward_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward model with an attempt to model the ‘offset’ from nuissance lines</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>np.ndarray</em>) – array of r values to compute q on</p></li>
+<li><p><strong>L</strong> (<em>float</em>) – camera lens focal length, same units as r (pixels or mm)</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – etalon spacing (mm)</p></li>
+<li><p><strong>F</strong> (<em>float</em>) – etalon finesse</p></li>
+<li><p><strong>w0</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – central wavelength(s) in nm</p></li>
+<li><p><strong>mu</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – mass(es) in amu</p></li>
+<li><p><strong>amp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – amplitude(s) for the lines</p></li>
+<li><p><strong>temp</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – temperature(s) in eV</p></li>
+<li><p><strong>v</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>list</em><em>]</em>) – velocities in m/s</p></li>
+<li><p><strong>nlambda</strong> (<em>int</em>) – number of points in wavelength array, default=1024</p></li>
+<li><p><strong>sm_ang</strong> (<em>bool</em>) – use the small angle approx or not, default=True</p></li>
+<li><p><strong>coeff</strong> (<em>float</em>) – coefficient to q the relative amplitude of all the nuissance lines</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array length of r of forward q</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>array length of r of forward q</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.models.peak_calculator">
-<code class="descclassname">fabry.core.models.</code><code class="descname">peak_calculator</code><a class="headerlink" href="#fabry.core.models.peak_calculator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">peak_calculator</code><a class="headerlink" href="#fabry.core.models.peak_calculator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple peak calculator for ideal Fabry-Perot.</p>
 <div class="math">
-<p><img src="_images/math/ca449a9a36b059c3953e81de8cc2d9c4c95ea91c.svg" alt="r_j = L  \sqrt{ \left( \frac{2d/w}{\rm{Floor}(2d/w)-j}\right)^2 - 1}"/></p>
-</div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>L</strong> (<em>float</em>) – L value, units will set return units (pixels or mm)</li>
-<li><strong>d</strong> (<em>float</em>) – etalon spacing in mm</li>
-<li><strong>w</strong> (<em>float</em>) – peak wavelength in nm</li>
-<li><strong>order</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>,</em><em>int</em><em>]</em>) – j order number. 0 gives order nearest center
-of rings, increasing j as you move out.</li>
+<p><img src="_images/math/288a4da04b7a3888c6bb05e50086d8ec368e12e6.png" alt="r_j = L  \sqrt{ \left( \frac{2d/w}{\rm{Floor}(2d/w)-j}\right)^2 - 1}"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>L</strong> (<em>float</em>) – L value, units will set return units (pixels or mm)</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – etalon spacing in mm</p></li>
+<li><p><strong>w</strong> (<em>float</em>) – peak wavelength in nm</p></li>
+<li><p><strong>order</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>,</em><em>int</em><em>]</em>) – j order number. 0 gives order nearest center
+of rings, increasing j as you move out.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>the location of the peak(s)</dt>
-<dd><p class="first last">in the same units as L with the same length as order</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>the location of the peak(s)</dt><dd><p>in the same units as L with the same length as order</p>
 </dd>
 </dl>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Union[np.ndarray, float]</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Union[np.ndarray, float]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.core.models.trapezoidal_integration">
-<code class="descclassname">fabry.core.models.</code><code class="descname">trapezoidal_integration</code><a class="headerlink" href="#fabry.core.models.trapezoidal_integration" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.models.</code><code class="sig-name descname">trapezoidal_integration</code><a class="headerlink" href="#fabry.core.models.trapezoidal_integration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs trapezoidal intergration</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>y</strong> (<em>Union</em><em>[</em><em>list</em><em>, </em><em>np.ndarray</em><em>]</em>) – y data points</li>
-<li><strong>x</strong> (<em>Union</em><em>[</em><em>list</em><em>, </em><em>np.ndarray</em><em>]</em>) – x data points</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>Union</em><em>[</em><em>list</em><em>, </em><em>np.ndarray</em><em>]</em>) – y data points</p></li>
+<li><p><strong>x</strong> (<em>Union</em><em>[</em><em>list</em><em>, </em><em>np.ndarray</em><em>]</em>) – x data points</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">area under the curve y(x)</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>area under the curve y(x)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -531,1239 +566,84 @@ of rings, increasing j as you move out.</li>
 <span id="fitting"></span><h2>Fitting<a class="headerlink" href="#module-fabry.core.fitting" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="fabry.core.fitting.determine_fit_range">
-<code class="descclassname">fabry.core.fitting.</code><code class="descname">determine_fit_range</code><span class="sig-paren">(</span><em>r</em>, <em>signal</em>, <em>pkr</em>, <em>thres=0.15</em>, <em>plotit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.fitting.determine_fit_range" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.fitting.</code><code class="sig-name descname">determine_fit_range</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">signal</em>, <em class="sig-param">pkr</em>, <em class="sig-param">thres=0.15</em>, <em class="sig-param">plotit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.fitting.determine_fit_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to pick fitting range using peak guess and a threshold</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) – r data</li>
-<li><strong>signal</strong> (<em>np.ndarray</em>) – ringsum data</li>
-<li><strong>pkr</strong> (<em>float</em>) – guess for peak location</li>
-<li><strong>thres</strong> (<em>float</em>) – threshold from peak that is included, default=0.15</li>
-<li><strong>plotit</strong> (<em>bools</em>) – plots the determined range for checking, default=False</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>np.ndarray</em>) – r data</p></li>
+<li><p><strong>signal</strong> (<em>np.ndarray</em>) – ringsum data</p></li>
+<li><p><strong>pkr</strong> (<em>float</em>) – guess for peak location</p></li>
+<li><p><strong>thres</strong> (<em>float</em>) – threshold from peak that is included, default=0.15</p></li>
+<li><p><strong>plotit</strong> (<em>bools</em>) – plots the determined range for checking, default=False</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of indexes within threshold of peak guess</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of indexes within threshold of peak guess</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.core.fitting.find_maximum">
-<code class="descclassname">fabry.core.fitting.</code><code class="descname">find_maximum</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>returnval=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.fitting.find_maximum" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Finds maximum location of a single peak using simple derivative method. Assumes only one</dt>
-<dd>peak is in given data range.</dd>
+<code class="sig-prename descclassname">fabry.core.fitting.</code><code class="sig-name descname">find_maximum</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">returnval=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.fitting.find_maximum" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Finds maximum location of a single peak using simple derivative method. Assumes only one</dt><dd><p>peak is in given data range.</p>
+</dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>np.ndarray</em>) – x array of values</li>
-<li><strong>y</strong> (<em>np.ndarray</em>) – y array of values</li>
-<li><strong>returnval</strong> (<em>bool</em>) – Returns the value at the maximum if True, default=False</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – x array of values</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – y array of values</p></li>
+<li><p><strong>returnval</strong> (<em>bool</em>) – Returns the value at the maximum if True, default=False</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>x position of peak</dt>
-<dd><p class="first last">if a minimum is detected, returns None</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>x position of peak</dt><dd><p>if a minimum is detected, returns None</p>
 </dd>
 </dl>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pk (float)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pk (float)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.core.fitting.find_maximum_3">
-<code class="descclassname">fabry.core.fitting.</code><code class="descname">find_maximum_3</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>y_sd</em>, <em>basename</em>, <em>plotit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.fitting.find_maximum_3" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.fitting.</code><code class="sig-name descname">find_maximum_3</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">y_sd</em>, <em class="sig-param">basename</em>, <em class="sig-param">plotit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.fitting.find_maximum_3" title="Permalink to this definition">¶</a></dt>
 <dd><p>guass fit using multinest</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.core.fitting.find_peak">
-<code class="descclassname">fabry.core.fitting.</code><code class="descname">find_peak</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>x_sd</em>, <em>y_sd</em>, <em>returnval=False</em>, <em>plotit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.fitting.find_peak" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.core.fitting.</code><code class="sig-name descname">find_peak</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">x_sd</em>, <em class="sig-param">y_sd</em>, <em class="sig-param">returnval=False</em>, <em class="sig-param">plotit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.fitting.find_peak" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses a gaussian fit to find maximum via scipy.odr fit is performed in x^2 space, but all conversions
 are taken care of inside this function</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>np.ndarray</em>) – x values for fit</li>
-<li><strong>y</strong> (<em>np.ndarray</em>) – y values for fit</li>
-<li><strong>x_sd</strong> (<em>np.ndarray</em>) – standard deviation in x values (typically binsize)</li>
-<li><strong>y_sd</strong> (<em>np.ndarray</em>) – standard deviation in y values</li>
-<li><strong>returnval</strong> (<em>bool</em>) – flag for returning fit value at peak location, default=False</li>
-<li><strong>plotit</strong> (<em>bool</em>) – flag for plotting fit, default=False</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – x values for fit</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – y values for fit</p></li>
+<li><p><strong>x_sd</strong> (<em>np.ndarray</em>) – standard deviation in x values (typically binsize)</p></li>
+<li><p><strong>y_sd</strong> (<em>np.ndarray</em>) – standard deviation in y values</p></li>
+<li><p><strong>returnval</strong> (<em>bool</em>) – flag for returning fit value at peak location, default=False</p></li>
+<li><p><strong>plotit</strong> (<em>bool</em>) – flag for plotting fit, default=False</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">peak location, peak location error, peak value</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Tuple (float, float, float)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-fabry.core.synthetic">
-<span id="synthetic"></span><h2>Synthetic<a class="headerlink" href="#module-fabry.core.synthetic" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="fabry.core.synthetic.Etalon">
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">Etalon</code><span class="sig-paren">(</span><em>L</em>, <em>d</em>, <em>F</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.Etalon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class that represents an etalon for a Fabry-Perot spectrometer</p>
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Etalon.L">
-<code class="descname">L</code><a class="headerlink" href="#fabry.core.synthetic.Etalon.L" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – focal length of lens for the camera</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Etalon.d">
-<code class="descname">d</code><a class="headerlink" href="#fabry.core.synthetic.Etalon.d" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – etalon spacing</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Etalon.F">
-<code class="descname">F</code><a class="headerlink" href="#fabry.core.synthetic.Etalon.F" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – finesse of etalon</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.Etalon.calculate_emission">
-<code class="descname">calculate_emission</code><span class="sig-paren">(</span><em>sensor</em>, <em>light_source</em>, <em>nprocs=4</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.Etalon.calculate_emission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calcultes the emission onto a sensor from a light source</p>
-<dl class="docutils">
-<dt>Note: This uses multiprocessing for speed. Each process has a for loop</dt>
-<dd>because of memory constraints if the sensor is too big.</dd>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>peak location, peak location error, peak value</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple (float, float, float)</p>
+</dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sensor</strong> (<a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor"><em>Sensor</em></a>) – represents a camera sensor</li>
-<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – represents a light source for the Fabry Perot</li>
-<li><strong>nprocs</strong> (<em>int</em>) – number of processes to use</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">shape matches sensor.sensor.shape</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="fabry.core.synthetic.Etalon.from_dict">
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>etalon</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.Etalon.from_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates an instance of Etalon from a dictionary</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>etalon</strong> (<em>dict</em>) – dictionary representing a etalon</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an new instance of a Etalon</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#fabry.core.synthetic.Etalon" title="fabry.core.synthetic.Etalon">Etalon</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.Etalon.to_dict">
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.Etalon.to_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dictionary representing itself</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a dictionary representing itself</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="fabry.core.synthetic.LightSource">
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">LightSource</code><span class="sig-paren">(</span><em>Ti</em>, <em>w</em>, <em>mu</em>, <em>velocity</em>, <em>amplitude=1</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.LightSource" title="Permalink to this definition">¶</a></dt>
-<dd><p>A representation of a light source for a Fabry-Perot spectrometer</p>
-<dl class="attribute">
-<dt id="fabry.core.synthetic.LightSource.temperature">
-<code class="descname">temperature</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.temperature" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – temperature of the emitting ion in eV</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.LightSource.wavelength">
-<code class="descname">wavelength</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.wavelength" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – wavelength of the light emitted in nm</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.LightSource.mu">
-<code class="descname">mu</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.mu" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – relative mass of the ion</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.LightSource.amplitude">
-<code class="descname">amplitude</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.amplitude" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – amplitude of the light emitted (you can choose your units here…)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.LightSource.velocity">
-<code class="descname">velocity</code><a class="headerlink" href="#fabry.core.synthetic.LightSource.velocity" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>VelocityProfile or float</em> – velocity of the emitting ion in m/s</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="fabry.core.synthetic.LightSource.from_dict">
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>light_source</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.LightSource.from_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new instance of LightSource from a dictionary</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>light_source</strong> (<em>dict</em>) – dictionary representing a light source</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">LightSource</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.LightSource.to_dict">
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.LightSource.to_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dict representing itself</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="fabry.core.synthetic.Sensor">
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">Sensor</code><span class="sig-paren">(</span><em>nx</em>, <em>ny</em>, <em>px_size=0.004</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.Sensor" title="Permalink to this definition">¶</a></dt>
-<dd><p>A representation for a camera sensor for the Fabry Perot</p>
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Sensor.nx">
-<code class="descname">nx</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.nx" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> – number of pixels in the x direction</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Sensor.ny">
-<code class="descname">ny</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.ny" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> – number of pixels in the y direction</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Sensor.px_size">
-<code class="descname">px_size</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.px_size" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Pixel size in mm</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Sensor.x0">
-<code class="descname">x0</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.x0" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – x location of the center</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Sensor.y0">
-<code class="descname">y0</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.y0" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – y location of th center</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Sensor.sensor">
-<code class="descname">sensor</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.sensor" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>np.ndarray</em> – 2D array representing the sensors where each
-element is the count value for that pixel</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.Sensor.R">
-<code class="descname">R</code><a class="headerlink" href="#fabry.core.synthetic.Sensor.R" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>np.ndarray</em> – 2D array of radii values for each pixel</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.Sensor.calculate_emission">
-<code class="descname">calculate_emission</code><span class="sig-paren">(</span><em>etalon</em>, <em>light_source</em>, <em>nprocs=4</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.Sensor.calculate_emission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates emission from a light source through an etalon onto the sensor</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>etalon</strong> (<a class="reference internal" href="#fabry.core.synthetic.Etalon" title="fabry.core.synthetic.Etalon"><em>Etalon</em></a>) – representation of the etalon</li>
-<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – representation of the light source</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.Sensor.create_Rgrid">
-<code class="descname">create_Rgrid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.Sensor.create_Rgrid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a 2D matrix of radii values for each pixel</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="fabry.core.synthetic.Sensor.from_dict">
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>sensor</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.Sensor.from_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates an instance of Sensor from a dictionary</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sensor</strong> (<em>dict</em>) – dictionary representing a sensor</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a new instance of a Sensor</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor">Sensor</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.Sensor.to_dict">
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.Sensor.to_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dictionary representation of a Sensor</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a dictionary representation of a Sensor</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="fabry.core.synthetic.UniformPlasma">
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">UniformPlasma</code><span class="sig-paren">(</span><em>ne</em>, <em>Ti</em>, <em>pec</em>, <em>w</em>, <em>velocity=None</em>, <em>mu=40.0</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>A representation of a uniform density and uniform Ti plasma with ion</dt>
-<dd>species mu emitting light for a Fabry-Perot spectrometer</dd>
-</dl>
-<dl class="attribute">
-<dt id="fabry.core.synthetic.UniformPlasma.mu">
-<code class="descname">mu</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.mu" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – relative mass of the ion</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.UniformPlasma.velocity">
-<code class="descname">velocity</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.velocity" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Union[VelocityProfile,float]</em> – velocity of the emitting ion in m/s</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.UniformPlasma.ne">
-<code class="descname">ne</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.ne" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – electron density in cm^-3</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.UniformPlasma.pec">
-<code class="descname">pec</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.pec" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – photon emissivity coefficient (need to decide on units here)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">mu</code></dt>
-<dd><p><em>float</em> – relative mass of the ion</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.UniformPlasma.calculate_shift">
-<code class="descname">calculate_shift</code><span class="sig-paren">(</span><em>velocity</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.calculate_shift" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate doppler shift from the ion velocity</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity in m/s</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="fabry.core.synthetic.UniformPlasma.from_dict">
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>plasma</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.from_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new instance of UniformPlasma from dict</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>plasma</strong> (<em>dict</em>) – dictionary representation of a UniformPlasma</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">UniformPlasma</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.UniformPlasma.gaussian">
-<code class="descname">gaussian</code><span class="sig-paren">(</span><em>wavelength</em>, <em>velocity</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.gaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates doppler broadened and shifted gaussian</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line profile</li>
-<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity of ion for doppler shift</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.UniformPlasma.ion_emission">
-<code class="descname">ion_emission</code><span class="sig-paren">(</span><em>r</em>, <em>wavelength</em>, <em>cos_theta=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.ion_emission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates ion emission at a radius r for wavelengths provided</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to calculate ion emission at</li>
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line
-profile</li>
-<li><strong>cos_theta</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – cos(theta) to project velocity onto a unit
-vector an angle theta from the toroidal direction</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.UniformPlasma.mass">
-<code class="descname">mass</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.mass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mass of ion in kg</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.UniformPlasma.sigma">
-<code class="descname">sigma</code><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.sigma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Thermal doppler broadening</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.UniformPlasma.to_dict">
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.UniformPlasma.to_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dict representation</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="fabry.core.synthetic.VelocityProfile">
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">VelocityProfile</code><span class="sig-paren">(</span><em>Vmax</em>, <em>max_radius</em>, <em>length_scale</em>, <em>edge_scale</em>, <em>R0=140.0</em>, <em>offset=0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represents a edge driven velocity profile</p>
-<dl class="attribute">
-<dt id="fabry.core.synthetic.VelocityProfile.Vmax">
-<code class="descname">Vmax</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.Vmax" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – maximum velocity</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.VelocityProfile.max_radius">
-<code class="descname">max_radius</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.max_radius" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – radial location of the maximum velocity</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.VelocityProfile.length_scale">
-<code class="descname">length_scale</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.length_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – scale for the velocity gradient inward radially</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.VelocityProfile.edge_scale">
-<code class="descname">edge_scale</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.edge_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – scale for the velocity edge gradient</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.VelocityProfile.R0">
-<code class="descname">R0</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.R0" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – location of the edge</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="fabry.core.synthetic.VelocityProfile.offset">
-<code class="descname">offset</code><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.offset" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – offset velocity in the center</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="fabry.core.synthetic.VelocityProfile.from_dict">
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>velocity</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.from_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a new instance of VelocityProfile from a dict</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>dict</em>) – dict reprsentation of a VelocityProfile</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">VelocityProfile</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.VelocityProfile.gaussian">
-<code class="descname">gaussian</code><span class="sig-paren">(</span><em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.gaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function for the inward velocity gradient</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate at</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.VelocityProfile.right_edge_profile">
-<code class="descname">right_edge_profile</code><span class="sig-paren">(</span><em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.right_edge_profile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function for the edge profile</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaulate at</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.VelocityProfile.to_dict">
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.to_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dict representation of the VelocityProfile</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fabry.core.synthetic.VelocityProfile.vphi">
-<code class="descname">vphi</code><span class="sig-paren">(</span><em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.synthetic.VelocityProfile.vphi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the Torodial velocity at r</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate vphi at</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt>
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">Sensor</code><span class="sig-paren">(</span><em>nx</em>, <em>ny</em>, <em>px_size=0.004</em><span class="sig-paren">)</span></dt>
-<dd><p>A representation for a camera sensor for the Fabry Perot</p>
-<dl class="attribute">
-<dt>
-<code class="descname">nx</code></dt>
-<dd><p><em>int</em> – number of pixels in the x direction</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">ny</code></dt>
-<dd><p><em>int</em> – number of pixels in the y direction</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">px_size</code></dt>
-<dd><p><em>float</em> – Pixel size in mm</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">x0</code></dt>
-<dd><p><em>float</em> – x location of the center</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">y0</code></dt>
-<dd><p><em>float</em> – y location of th center</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">sensor</code></dt>
-<dd><p><em>np.ndarray</em> – 2D array representing the sensors where each
-element is the count value for that pixel</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">R</code></dt>
-<dd><p><em>np.ndarray</em> – 2D array of radii values for each pixel</p>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">calculate_emission</code><span class="sig-paren">(</span><em>etalon</em>, <em>light_source</em>, <em>nprocs=4</em><span class="sig-paren">)</span></dt>
-<dd><p>Calculates emission from a light source through an etalon onto the sensor</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>etalon</strong> (<a class="reference internal" href="#fabry.core.synthetic.Etalon" title="fabry.core.synthetic.Etalon"><em>Etalon</em></a>) – representation of the etalon</li>
-<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – representation of the light source</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">create_Rgrid</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Creates a 2D matrix of radii values for each pixel</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt>
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>sensor</em><span class="sig-paren">)</span></dt>
-<dd><p>Creates an instance of Sensor from a dictionary</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sensor</strong> (<em>dict</em>) – dictionary representing a sensor</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a new instance of a Sensor</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor">Sensor</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Returns a dictionary representation of a Sensor</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a dictionary representation of a Sensor</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt>
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">Etalon</code><span class="sig-paren">(</span><em>L</em>, <em>d</em>, <em>F</em><span class="sig-paren">)</span></dt>
-<dd><p>Class that represents an etalon for a Fabry-Perot spectrometer</p>
-<dl class="attribute">
-<dt>
-<code class="descname">L</code></dt>
-<dd><p><em>float</em> – focal length of lens for the camera</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">d</code></dt>
-<dd><p><em>float</em> – etalon spacing</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">F</code></dt>
-<dd><p><em>float</em> – finesse of etalon</p>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">calculate_emission</code><span class="sig-paren">(</span><em>sensor</em>, <em>light_source</em>, <em>nprocs=4</em><span class="sig-paren">)</span></dt>
-<dd><p>Calcultes the emission onto a sensor from a light source</p>
-<dl class="docutils">
-<dt>Note: This uses multiprocessing for speed. Each process has a for loop</dt>
-<dd>because of memory constraints if the sensor is too big.</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sensor</strong> (<a class="reference internal" href="#fabry.core.synthetic.Sensor" title="fabry.core.synthetic.Sensor"><em>Sensor</em></a>) – represents a camera sensor</li>
-<li><strong>light_source</strong> (<a class="reference internal" href="#fabry.core.synthetic.LightSource" title="fabry.core.synthetic.LightSource"><em>LightSource</em></a>) – represents a light source for the Fabry Perot</li>
-<li><strong>nprocs</strong> (<em>int</em>) – number of processes to use</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">shape matches sensor.sensor.shape</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt>
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>etalon</em><span class="sig-paren">)</span></dt>
-<dd><p>Creates an instance of Etalon from a dictionary</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>etalon</strong> (<em>dict</em>) – dictionary representing a etalon</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an new instance of a Etalon</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#fabry.core.synthetic.Etalon" title="fabry.core.synthetic.Etalon">Etalon</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Returns a dictionary representing itself</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a dictionary representing itself</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt>
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">LightSource</code><span class="sig-paren">(</span><em>Ti</em>, <em>w</em>, <em>mu</em>, <em>velocity</em>, <em>amplitude=1</em><span class="sig-paren">)</span></dt>
-<dd><p>A representation of a light source for a Fabry-Perot spectrometer</p>
-<dl class="attribute">
-<dt>
-<code class="descname">temperature</code></dt>
-<dd><p><em>float</em> – temperature of the emitting ion in eV</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">wavelength</code></dt>
-<dd><p><em>float</em> – wavelength of the light emitted in nm</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">mu</code></dt>
-<dd><p><em>float</em> – relative mass of the ion</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">amplitude</code></dt>
-<dd><p><em>float</em> – amplitude of the light emitted (you can choose your units here…)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">velocity</code></dt>
-<dd><p><em>VelocityProfile or float</em> – velocity of the emitting ion in m/s</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt>
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>light_source</em><span class="sig-paren">)</span></dt>
-<dd><p>Creates a new instance of LightSource from a dictionary</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>light_source</strong> (<em>dict</em>) – dictionary representing a light source</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">LightSource</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Returns a dict representing itself</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt>
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">UniformPlasma</code><span class="sig-paren">(</span><em>ne</em>, <em>Ti</em>, <em>pec</em>, <em>w</em>, <em>velocity=None</em>, <em>mu=40.0</em><span class="sig-paren">)</span></dt>
-<dd><dl class="docutils">
-<dt>A representation of a uniform density and uniform Ti plasma with ion</dt>
-<dd>species mu emitting light for a Fabry-Perot spectrometer</dd>
-</dl>
-<dl class="attribute">
-<dt>
-<code class="descname">mu</code></dt>
-<dd><p><em>float</em> – relative mass of the ion</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">velocity</code></dt>
-<dd><p><em>Union[VelocityProfile,float]</em> – velocity of the emitting ion in m/s</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">ne</code></dt>
-<dd><p><em>float</em> – electron density in cm^-3</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">pec</code></dt>
-<dd><p><em>float</em> – photon emissivity coefficient (need to decide on units here)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">mu</code></dt>
-<dd><p><em>float</em> – relative mass of the ion</p>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">calculate_shift</code><span class="sig-paren">(</span><em>velocity</em><span class="sig-paren">)</span></dt>
-<dd><p>Calculate doppler shift from the ion velocity</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity in m/s</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt>
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>plasma</em><span class="sig-paren">)</span></dt>
-<dd><p>Creates a new instance of UniformPlasma from dict</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>plasma</strong> (<em>dict</em>) – dictionary representation of a UniformPlasma</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">UniformPlasma</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">gaussian</code><span class="sig-paren">(</span><em>wavelength</em>, <em>velocity</em><span class="sig-paren">)</span></dt>
-<dd><p>Calculates doppler broadened and shifted gaussian</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line profile</li>
-<li><strong>velocity</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – velocity of ion for doppler shift</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">ion_emission</code><span class="sig-paren">(</span><em>r</em>, <em>wavelength</em>, <em>cos_theta=None</em><span class="sig-paren">)</span></dt>
-<dd><p>Calculates ion emission at a radius r for wavelengths provided</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to calculate ion emission at</li>
-<li><strong>wavelength</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – wavelength to calculate emission line
-profile</li>
-<li><strong>cos_theta</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – cos(theta) to project velocity onto a unit
-vector an angle theta from the toroidal direction</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">mass</code></dt>
-<dd><p>Mass of ion in kg</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">sigma</code></dt>
-<dd><p>Thermal doppler broadening</p>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Returns a dict representation</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt>
-<em class="property">class </em><code class="descclassname">fabry.core.synthetic.</code><code class="descname">VelocityProfile</code><span class="sig-paren">(</span><em>Vmax</em>, <em>max_radius</em>, <em>length_scale</em>, <em>edge_scale</em>, <em>R0=140.0</em>, <em>offset=0.0</em><span class="sig-paren">)</span></dt>
-<dd><p>Represents a edge driven velocity profile</p>
-<dl class="attribute">
-<dt>
-<code class="descname">Vmax</code></dt>
-<dd><p><em>float</em> – maximum velocity</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">max_radius</code></dt>
-<dd><p><em>float</em> – radial location of the maximum velocity</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">length_scale</code></dt>
-<dd><p><em>float</em> – scale for the velocity gradient inward radially</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">edge_scale</code></dt>
-<dd><p><em>float</em> – scale for the velocity edge gradient</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">R0</code></dt>
-<dd><p><em>float</em> – location of the edge</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">offset</code></dt>
-<dd><p><em>float</em> – offset velocity in the center</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt>
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>velocity</em><span class="sig-paren">)</span></dt>
-<dd><p>Returns a new instance of VelocityProfile from a dict</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>velocity</strong> (<em>dict</em>) – dict reprsentation of a VelocityProfile</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">VelocityProfile</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">gaussian</code><span class="sig-paren">(</span><em>r</em><span class="sig-paren">)</span></dt>
-<dd><p>Helper function for the inward velocity gradient</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate at</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">right_edge_profile</code><span class="sig-paren">(</span><em>r</em><span class="sig-paren">)</span></dt>
-<dd><p>Helper function for the edge profile</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaulate at</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Returns a dict representation of the VelocityProfile</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">vphi</code><span class="sig-paren">(</span><em>r</em><span class="sig-paren">)</span></dt>
-<dd><p>Returns the Torodial velocity at r</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radii to evaluate vphi at</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">np.ndarray</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-fabry.core.zeeman">
-<span id="zeeman"></span><h2>Zeeman<a class="headerlink" href="#module-fabry.core.zeeman" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="fabry.core.zeeman.lande_g">
-<code class="descclassname">fabry.core.zeeman.</code><code class="descname">lande_g</code><span class="sig-paren">(</span><em>L</em>, <em>S</em>, <em>J</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.zeeman.lande_g" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the lande g factor given L, S and J</p>
-<div class="math">
-<p><img src="_images/math/beb296392ed487caf9fc87d85e1162cddb57be2a.svg" alt="g = 1 + \frac{J(J+1) + S(S+1) - L(L+1)}{2J(J+1)}"/></p>
-</div><dl class="docutils">
-<dt>Reference: Sobel’man, I.I. Introduction to the</dt>
-<dd>Theory of Atomic Spectra. 1972. pp. 277</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>L</strong> (<em>float</em>) – L number</li>
-<li><strong>S</strong> (<em>float</em>) – S number</li>
-<li><strong>J</strong> (<em>float</em>) – J number</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">lande g factor</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="fabry.core.zeeman.zeeman_factors">
-<code class="descclassname">fabry.core.zeeman.</code><code class="descname">zeeman_factors</code><span class="sig-paren">(</span><em>L_up</em>, <em>S_up</em>, <em>J_up</em>, <em>L_lo</em>, <em>S_lo</em>, <em>J_lo</em>, <em>parallel=True</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.zeeman.zeeman_factors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the Zeeman factors and relative amplitudes for a given
-line transition from (L,S,J)_upper to (L,S,J)_lower</p>
-<p>assumes LS-coupling (not jj) therefore Z&lt;=30 and that this will
-be used for a weak-field (B &lt; 10T) Zeeman calculation</p>
-<dl class="docutils">
-<dt>Reference: Sobel’man, I.I. Introduction the Theory of</dt>
-<dd>Atomic Spectra. 1972. pp. 277-280</dd>
-</dl>
-<p>Notes on getting L,S,J for a given spectral line:
-NIST spectral database will return the upper and lower level
-electron configuration information for a given line. The term
-will be of the form:</p>
-<blockquote>
-<div>(#){S,P,D,F}</div></blockquote>
-<p>where #==(2S+1), and {S,P,D,F} correspond to L=0,1,2,3
-Also, NIST will return the value of J for the upper and lower level</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>L_up</strong> (<em>float</em>) – the upper state L number</li>
-<li><strong>S_up</strong> (<em>float</em>) – the upper state S number</li>
-<li><strong>J_up</strong> (<em>float</em>) – the upper state J number</li>
-<li><strong>L_lo</strong> (<em>float</em>) – the lower state L number</li>
-<li><strong>S_lo</strong> (<em>float</em>) – the lower state S number</li>
-<li><strong>J_lo</strong> (<em>float</em>) – the lower state J number</li>
-<li><strong>parallel</strong> (<em>bool</em><em>, </em><em>default=True</em>) – a boolean flag for the direction
-of observation wrt the magnetic field. If true, the spectrum
-is observed on a line of sight parallel with the magnetic
-field and there are no pi-components of the Zeeman split. If
-false the observation is perpendicular to the field and there
-will be pi-components of the Zeeman split.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a dictionary with the following items
-sp_fac (list) -&gt; sigma plus components zeeman factors
-sp_amp (list) -&gt; relative amplitudes of sigma plus components
-sm_fac (list) -&gt; sigma minus components zeeman factors
-sm_amp (list) -&gt; relative amplitudes of sigma minus components
-if parallel is False:
-pi_fac (list) -&gt; pi components zeeman factors
-pi_amp (list) -&gt; relative amplitudes of pi components</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">out (dict)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="fabry.core.zeeman.zeeman_lambda">
-<code class="descclassname">fabry.core.zeeman.</code><code class="descname">zeeman_lambda</code><span class="sig-paren">(</span><em>w0</em>, <em>B</em>, <em>factors</em>, <em>amps=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.core.zeeman.zeeman_lambda" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the zeeman split shifts from a central wavelength for
-a given magnetic field strength</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>w0</strong> (<em>float</em>) – central wavelength in nm</li>
-<li><strong>B</strong> (<em>float</em>) – magnetic field strength in T</li>
-<li><strong>factors</strong> (<em>list</em>) – list of zeeman factors (from zeeman_factors dictionary)</li>
-<li><strong>amps</strong> (<em>list</em><em>, </em><em>default=None</em>) – optional list of amplitudes to renormalize</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of zeeman splitting peak locations based on factors, if amps is not None: amps (list): list of normalized amplitudes</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Tuple (list, list)</p>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </div>
@@ -1771,15 +651,16 @@ a given magnetic field strength</p>
 
 
            </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tools.html" class="btn btn-neutral float-right" title="Tools" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tools.html" class="btn btn-neutral float-right" title="Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Welcome to Fabry Perot’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Fabry Perot’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1788,11 +669,11 @@ a given magnetic field strength</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Jason Milhone.
+        &copy; Copyright 2018, Jason Milhone
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1805,35 +686,15 @@ a given magnetic field strength</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.1.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

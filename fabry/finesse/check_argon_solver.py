@@ -1,16 +1,16 @@
 from __future__ import print_function, division, absolute_import
-import functools
+
 import concurrent.futures
-import pymultinest
-import numpy as np
-from ..core.models import forward_model, peak_calculator, offset_forward_model
-from ..tools import plotting
 import json
-import h5py
-import matplotlib.pyplot as plt # For testing purposes only
+from os.path import join
+
+import matplotlib.pyplot as plt  # For testing purposes only
+import numpy as np
+import pymultinest
+
+from ..core.models import forward_model, peak_calculator
 from ..tools import file_io as io
-import random
-from os.path import abspath, join
+from ..tools import plotting
 
 w0 = (487.873302, 487.98634, 487.800942)
 mu = (232.03806, 39.948, 232.03806)

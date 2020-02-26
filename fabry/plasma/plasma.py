@@ -119,6 +119,13 @@ def density_profile(r, r_edge, gradient_length_scale):
 
 
 def vfd_density_profile(r, r_anode):
+    """Calculate volumetric flow density profile model
+
+    :param np.ndarray r: radii to calculate density on
+    :param float r_anode: radius of the anodes
+    :returns: density array
+    :rtype: np.ndarray
+    """
     offset = 0.2
     density = 0.85*(1.0 - (r/r_anode)**1.6)**2 + offset
     density = np.where(r > r_anode, offset, density)
@@ -316,7 +323,21 @@ def linear_Ti_profile(r, Ti_center, Ti_edge, r_edge):
 
 
 def vfd_chord(impact_factor, Ti_args, V_args, ne_args, w0=487.98634, rmax=40.0, nr=100, nlambda=2048, mu=39.948, test_plot=False):
+    """Calculate radiance for a chord from a PCX volumetric flow drive plasma
 
+    :param float impact_factor: closest distance the chord is from the origin
+    :param List Ti_args: List containing args for Ti profile
+    :param List V_args: List containing args for V profile
+    :param List ne_args: List containing args for density profile
+    :param float w0: central wavelength
+    :param float rmax: radius of the edge of the plasma
+    :param int nr: number of radii to use in calculation
+    :param int nlambda: number of wavelength to use in calculation
+    :param float mu: mass of ion in amu
+    :param bool test_plot: create a test plot if True
+    :return: radiance for modeled chord
+    :rtype: np.ndarray
+    """
     r, theta, x = calculate_r_theta_x_from_impact_factor(impact_factor, rmax=rmax, npts=nr)
     
     #for tup in zip(r, x, theta):

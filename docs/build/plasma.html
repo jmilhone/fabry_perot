@@ -1,0 +1,759 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Plasma &mdash; Fabry Perot 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Finesse" href="finesse.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Fabry Perot
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finesse.html">Finesse</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Plasma</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-fabry.plasma.plasma">Plasma Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#argon-plasma-solver-module">Argon Plasma Solver Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#argon-chord-solver-module">Argon Chord Solver Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#check-argon-chord-solver-module">Check Argon Chord Solver Module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Fabry Perot</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Plasma</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/plasma.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="plasma">
+<h1>Plasma<a class="headerlink" href="#plasma" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-fabry.plasma.plasma">
+<span id="plasma-module"></span><h2>Plasma Module<a class="headerlink" href="#module-fabry.plasma.plasma" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fabry.plasma.plasma.calculate_line_profile">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">calculate_line_profile</code><span class="sig-paren">(</span><em class="sig-param">wavelength</em>, <em class="sig-param">w0</em>, <em class="sig-param">Ti</em>, <em class="sig-param">vel</em>, <em class="sig-param">theta</em>, <em class="sig-param">mu</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.calculate_line_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the Gaussian line shape for a given set of parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavelength</strong> (<em>np.ndarray</em>) – wavelength array</p></li>
+<li><p><strong>w0</strong> (<em>float</em>) – central wavelength</p></li>
+<li><p><strong>Ti</strong> (<em>float</em>) – temperature of emitting species</p></li>
+<li><p><strong>vel</strong> (<em>float</em>) – toroidal velocity in m/s</p></li>
+<li><p><strong>theta</strong> (<em>float</em>) – angle of torodial velocity to line of sight</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – relative mass in amu</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>gaussian line shape</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.calculate_pcx_chord_emission">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">calculate_pcx_chord_emission</code><span class="sig-paren">(</span><em class="sig-param">impact_factor</em>, <em class="sig-param">Ti</em>, <em class="sig-param">w0</em>, <em class="sig-param">mu</em>, <em class="sig-param">Lnu</em>, <em class="sig-param">Vouter</em>, <em class="sig-param">rmax=40.0</em>, <em class="sig-param">nr=101</em>, <em class="sig-param">nlambda=2000</em>, <em class="sig-param">Lne=2.5</em>, <em class="sig-param">R_outer=35</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.calculate_pcx_chord_emission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates PCX emission with only the outer boundary spinning for a given impact factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>impact_factor</strong> (<em>float</em>) – impact factor for chord</p></li>
+<li><p><strong>Ti</strong> (<em>float</em>) – ion temperature in eV</p></li>
+<li><p><strong>w0</strong> (<em>float</em>) – central wavelength</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – mass in amu</p></li>
+<li><p><strong>Lnu</strong> (<em>float</em>) – momentum diffusion length</p></li>
+<li><p><strong>Vouter</strong> (<em>float</em>) – velocity in m/s for outer boundary</p></li>
+<li><p><strong>rmax</strong> (<em>float</em>) – end of the plasma</p></li>
+<li><p><strong>nr</strong> (<em>int</em>) – number of radial points to integrate chord with</p></li>
+<li><p><strong>nlambda</strong> (<em>int</em>) – number of wavelength points</p></li>
+<li><p><strong>Lne</strong> (<em>float</em>) – density gradient scale length at rmax</p></li>
+<li><p><strong>R_outer</strong> (<em>float</em>) – velocity at outer boundary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(np.ndarray, np.ndarray) wavelength and spectrum</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.calculate_r_theta_x_from_impact_factor">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">calculate_r_theta_x_from_impact_factor</code><span class="sig-paren">(</span><em class="sig-param">impact_factor</em>, <em class="sig-param">rmax=150.0</em>, <em class="sig-param">npts=101</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.calculate_r_theta_x_from_impact_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the radius array, theta array, and the distance along a chord at the specified impact factor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>impact_factor</strong> (<em>float</em>) – impact factor of the chord</p></li>
+<li><p><strong>rmax</strong> (<em>float</em>) – max radius to include in chord</p></li>
+<li><p><strong>npts</strong> (<em>int</em>) – number of points to use</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(np.ndarray, np.ndarray, np.ndarray) r, theta, x</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.density_profile">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">density_profile</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">r_edge</em>, <em class="sig-param">gradient_length_scale</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.density_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the electron density profile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>float</em><em>]</em>) – radii to calculate profile on</p></li>
+<li><p><strong>r_edge</strong> (<em>float</em>) – edge of the electron density profile</p></li>
+<li><p><strong>gradient_length_scale</strong> (<em>float</em>) – length scale of the gradient at r_edge</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>electron density profile as a function of r</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.linear_Ti_profile">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">linear_Ti_profile</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">Ti_center</em>, <em class="sig-param">Ti_edge</em>, <em class="sig-param">r_edge</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.linear_Ti_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a linear Ti profile at the radii r</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – radius or radius array to calculate Ti</p></li>
+<li><p><strong>Ti_center</strong> (<em>float</em>) – Ti at r=0</p></li>
+<li><p><strong>Ti_edge</strong> (<em>float</em>) – Ti at r=r_edge</p></li>
+<li><p><strong>r_edge</strong> (<em>float</em>) – Edge of the plasma where Ti(r=r_edge)=Ti_ege</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Ti at r=r with the same shape as r</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.pcx_couette_velocity_profile">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">pcx_couette_velocity_profile</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">mom_dif_length</em>, <em class="sig-param">R_inner</em>, <em class="sig-param">R_outer</em>, <em class="sig-param">V_inner</em>, <em class="sig-param">V_outer</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.pcx_couette_velocity_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the torodial velocity profile for PCX</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>float</em><em>]</em>) – radii to calculate profile on</p></li>
+<li><p><strong>mom_dif_length</strong> (<em>float</em>) – momentum diffusion length scale</p></li>
+<li><p><strong>R_inner</strong> (<em>float</em>) – Radius of inner boundary</p></li>
+<li><p><strong>R_outer</strong> (<em>float</em>) – Radius of outer boundary</p></li>
+<li><p><strong>V_inner</strong> (<em>float</em>) – Velocity at inner boundary</p></li>
+<li><p><strong>V_outer</strong> (<em>float</em>) – Velocity at outer boundary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>torodial velocity profile as a function of r</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.pcx_velocity_profile">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">pcx_velocity_profile</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">mom_dif_length</em>, <em class="sig-param">R_outer</em>, <em class="sig-param">V_outer</em>, <em class="sig-param">V_offset</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.pcx_velocity_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the toroidal velocity profile with no inner boundary for PCX</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>float</em><em>]</em>) – raddi to calculate profile on</p></li>
+<li><p><strong>mom_dif_length</strong> (<em>float</em>) – momentum diffusion length scale</p></li>
+<li><p><strong>R_outer</strong> (<em>float</em>) – Radii for outer boundary</p></li>
+<li><p><strong>V_outer</strong> (<em>float</em>) – Velocity at outer boundary</p></li>
+<li><p><strong>V_offset</strong> (<em>float</em>) – Offset velocity applied to whole profile to account for any erros in the diagnostic</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>torodial velocity profile as a function of r</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.pcx_vfd_velocity_profile">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">pcx_vfd_velocity_profile</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">r_anode</em>, <em class="sig-param">V_max</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.pcx_vfd_velocity_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the toroidal velocity profile for VFD on PCX</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>float</em><em>]</em>) – radii to calculate profile on</p></li>
+<li><p><strong>r_anode</strong> (<em>float</em>) – location of anodes, assumed location of peak profile starting</p></li>
+<li><p><strong>V_max</strong> (<em>float</em>) – maximum velocity at r_anode</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>torodial velocity profile as a function of r</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.radiance_from_profiles">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">radiance_from_profiles</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">w0</em>, <em class="sig-param">Ti</em>, <em class="sig-param">V_adjusted</em>, <em class="sig-param">amp</em>, <em class="sig-param">mu=39.948</em>, <em class="sig-param">nlambda=2048</em>, <em class="sig-param">test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.radiance_from_profiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates radiance for a plasma chord given profiles and position along the chord</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – position along the chord</p></li>
+<li><p><strong>w0</strong> (<em>float</em>) – central wavelength</p></li>
+<li><p><strong>V_adjusted</strong> (<em>np.ndarray</em>) – toroidal velocity array but adjusted with the dot product with the chord vector</p></li>
+<li><p><strong>amp</strong> (<em>np.ndarray</em>) – emissivity amplitude along the chord</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – relative mass of the ion</p></li>
+<li><p><strong>nlambda</strong> (<em>int</em>) – number of wavelengths to calculate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>wavelength and radiance as a function of wavelength for the chord</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple(np.ndarray, np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.vfd_chord">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">vfd_chord</code><span class="sig-paren">(</span><em class="sig-param">impact_factor</em>, <em class="sig-param">Ti_args</em>, <em class="sig-param">V_args</em>, <em class="sig-param">ne_args</em>, <em class="sig-param">w0=487.98634</em>, <em class="sig-param">rmax=40.0</em>, <em class="sig-param">nr=100</em>, <em class="sig-param">nlambda=2048</em>, <em class="sig-param">mu=39.948</em>, <em class="sig-param">test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.vfd_chord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate radiance for a chord from a PCX volumetric flow drive plasma</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>impact_factor</strong> (<em>float</em>) – closest distance the chord is from the origin</p></li>
+<li><p><strong>Ti_args</strong> (<em>List</em>) – List containing args for Ti profile</p></li>
+<li><p><strong>V_args</strong> (<em>List</em>) – List containing args for V profile</p></li>
+<li><p><strong>ne_args</strong> (<em>List</em>) – List containing args for density profile</p></li>
+<li><p><strong>w0</strong> (<em>float</em>) – central wavelength</p></li>
+<li><p><strong>rmax</strong> (<em>float</em>) – radius of the edge of the plasma</p></li>
+<li><p><strong>nr</strong> (<em>int</em>) – number of radii to use in calculation</p></li>
+<li><p><strong>nlambda</strong> (<em>int</em>) – number of wavelength to use in calculation</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – mass of ion in amu</p></li>
+<li><p><strong>test_plot</strong> (<em>bool</em>) – create a test plot if True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>radiance for modeled chord</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.plasma.vfd_density_profile">
+<code class="sig-prename descclassname">fabry.plasma.plasma.</code><code class="sig-name descname">vfd_density_profile</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">r_anode</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.plasma.vfd_density_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate volumetric flow density profile model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>np.ndarray</em>) – radii to calculate density on</p></li>
+<li><p><strong>r_anode</strong> (<em>float</em>) – radius of the anodes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>density array</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="argon-plasma-solver-module">
+<h2>Argon Plasma Solver Module<a class="headerlink" href="#argon-plasma-solver-module" title="Permalink to this headline">¶</a></h2>
+<p>This module contains a few different MultiNest plasma solvers.</p>
+<dl class="attribute">
+<dt id="fabry.plasma.argon_plasma_solver.py.w0">
+<code class="sig-prename descclassname">fabry.plasma.argon_plasma_solver.py.</code><code class="sig-name descname">w0</code><a class="headerlink" href="#fabry.plasma.argon_plasma_solver.py.w0" title="Permalink to this definition">¶</a></dt>
+<dd><p>wavelength for the Ar II ion line</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.plasma.argon_plasma_solver.py.mu">
+<code class="sig-prename descclassname">fabry.plasma.argon_plasma_solver.py.</code><code class="sig-name descname">mu</code><a class="headerlink" href="#fabry.plasma.argon_plasma_solver.py.mu" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass of argon in amu</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.argon_plasma_solver.py.no_vel_solver">
+<code class="sig-prename descclassname">fabry.plasma.argon_plasma_solver.py.</code><code class="sig-name descname">no_vel_solver</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em>, <em class="sig-param">Fpost</em>, <em class="sig-param">Lpost</em>, <em class="sig-param">dpost</em>, <em class="sig-param">resume=True</em>, <em class="sig-param">test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.argon_plasma_solver.py.no_vel_solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>MultiNest solver for argon with no velocity shift</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_folder</strong> (<em>str</em>) – path to folder for input and output folders</p></li>
+<li><p><strong>Fpost</strong> (<em>np.ndarray</em>) – posterior results for the finesse</p></li>
+<li><p><strong>Lpost</strong> (<em>np.ndarray</em>) – posterior results for the camera focal length</p></li>
+<li><p><strong>dpost</strong> (<em>np.ndarray</em>) – posterior results for the etalon spacing</p></li>
+<li><p><strong>resume</strong> (<em>bool</em>) – resume calculation if True, default=True</p></li>
+<li><p><strong>test_plot</strong> (<em>bool</em>) – make a test plot of prior intstead of solving, default=False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.argon_plasma_solver.py.const_vel_solver">
+<code class="sig-prename descclassname">fabry.plasma.argon_plasma_solver.py.</code><code class="sig-name descname">const_vel_solver</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em>, <em class="sig-param">Fpost</em>, <em class="sig-param">Lpost</em>, <em class="sig-param">dpost</em>, <em class="sig-param">resume=True</em>, <em class="sig-param">test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.argon_plasma_solver.py.const_vel_solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>MultiNest solver for argon with a constant velocity shift</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_folder</strong> (<em>str</em>) – path to folder for input and output folders</p></li>
+<li><p><strong>Fpost</strong> (<em>np.ndarray</em>) – posterior results for the finesse</p></li>
+<li><p><strong>Lpost</strong> (<em>np.ndarray</em>) – posterior results for the camera focal length</p></li>
+<li><p><strong>dpost</strong> (<em>np.ndarray</em>) – posterior results for the etalon spacing</p></li>
+<li><p><strong>resume</strong> (<em>bool</em>) – resume calculation if True, default=True</p></li>
+<li><p><strong>test_plot</strong> (<em>bool</em>) – make a test plot of prior intstead of solving, default=False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.argon_plasma_solver.py.profile_vel_solver">
+<code class="sig-prename descclassname">fabry.plasma.argon_plasma_solver.py.</code><code class="sig-name descname">profile_vel_solver</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em>, <em class="sig-param">Fpost</em>, <em class="sig-param">Lpost</em>, <em class="sig-param">dpost</em>, <em class="sig-param">resume=True</em>, <em class="sig-param">test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.argon_plasma_solver.py.profile_vel_solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>MultiNest solver for argon with a PCX-U torodial velocity with only outer drive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_folder</strong> (<em>str</em>) – path to folder for input and output folders</p></li>
+<li><p><strong>Fpost</strong> (<em>np.ndarray</em>) – posterior results for the finesse</p></li>
+<li><p><strong>Lpost</strong> (<em>np.ndarray</em>) – posterior results for the camera focal length</p></li>
+<li><p><strong>dpost</strong> (<em>np.ndarray</em>) – posterior results for the etalon spacing</p></li>
+<li><p><strong>resume</strong> (<em>bool</em>) – resume calculation if True, default=True</p></li>
+<li><p><strong>test_plot</strong> (<em>bool</em>) – make a test plot of prior intstead of solving, default=False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="argon-chord-solver-module">
+<h2>Argon Chord Solver Module<a class="headerlink" href="#argon-chord-solver-module" title="Permalink to this headline">¶</a></h2>
+<p>This module contains a chord solver for VFD argon plasmas on PCX</p>
+<dl class="attribute">
+<dt id="fabry.plasma.argon_chord_solver.py.w0">
+<code class="sig-prename descclassname">fabry.plasma.argon_chord_solver.py.</code><code class="sig-name descname">w0</code><a class="headerlink" href="#fabry.plasma.argon_chord_solver.py.w0" title="Permalink to this definition">¶</a></dt>
+<dd><p>wavelength for the Ar II ion line</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.plasma.argon_chord_solver.py.mu">
+<code class="sig-prename descclassname">fabry.plasma.argon_chord_solver.py.</code><code class="sig-name descname">mu</code><a class="headerlink" href="#fabry.plasma.argon_chord_solver.py.mu" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass of argon in amu</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabry.plasma.argon_chord_solver.py.pcx_vfd_model">
+<code class="sig-prename descclassname">fabry.plasma.argon_chord_solver.py.</code><code class="sig-name descname">pcx_vfd_model</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">b</em>, <em class="sig-param">Ti_params</em>, <em class="sig-param">V_params</em>, <em class="sig-param">ne_params</em>, <em class="sig-param">delta_d</em>, <em class="sig-param">amp</em>, <em class="sig-param">L</em>, <em class="sig-param">d</em>, <em class="sig-param">F</em>, <em class="sig-param">rmax=40.0</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.plasma.argon_chord_solver.py.pcx_vfd_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple wrapper for modeling chords on PCX for VFD experiments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>np.ndarray</em>) – array of pixel radius locations</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – impact factor</p></li>
+<li><p><strong>Ti_params</strong> (<em>List</em>) – List containing args for Ti profile</p></li>
+<li><p><strong>V_params</strong> (<em>List</em>) – List containing args for V profile</p></li>
+<li><p><strong>ne_params</strong> (<em>List</em>) – List containing args for ne profile</p></li>
+<li><p><strong>delta_d</strong> (<em>float</em>) – change in etalon spacing in mm</p></li>
+<li><p><strong>amp</strong> (<em>float</em>) – amplitude</p></li>
+<li><p><strong>L</strong> (<em>float</em>) – focal length in pixels</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – etalon spacing in mm</p></li>
+<li><p><strong>F</strong> (<em>float</em>) – etalon finesse</p></li>
+<li><p><strong>rmax</strong> (<em>float</em>) – max radius in the plasma to model</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">calculate_delta_d(velocity_offset):</code></dt>
+<dd><p>Calculates delta d (in mm) for a velocity offset (m/s)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>velocity_offset</strong> (<em>float</em>) – offset velocity in n/s</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>delta d in mm</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">prior(cube, ndim, nparams):</code></dt>
+<dd><p>Transforms prior hypercube to physical units</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<em>List</em>) – hypercube to transform to physical units</p></li>
+<li><p><strong>ndim</strong> – Not used, MultiNest asks for it</p></li>
+<li><p><strong>nparams</strong> (<em>int</em>) – number of parameters, can be bigger than cube dimension I believe</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">argon_multi_image_solver_fixed_Lnu(output_folder, calib_posterior, image_data, resume=True, test_plot=False):</code></dt>
+<dd><p>Runs MultiNest solver for multiple chords in a PCX Ar plasma with a fixed Lnu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_folder</strong> (<em>str</em>) – output folder to store multinest files</p></li>
+<li><p><strong>calib_posterior</strong> (<em>np.ndarray</em>) – calibration equally weighted posterior samples</p></li>
+<li><p><strong>image_data</strong> (<em>tuple</em>) – Tuple containing (r, sig, std, impact_factor) for the images to be analyzed</p></li>
+<li><p><strong>resume</strong> (<em>bool</em>) – Resume multinest solver if True, default=True</p></li>
+<li><p><strong>test_plot</strong> (<em>bool</em>) – Runs test plot sampling from prior instead of running solver, default=False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="check-argon-chord-solver-module">
+<h2>Check Argon Chord Solver Module<a class="headerlink" href="#check-argon-chord-solver-module" title="Permalink to this headline">¶</a></h2>
+<p>This module contains functions for checking the validity of the argon_chord_solver</p>
+<dl class="attribute">
+<dt id="fabry.plasma.check_argon_chord_solver.py.w0">
+<code class="sig-prename descclassname">fabry.plasma.check_argon_chord_solver.py.</code><code class="sig-name descname">w0</code><a class="headerlink" href="#fabry.plasma.check_argon_chord_solver.py.w0" title="Permalink to this definition">¶</a></dt>
+<dd><p>wavelength for the Ar II ion line</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fabry.plasma.check_argon_chord_solver.py.mu">
+<code class="sig-prename descclassname">fabry.plasma.check_argon_chord_solver.py.</code><code class="sig-name descname">mu</code><a class="headerlink" href="#fabry.plasma.check_argon_chord_solver.py.mu" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass of argon in amu</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">check_const_Lnu_solver(output_folder, calib_posterior, image_data, n_samples=200):</code></dt>
+<dd><p>Creates many plots to check validity of chord solver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_folder</strong> (<em>str</em>) – output folder where MultiNest files are stored</p></li>
+<li><p><strong>calib_posterior</strong> (<em>np.ndarray</em>) – calibration posterior</p></li>
+<li><p><strong>image_data</strong> (<em>Tuple</em>) – Tuple containing r, signal, signal error, and impact factor for the image data</p></li>
+<li><p><strong>n_samples</strong> (<em>int</em>) – number of posterior samples to use for fit plotting</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">joint_marginal_plot(xpost, ypost, xlabel, ylabel, savefig=False, fname=None, block=False):</code></dt>
+<dd><p>Plot joint marginal distribution with marginals for x and y posteriors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xpost</strong> (<em>np.ndarray</em>) – posterior values for the x axis</p></li>
+<li><p><strong>ypost</strong> (<em>np.ndarray</em>) – posterior values for the y axis</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em>) – x axis label</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>) – y axis label</p></li>
+<li><p><strong>savefig</strong> (<em>bool</em>) – True if the figure should be saved</p></li>
+<li><p><strong>fname</strong> (<em>str</em>) – filename to save figure to</p></li>
+<li><p><strong>block</strong> (<em>bool</em>) – block script while showing figure. User must close figure to continue</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple with figure and axes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">marginal_plot(posterior, xlabel, ylabel, savefig=False, fname=None, block=False):</code></dt>
+<dd><p>Create a marginal posterior plot for posterior</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>posterior</strong> (<em>np.ndarray</em>) – posterior to plot</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em>) – x axis label</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>) – y axis label</p></li>
+<li><p><strong>savefig</strong> (<em>bool</em>) – True if the figure should be saved</p></li>
+<li><p><strong>fname</strong> (<em>str</em>) – filename to save figure to</p></li>
+<li><p><strong>block</strong> (<em>bool</em>) – block script while showing figure. User must close figure to continue.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple containing figure and axes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">calculate_multi_models(r, impact_factors, vel_offsets, L, d, F, Lnu, cube, nlambda=2000, nr=101, rmax=40.0, r_anode=32.0):</code></dt>
+<dd><p>Calculates forward models for the given parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>List</em>) – List containing r arrays for each image</p></li>
+<li><p><strong>impact_factors</strong> (<em>List</em>) – List containing impact factors for each image</p></li>
+<li><p><strong>vel_offsets</strong> (<em>List</em>) – velocity offsets to account for etalon variation in time</p></li>
+<li><p><strong>L</strong> (<em>float</em>) – camera focal length in pixels</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – etalon spacing in mm</p></li>
+<li><p><strong>F</strong> (<em>float</em>) – etalon finesse</p></li>
+<li><p><strong>Lnu</strong> (<em>float</em>) – momentum diffusion length</p></li>
+<li><p><strong>cube</strong> (<em>list</em>) – posterior samples for each parameter</p></li>
+<li><p><strong>nlambda</strong> (<em>int</em>) – number of wavelengths to calculate with</p></li>
+<li><p><strong>nr</strong> (<em>int</em>) – number of radial points to model chord with</p></li>
+<li><p><strong>rmax</strong> (<em>float</em>) – edge of the plasma</p></li>
+<li><p><strong>r_anode</strong> (<em>float</em>) – radius location of the anode tip</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of values for each chord location</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-name descname">calculate_percentile_ranges(data, levels):</code></dt>
+<dd><p>Calculates the percentage ranges that include the level around the mean. Generally used for finding 1 sigma, 2 sigma, and 3 sigma assuming Gaussian distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – data to calculate percentile ranges</p></li>
+<li><p><strong>levels</strong> (<em>List</em>) – List of levesl to calcualte ranges on. Should be in % and be between 0 and 100</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary with keys being the levels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="finesse.html" class="btn btn-neutral float-left" title="Finesse" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Jason Milhone
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

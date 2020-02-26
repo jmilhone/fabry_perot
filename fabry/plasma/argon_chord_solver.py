@@ -1,3 +1,5 @@
+"""This module contains a solver for multiple PCX chords meant for solid body
+flows with a linear Ti profile"""
 from __future__ import print_function, division
 
 import os.path

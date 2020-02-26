@@ -13,43 +13,40 @@
 
   
   
+  
+  
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Fabry Perot 0.1.0 documentation" href="index.html"/>
-        <link rel="next" title="Finesse" href="finesse.html"/>
-        <link rel="prev" title="Core" href="core.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Finesse" href="finesse.html" />
+    <link rel="prev" title="Core" href="core.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
+   
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -84,16 +81,20 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents:</span></p>
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="core.html">Core</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-fabry.tools.file_io">File_IO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-fabry.tools.images">Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#images">Images</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-fabry.tools.plotting">Plotting</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="finesse.html">Finesse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plasma.html">Plasma</a></li>
 </ul>
 
             
@@ -105,34 +106,54 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Fabry Perot</a>
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Fabry Perot</a>
+        
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Tools</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tools</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="_sources/tools.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -144,362 +165,287 @@
 <span id="file-io"></span><h2>File_IO<a class="headerlink" href="#module-fabry.tools.file_io" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="fabry.tools.file_io.dict_2_h5">
-<code class="descclassname">fabry.tools.file_io.</code><code class="descname">dict_2_h5</code><span class="sig-paren">(</span><em>fname</em>, <em>dic</em>, <em>append=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.dict_2_h5" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Writes a dictionary to a hdf5 file with given filename</dt>
-<dd>It will use lzf compression for all numpy arrays</dd>
+<code class="sig-prename descclassname">fabry.tools.file_io.</code><code class="sig-name descname">dict_2_h5</code><span class="sig-paren">(</span><em class="sig-param">fname</em>, <em class="sig-param">dic</em>, <em class="sig-param">append=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.dict_2_h5" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Writes a dictionary to a hdf5 file with given filename</dt><dd><p>It will use lzf compression for all numpy arrays</p>
+</dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>fname</strong> (<em>str</em>) – filename to write to</li>
-<li><strong>dic</strong> (<em>dict</em>) – dictionary to write</li>
-<li><strong>append</strong> (<em>bool</em>) – if true, will append to file instead of overwriting, default=False</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname</strong> (<em>str</em>) – filename to write to</p></li>
+<li><p><strong>dic</strong> (<em>dict</em>) – dictionary to write</p></li>
+<li><p><strong>append</strong> (<em>bool</em>) – if true, will append to file instead of overwriting, default=False</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.file_io.h5_2_dict">
-<code class="descclassname">fabry.tools.file_io.</code><code class="descname">h5_2_dict</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.h5_2_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.file_io.</code><code class="sig-name descname">h5_2_dict</code><span class="sig-paren">(</span><em class="sig-param">fname</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.h5_2_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a dictionary from a hdf5 file with given filename</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<em>str</em>) – hdf5 filename to read</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary of hdf5 keys</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fname</strong> (<em>str</em>) – hdf5 filename to read</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary of hdf5 keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.file_io.prep_folder">
-<code class="descclassname">fabry.tools.file_io.</code><code class="descname">prep_folder</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.prep_folder" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Checks if folder exists and recursively creates folders</dt>
-<dd>to ensure the path is valid</dd>
+<code class="sig-prename descclassname">fabry.tools.file_io.</code><code class="sig-name descname">prep_folder</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.prep_folder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Checks if folder exists and recursively creates folders</dt><dd><p>to ensure the path is valid</p>
+</dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – path to folder</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – path to folder</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.file_io.read_Ld_results">
-<code class="descclassname">fabry.tools.file_io.</code><code class="descname">read_Ld_results</code><span class="sig-paren">(</span><em>Ld_directory</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.read_Ld_results" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.file_io.</code><code class="sig-name descname">read_Ld_results</code><span class="sig-paren">(</span><em class="sig-param">Ld_directory</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.read_Ld_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads L and d histogram data from multinest run</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Ld_directory</strong> (<em>str</em>) – path to multinest save directory</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Tuple (np.ndarray, np.ndarray) L histogram values (in pixels), d histogram values (in mm)</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>Ld_directory</strong> (<em>str</em>) – path to multinest save directory</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple (np.ndarray, np.ndarray) L histogram values (in pixels), d histogram values (in mm)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.file_io.recursive_load_dict_from_h5">
-<code class="descclassname">fabry.tools.file_io.</code><code class="descname">recursive_load_dict_from_h5</code><span class="sig-paren">(</span><em>h5</em>, <em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.recursive_load_dict_from_h5" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.file_io.</code><code class="sig-name descname">recursive_load_dict_from_h5</code><span class="sig-paren">(</span><em class="sig-param">h5</em>, <em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.recursive_load_dict_from_h5" title="Permalink to this definition">¶</a></dt>
 <dd><p>function used in load_h5_to_dict in order to get recursion</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.file_io.recursive_save_dict_to_h5">
-<code class="descclassname">fabry.tools.file_io.</code><code class="descname">recursive_save_dict_to_h5</code><span class="sig-paren">(</span><em>h5</em>, <em>path</em>, <em>dic</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.recursive_save_dict_to_h5" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.file_io.</code><code class="sig-name descname">recursive_save_dict_to_h5</code><span class="sig-paren">(</span><em class="sig-param">h5</em>, <em class="sig-param">path</em>, <em class="sig-param">dic</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.file_io.recursive_save_dict_to_h5" title="Permalink to this definition">¶</a></dt>
 <dd><p>function used in save_dict_to_h5 in order to get recursion</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-fabry.tools.images">
-<span id="images"></span><h2>Images<a class="headerlink" href="#module-fabry.tools.images" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="fabry.tools.images.get_data">
-<code class="descclassname">fabry.tools.images.</code><code class="descname">get_data</code><span class="sig-paren">(</span><em>filename</em>, <em>color=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.images.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads image data from filename</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filename</strong> (<em>str</em>) – filename to read</li>
-<li><strong>color</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>]</em>) – [0,2] for rgb, or a letter from rgb</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">2d image data</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="fabry.tools.images.get_metadata">
-<code class="descclassname">fabry.tools.images.</code><code class="descname">get_metadata</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.images.get_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns metadata from image filename</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – file to get metadata from</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary containing metadata</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="fabry.tools.images.register_reader">
-<code class="descclassname">fabry.tools.images.</code><code class="descname">register_reader</code><span class="sig-paren">(</span><em>reader_func</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.images.register_reader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorator for registering functions as image readers</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>reader_func</strong> (<em>collections.Callable</em>) – callable function for reading in image files</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<div class="section" id="images">
+<h2>Images<a class="headerlink" href="#images" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-fabry.tools.plotting">
 <span id="plotting"></span><h2>Plotting<a class="headerlink" href="#module-fabry.tools.plotting" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="fabry.tools.plotting.ClickBuilder">
-<em class="property">class </em><code class="descclassname">fabry.tools.plotting.</code><code class="descname">ClickBuilder</code><span class="sig-paren">(</span><em>fig</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">fabry.tools.plotting.</code><code class="sig-name descname">ClickBuilder</code><span class="sig-paren">(</span><em class="sig-param">fig</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Little class for interactive plot features</p>
 <dl class="attribute">
 <dt id="fabry.tools.plotting.ClickBuilder.x">
-<code class="descname">x</code><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.x" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – x values from clicking</p>
+<code class="sig-name descname">x</code><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>x values from clicking</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.tools.plotting.ClickBuilder.y">
-<code class="descname">y</code><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.y" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – y values from clicking</p>
+<code class="sig-name descname">y</code><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>y values from clicking</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.tools.plotting.ClickBuilder.fig">
-<code class="descname">fig</code><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.fig" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>matplotlib.figure.Figure</em> – matplotlib figure to get clicks from</p>
+<code class="sig-name descname">fig</code><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.fig" title="Permalink to this definition">¶</a></dt>
+<dd><p>matplotlib figure to get clicks from</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.tools.plotting.ClickBuilder.cid">
-<code class="descname">cid</code><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.cid" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> – id for the matplotlib callback</p>
+<code class="sig-name descname">cid</code><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.cid" title="Permalink to this definition">¶</a></dt>
+<dd><p>id for the matplotlib callback</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fabry.tools.plotting.ClickBuilder.onclick">
-<code class="descname">onclick</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.onclick" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">onclick</code><span class="sig-paren">(</span><em class="sig-param">event</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.ClickBuilder.onclick" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback function for registering matplotlib clicks. X and Y values are stored in self.x and self.y</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>matplotlib.backend_bases.LocationEvent</em>) – matplotlib location event</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>matplotlib.backend_bases.LocationEvent</em>) – matplotlib location event</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.plotting.center_plot">
-<code class="descclassname">fabry.tools.plotting.</code><code class="descname">center_plot</code><span class="sig-paren">(</span><em>data</em>, <em>x0=None</em>, <em>y0=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.center_plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.plotting.</code><code class="sig-name descname">center_plot</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">x0=None</em>, <em class="sig-param">y0=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.center_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs clickable center plot for an image</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) – pixel values for image</li>
-<li><strong>x0</strong> (<em>float</em><em>, </em><em>default=None</em>) – x center for zoomed image, if
-none will use the center of data array</li>
-<li><strong>y0</strong> (<em>float</em><em>, </em><em>default=None</em>) – y center for zoomed image, if
-none will use the cneter of data array</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – pixel values for image</p></li>
+<li><p><strong>x0</strong> (<em>float</em><em>, </em><em>default=None</em>) – x center for zoomed image, if
+none will use the center of data array</p></li>
+<li><p><strong>y0</strong> (<em>float</em><em>, </em><em>default=None</em>) – y center for zoomed image, if
+none will use the cneter of data array</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">x value of click guess,  y value of click guess</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Tuple (float, float)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>x value of click guess,  y value of click guess</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple (float, float)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.plotting.my_hist">
-<code class="descclassname">fabry.tools.plotting.</code><code class="descname">my_hist</code><span class="sig-paren">(</span><em>ax</em>, <em>data</em>, <em>bins=None</em>, <em>horizontal=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.my_hist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.plotting.</code><code class="sig-name descname">my_hist</code><span class="sig-paren">(</span><em class="sig-param">ax</em>, <em class="sig-param">data</em>, <em class="sig-param">bins=None</em>, <em class="sig-param">horizontal=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.my_hist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Custom histogram function for plotting multinest output</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – axes to plot with</li>
-<li><strong>data</strong> (<em>np.ndarray</em>) – array of values to histogram</li>
-<li><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – number of bins in histogram</li>
-<li><strong>horizontal</strong> (<em>bool</em>) – histogram is horizontal if True</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – axes to plot with</p></li>
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – array of values to histogram</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – number of bins in histogram</p></li>
+<li><p><strong>horizontal</strong> (<em>bool</em>) – histogram is horizontal if True</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bin edges for the histogram</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bin edges for the histogram</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.plotting.my_hist2d">
-<code class="descclassname">fabry.tools.plotting.</code><code class="descname">my_hist2d</code><span class="sig-paren">(</span><em>ax</em>, <em>data1</em>, <em>data2</em>, <em>bins=None</em>, <em>z=30</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.my_hist2d" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.plotting.</code><code class="sig-name descname">my_hist2d</code><span class="sig-paren">(</span><em class="sig-param">ax</em>, <em class="sig-param">data1</em>, <em class="sig-param">data2</em>, <em class="sig-param">bins=None</em>, <em class="sig-param">z=30</em>, <em class="sig-param">cmap='Blues'</em>, <em class="sig-param">plot_contours=False</em>, <em class="sig-param">use_percentage=True</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.my_hist2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Custom 2d histrogram option for plotting correlations</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – axes to plot with</li>
-<li><strong>data1</strong> (<em>np.ndarray</em>) – array of values to histogram</li>
-<li><strong>data2</strong> (<em>np.ndarray</em>) – other array of values</li>
-<li><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – number of bins in histogram</li>
-<li><strong>z</strong> (<em>int</em>) – number of filled contours</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – axes to plot with</p></li>
+<li><p><strong>data1</strong> (<em>np.ndarray</em>) – array of values to histogram</p></li>
+<li><p><strong>data2</strong> (<em>np.ndarray</em>) – other array of values</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – number of bins in histogram</p></li>
+<li><p><strong>z</strong> (<em>int</em>) – number of filled contours</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">colorbar from the 2d histogram</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matplotlib.colorbar.Colorbar</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>colorbar from the 2d histogram</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>matplotlib.colorbar.Colorbar</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.plotting.peak_plot">
-<code class="descclassname">fabry.tools.plotting.</code><code class="descname">peak_plot</code><span class="sig-paren">(</span><em>r</em>, <em>sig</em>, <em>peaks</em>, <em>peaks_sd</em>, <em>orders</em>, <em>fax=None</em>, <em>anspks=None</em>, <em>anspks_sd=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.peak_plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.plotting.</code><code class="sig-name descname">peak_plot</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">sig</em>, <em class="sig-param">peaks</em>, <em class="sig-param">peaks_sd</em>, <em class="sig-param">orders</em>, <em class="sig-param">fax=None</em>, <em class="sig-param">anspks=None</em>, <em class="sig-param">anspks_sd=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.peak_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots ringsum data with labeled peaks and orders</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) – r array from ringsum</li>
-<li><strong>sig</strong> (<em>np.ndarray</em>) – ringsum signal</li>
-<li><strong>peaks</strong> (<em>dict</em>) – dictionary of peak locations
-the keys are the wavelengths</li>
-<li><strong>peaks_sd</strong> (<em>dict</em>) – dictionary of peak errors</li>
-<li><strong>orders</strong> (<em>dict</em>) – dictionary of peak orders
-the keys are the wavelengths</li>
-<li><strong>fax</strong> (<em>tuple</em><em>, </em><em>default=None</em>) – the figure and axis
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>np.ndarray</em>) – r array from ringsum</p></li>
+<li><p><strong>sig</strong> (<em>np.ndarray</em>) – ringsum signal</p></li>
+<li><p><strong>peaks</strong> (<em>dict</em>) – dictionary of peak locations
+the keys are the wavelengths</p></li>
+<li><p><strong>peaks_sd</strong> (<em>dict</em>) – dictionary of peak errors</p></li>
+<li><p><strong>orders</strong> (<em>dict</em>) – dictionary of peak orders
+the keys are the wavelengths</p></li>
+<li><p><strong>fax</strong> (<em>tuple</em><em>, </em><em>default=None</em>) – the figure and axis
 handles for the plot, if adding to existing
 plot. Default is None, which will make a
-new set of figure and axes and run plt.show()</li>
-<li><strong>anspks</strong> (<em>dict</em>) – dictionary with peak answers from multinest</li>
-<li><strong>anspks_sd</strong> (<em>dict</em>) – dictionary with peak sd answers from multinest</li>
+new set of figure and axes and run plt.show()</p></li>
+<li><p><strong>anspks</strong> (<em>dict</em>) – dictionary with peak answers from multinest</p></li>
+<li><p><strong>anspks_sd</strong> (<em>dict</em>) – dictionary with peak sd answers from multinest</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.plotting.ring_plot">
-<code class="descclassname">fabry.tools.plotting.</code><code class="descname">ring_plot</code><span class="sig-paren">(</span><em>data</em>, <em>fax=None</em>, <em>block=True</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.ring_plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.plotting.</code><code class="sig-name descname">ring_plot</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">fax=None</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.ring_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the Fabry Perot ring image</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<em>np.ndarray</em>) – 2D image data</li>
-<li><strong>fax</strong> (<em>tuple</em><em>, </em><em>optional</em>) – figure and axis</li>
-<li><strong>block</strong> (<em>bool</em>) – True if you want plt.show(block=True)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – 2D image data</p></li>
+<li><p><strong>fax</strong> (<em>tuple</em><em>, </em><em>optional</em>) – figure and axis</p></li>
+<li><p><strong>block</strong> (<em>bool</em>) – True if you want plt.show(block=True)</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.plotting.ringsum_click">
-<code class="descclassname">fabry.tools.plotting.</code><code class="descname">ringsum_click</code><span class="sig-paren">(</span><em>r</em>, <em>sig</em>, <em>title='Click Me!'</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.ringsum_click" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.plotting.</code><code class="sig-name descname">ringsum_click</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">sig</em>, <em class="sig-param">title='Click Me!'</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.ringsum_click" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs clickable ringsum plot</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>np.ndarray</em>) – bin values</li>
-<li><strong>sig</strong> (<em>np.ndarray</em>) – ringsum values</li>
-<li><strong>title</strong> (<em>str</em>) – instructions for clicker displayed as plot title</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>np.ndarray</em>) – bin values</p></li>
+<li><p><strong>sig</strong> (<em>np.ndarray</em>) – ringsum values</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – instructions for clicker displayed as plot title</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">x value(s) of click(s),  y value(s) of click(s)</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Tuple (list, list)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>x value(s) of click(s),  y value(s) of click(s)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple (list, list)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.tools.plotting.tableau20_colors">
-<code class="descclassname">fabry.tools.plotting.</code><code class="descname">tableau20_colors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.tableau20_colors" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.tools.plotting.</code><code class="sig-name descname">tableau20_colors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fabry.tools.plotting.tableau20_colors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Good set of colors for plotting</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of r,g,b color values</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of r,g,b color values</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -507,15 +453,16 @@ new set of figure and axes and run plt.show()</li>
 
 
            </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="finesse.html" class="btn btn-neutral float-right" title="Finesse" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="finesse.html" class="btn btn-neutral float-right" title="Finesse" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="core.html" class="btn btn-neutral" title="Core" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="core.html" class="btn btn-neutral float-left" title="Core" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -524,11 +471,11 @@ new set of figure and axes and run plt.show()</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Jason Milhone.
+        &copy; Copyright 2018, Jason Milhone
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -541,35 +488,15 @@ new set of figure and axes and run plt.show()</li>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.1.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

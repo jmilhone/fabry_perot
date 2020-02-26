@@ -43,6 +43,13 @@ prior = acs.prior
 
 
 def check_const_Lnu_solver(output_folder, calib_posterior, image_data, n_samples=200):
+    """Creates many plots to check validity of chord solver
+
+    :param str output_folder: output folder where MultiNest files are stored
+    :param np.ndarray calib_posterior: calibration posterior
+    :param Tuple image_data: Tuple containing r, signal, signal error, and impact factor for the image data
+    :param int n_samples: number of posterior samples to use for fit plotting
+    """
     plot_folder = path.join(output_folder, 'Plots')
     file_io.prep_folder(plot_folder)
     
@@ -350,7 +357,7 @@ def joint_marginal_plot(xpost, ypost, xlabel, ylabel, savefig=False, fname=None,
 
 
 def marginal_plot(posterior, xlabel, ylabel, savefig=False, fname=None, block=False):
-    """
+    """Create a marginal posterior plot for posterior
 
     :param np.ndarray posterior: posterior to plot
     :param str xlabel: x axis label
@@ -400,21 +407,22 @@ def marginal_plot(posterior, xlabel, ylabel, savefig=False, fname=None, block=Fa
 
 def calculate_multi_models(r, impact_factors, vel_offsets, L, d, F, Lnu, cube, nlambda=2000,
                            nr=101, rmax=40.0, r_anode=32.0):
-    """
+    """Calculates forward models for the given parameters
 
-    :param r:
-    :param impact_factors:
-    :param vel_offsets:
-    :param L:
-    :param d:
-    :param F:
-    :param Lnu:
-    :param cube:
-    :param nlambda:
-    :param nr:
-    :param rmax:
-    :param r_anode:
-    :return:
+    :param List r: List containing r arrays for each image
+    :param List impact_factors: List containing impact factors for each image
+    :param List vel_offsets: velocity offsets to account for etalon variation in time
+    :param float L: camera focal length in pixels
+    :param float d: etalon spacing in mm
+    :param float F: etalon finesse
+    :param float Lnu: momentum diffusion length
+    :param list cube: posterior samples for each parameter
+    :param int nlambda: number of wavelengths to calculate with
+    :param int nr: number of radial points to model chord with
+    :param float rmax: edge of the plasma
+    :param float r_anode: radius location of the anode tip
+    :return: List of values for each chord location
+    :rtype: List
     """
     values = list()
     for idx, (loc, v_offset) in enumerate(zip(impact_factors, vel_offsets)):
@@ -439,6 +447,14 @@ def calculate_multi_models(r, impact_factors, vel_offsets, L, d, F, Lnu, cube, n
     return values
 
 def calculate_percentile_ranges(data, levels):
+    """Calculates the percentage ranges that include the level around the mean.
+     Generally used for finding 1 sigma, 2 sigma, and 3 sigma assuming Gaussian distribution.
+
+    :param np.ndarray data: data to calculate percentile ranges
+    :param List levels: List of levesl to calcualte ranges on. Should be in % and be between 0 and 100
+    :return: dictionary with keys being the levels
+    :rtype: dict
+    """
     lower_levels = [50.0 - x/2.0 for x in levels]
     upper_levels = [50.0 + x/2.0 for x in levels]
 

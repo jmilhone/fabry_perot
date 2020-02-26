@@ -13,42 +13,40 @@
 
   
   
+  
+  
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Fabry Perot 0.1.0 documentation" href="index.html"/>
-        <link rel="prev" title="Tools" href="tools.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Plasma" href="plasma.html" />
+    <link rel="prev" title="Tools" href="tools.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
+   
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -83,7 +81,10 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents:</span></p>
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="core.html">Core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
@@ -93,6 +94,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#check-argon-solver">Check Argon Solver</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="plasma.html">Plasma</a></li>
 </ul>
 
             
@@ -104,34 +106,54 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Fabry Perot</a>
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Fabry Perot</a>
+        
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Finesse</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Finesse</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="_sources/finesse.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -144,64 +166,56 @@
 <p>This module contains a few different MultiNest calibration solvers for the Th lamp with the 488 nm central wavelength 1 nm fwhm filter.</p>
 <dl class="attribute">
 <dt id="fabry.finesse.argon_solver.mu">
-<code class="descclassname">fabry.finesse.argon_solver.</code><code class="descname">mu</code><a class="headerlink" href="#fabry.finesse.argon_solver.mu" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.argon_solver.</code><code class="sig-name descname">mu</code><a class="headerlink" href="#fabry.finesse.argon_solver.mu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tuple with the relative masses for Th and  Ar</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.finesse.argon_solver.w0">
-<code class="descclassname">fabry.finesse.argon_solver.</code><code class="descname">w0</code><a class="headerlink" href="#fabry.finesse.argon_solver.w0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.argon_solver.</code><code class="sig-name descname">w0</code><a class="headerlink" href="#fabry.finesse.argon_solver.w0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tuple with Th I and Ar II wavelengths used for calibration</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.finesse.argon_solver.solver">
-<code class="descclassname">fabry.finesse.argon_solver.</code><code class="descname">solver</code><span class="sig-paren">(</span><em>output_folder</em>, <em>prior_filename</em>, <em>data_filename</em>, <em>Lpost</em>, <em>dpost</em>, <em>resume=True</em>, <em>test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.argon_solver.solver" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.argon_solver.</code><code class="sig-name descname">solver</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em>, <em class="sig-param">prior_filename</em>, <em class="sig-param">data_filename</em>, <em class="sig-param">Lpost</em>, <em class="sig-param">dpost</em>, <em class="sig-param">resume=True</em>, <em class="sig-param">test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.argon_solver.solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>MultiNest solver for point spread function calibration with the Argon filter</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files for finesse solver</li>
-<li><strong>prior_filename</strong> (<em>str</em>) – path to file for the MultiNest prior (json format)</li>
-<li><strong>data_filename</strong> (<em>str</em>) – path to file for the input data</li>
-<li><strong>Lpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior L values</li>
-<li><strong>dpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior d values</li>
-<li><strong>(</strong><strong>bool</strong><strong>, </strong><strong>optional</strong><strong>)</strong> (<em>resume</em>) – MultiNest will resume the calculation if True</li>
-<li><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the user to sample the prior and compare to input data</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files for finesse solver</p></li>
+<li><p><strong>prior_filename</strong> (<em>str</em>) – path to file for the MultiNest prior (json format)</p></li>
+<li><p><strong>data_filename</strong> (<em>str</em>) – path to file for the input data</p></li>
+<li><p><strong>Lpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior L values</p></li>
+<li><p><strong>dpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior d values</p></li>
+<li><p><strong>(</strong><strong>bool</strong><strong>, </strong><strong>optional</strong><strong>)</strong> (<em>resume</em>) – MultiNest will resume the calculation if True</p></li>
+<li><p><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the user to sample the prior and compare to input data</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.finesse.argon_solver.full_solver">
-<code class="descclassname">fabry.finesse.argon_solver.</code><code class="descname">full_solver</code><span class="sig-paren">(</span><em>output_folder</em>, <em>prior_filename</em>, <em>data_filename</em>, <em>resume=True</em>, <em>test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.argon_solver.full_solver" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>MultiNest solver for point spread function calibration with the Argon filter. This is a</dt>
-<dd>full solver. L and d will be solved as well!</dd>
+<code class="sig-prename descclassname">fabry.finesse.argon_solver.</code><code class="sig-name descname">full_solver</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em>, <em class="sig-param">prior_filename</em>, <em class="sig-param">data_filename</em>, <em class="sig-param">resume=True</em>, <em class="sig-param">test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.argon_solver.full_solver" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>MultiNest solver for point spread function calibration with the Argon filter. This is a</dt><dd><p>full solver. L and d will be solved as well!</p>
+</dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files for finesse solver</li>
-<li><strong>prior_filename</strong> (<em>str</em>) – path to file for the MultiNest prior (json format)</li>
-<li><strong>data_filename</strong> (<em>str</em>) – path to file for the input data</li>
-<li><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</li>
-<li><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the user to sample the prior and compare to input data</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files for finesse solver</p></li>
+<li><p><strong>prior_filename</strong> (<em>str</em>) – path to file for the MultiNest prior (json format)</p></li>
+<li><p><strong>data_filename</strong> (<em>str</em>) – path to file for the input data</p></li>
+<li><p><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</p></li>
+<li><p><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the user to sample the prior and compare to input data</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -211,56 +225,48 @@
 468.6 nm 0.5 fwhm nm bandpass filter.</p>
 <dl class="attribute">
 <dt id="fabry.finesse.helium_solver.mu">
-<code class="descclassname">fabry.finesse.helium_solver.</code><code class="descname">mu</code><a class="headerlink" href="#fabry.finesse.helium_solver.mu" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.helium_solver.</code><code class="sig-name descname">mu</code><a class="headerlink" href="#fabry.finesse.helium_solver.mu" title="Permalink to this definition">¶</a></dt>
 <dd><p>float with the relative mass of Th</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.finesse.helium_solver.w0">
-<code class="descclassname">fabry.finesse.helium_solver.</code><code class="descname">w0</code><a class="headerlink" href="#fabry.finesse.helium_solver.w0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.helium_solver.</code><code class="sig-name descname">w0</code><a class="headerlink" href="#fabry.finesse.helium_solver.w0" title="Permalink to this definition">¶</a></dt>
 <dd><p>float with the dominant Th I wavelength inside the bandpass filter</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.finesse.helium_solver.full_solver">
-<code class="descclassname">fabry.finesse.helium_solver.</code><code class="descname">full_solver</code><span class="sig-paren">(</span><em>output_folder</em>, <em>data_filename</em>, <em>resume=True</em>, <em>test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.helium_solver.full_solver" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.helium_solver.</code><code class="sig-name descname">full_solver</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em>, <em class="sig-param">data_filename</em>, <em class="sig-param">resume=True</em>, <em class="sig-param">test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.helium_solver.full_solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>MultiNest solver for point spread function calibration with the He filter</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files</li>
-<li><strong>data_filename</strong> (<em>str</em>) – path to file for input data</li>
-<li><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</li>
-<li><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the u ser to sample the prior and compare to input data</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files</p></li>
+<li><p><strong>data_filename</strong> (<em>str</em>) – path to file for input data</p></li>
+<li><p><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</p></li>
+<li><p><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the u ser to sample the prior and compare to input data</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.finesse.helium_solver.solver">
-<code class="descclassname">fabry.finesse.helium_solver.</code><code class="descname">solver</code><span class="sig-paren">(</span><em>output_folder</em>, <em>prior_filename</em>, <em>data_filename</em>, <em>Lpost</em>, <em>dpost</em>, <em>resume=True</em>, <em>test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.helium_solver.solver" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.helium_solver.</code><code class="sig-name descname">solver</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em>, <em class="sig-param">prior_filename</em>, <em class="sig-param">data_filename</em>, <em class="sig-param">Lpost</em>, <em class="sig-param">dpost</em>, <em class="sig-param">resume=True</em>, <em class="sig-param">test_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.helium_solver.solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>MultiNest solver for point spread function with He filter. Uses previous L and d wavelength results.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files</li>
-<li><strong>prior_filename</strong> (<em>str</em>) – Unused</li>
-<li><strong>Lpost</strong> (<em>np.ndarray</em>) – array of posterior probabilties for the camera focal length, L</li>
-<li><strong>dpost</strong> (<em>np.ndarray</em>) – array of posterior probabilities for the etalon spacing, d</li>
-<li><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</li>
-<li><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the u ser to sample the prior and compare to input data</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_folder</strong> (<em>str</em>) – path to folder containing input and output files</p></li>
+<li><p><strong>prior_filename</strong> (<em>str</em>) – Unused</p></li>
+<li><p><strong>Lpost</strong> (<em>np.ndarray</em>) – array of posterior probabilties for the camera focal length, L</p></li>
+<li><p><strong>dpost</strong> (<em>np.ndarray</em>) – array of posterior probabilities for the etalon spacing, d</p></li>
+<li><p><strong>resume</strong> (<em>bool</em><em> or </em><em>None</em>) – MultiNest will resume the calculation if True</p></li>
+<li><p><strong>test_plot</strong> (<em>bool</em><em> or </em><em>None</em>) – for debugging purposes, allows the u ser to sample the prior and compare to input data</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -268,47 +274,40 @@
 <h2>Check Argon Solver<a class="headerlink" href="#check-argon-solver" title="Permalink to this headline">¶</a></h2>
 <dl class="attribute">
 <dt id="fabry.finesse.check_argon_solver.mu">
-<code class="descclassname">fabry.finesse.check_argon_solver.</code><code class="descname">mu</code><a class="headerlink" href="#fabry.finesse.check_argon_solver.mu" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.check_argon_solver.</code><code class="sig-name descname">mu</code><a class="headerlink" href="#fabry.finesse.check_argon_solver.mu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tuple with the relative masses for Th and  Ar</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fabry.finesse.check_argon_solver.w0">
-<code class="descclassname">fabry.finesse.check_argon_solver.</code><code class="descname">w0</code><a class="headerlink" href="#fabry.finesse.check_argon_solver.w0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.check_argon_solver.</code><code class="sig-name descname">w0</code><a class="headerlink" href="#fabry.finesse.check_argon_solver.w0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tuple with Th I and Ar II wavelengths used for calibration</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.finesse.check_argon_solver.check_solver">
-<code class="descclassname">fabry.finesse.check_argon_solver.</code><code class="descname">check_solver</code><span class="sig-paren">(</span><em>finesse_folder</em>, <em>Lpost</em>, <em>dpost</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.check_argon_solver.check_solver" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.check_argon_solver.</code><code class="sig-name descname">check_solver</code><span class="sig-paren">(</span><em class="sig-param">finesse_folder</em>, <em class="sig-param">Lpost</em>, <em class="sig-param">dpost</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.check_argon_solver.check_solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verfies the output of the point spread function solver.  Makes many plots.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>finesse_folder</strong> (<em>str</em>) – path to folder containing output files from the finesse solver</li>
-<li><strong>Lpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior L values</li>
-<li><strong>dpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior d values</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>finesse_folder</strong> (<em>str</em>) – path to folder containing output files from the finesse solver</p></li>
+<li><p><strong>Lpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior L values</p></li>
+<li><p><strong>dpost</strong> (<em>np.ndarray</em>) – array of equally weighted marginal posterior d values</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fabry.finesse.check_argon_solver.check_full_solver">
-<code class="descclassname">fabry.finesse.check_argon_solver.</code><code class="descname">check_full_solver</code><span class="sig-paren">(</span><em>finesse_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.check_argon_solver.check_full_solver" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fabry.finesse.check_argon_solver.</code><code class="sig-name descname">check_full_solver</code><span class="sig-paren">(</span><em class="sig-param">finesse_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#fabry.finesse.check_argon_solver.check_full_solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verfies the output of the full point spread function solver.  Makes many plots.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>finesse_folder</strong> (<em>str</em>) – path to folder containing output files from the finesse solver</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>finesse_folder</strong> (<em>str</em>) – path to folder containing output files from the finesse solver</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -316,13 +315,16 @@
 
 
            </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="plasma.html" class="btn btn-neutral float-right" title="Plasma" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="tools.html" class="btn btn-neutral" title="Tools" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="tools.html" class="btn btn-neutral float-left" title="Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -331,11 +333,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Jason Milhone.
+        &copy; Copyright 2018, Jason Milhone
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -348,35 +350,15 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.1.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>
